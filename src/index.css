@@ -1,0 +1,79 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* largura do scroll vertical e horizonal*/
+::-webkit-scrollbar {
+  width: 0px;
+  height: 0px;
+}
+
+/* Cor do scroll*/
+::-webkit-scrollbar-thumb {
+  background: silver;
+}
+
+/* Fundo do scroll*/
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  outline: 0;
+  position: relative;
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+.btn.btn-primary {
+  @apply rounded border-none bg-primary-light dark:bg-primary-dark disabled:bg-gray-500 disabled:dark:bg-gray-500 disabled:text-gray-400;
+}
+
+.btn.btn-outline {
+  @apply border-gray-400 text-gray-500 hover:bg-transparent hover:border-primary hover:text-primary;
+}
+
+.btn-navigation {
+  @apply w-full flex justify-center py-4 text-blue-300 dark:text-zinc-500;
+}
+
+.btn-navigation.active {
+  @apply bg-secondary-light text-white dark:bg-secondary-dark;
+}
+
+body {
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu',
+    'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  font-size: 100%;
+}
+
+a {
+  text-decoration: none;
+  color: inherit;
+}
+
+ul {
+  list-style: none;
+}
+
+img {
+  width: min-content;
+  max-width: 100%;
+}
+
+span,
+small {
+  display: flex;
+}
+
+code {
+  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New', monospace;
+}
