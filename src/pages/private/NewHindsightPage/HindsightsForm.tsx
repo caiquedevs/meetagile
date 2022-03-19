@@ -203,14 +203,14 @@ export default function HindsightsForm({}: HindsightFormProps) {
                   </td>
 
                   <td>
-                    {props.row?.employee?.name ? (
+                    {props.row?.employee_id?.name ? (
                       <span className="text-green-500 font-medium">Finalizado</span>
                     ) : (
                       <span className="text-yellow-500 font-medium">Pendente</span>
                     )}
                   </td>
                   <td>
-                    <span>{props.row?.employee?.name || 'Nenhum'}</span>
+                    <span>{props.row?.employee_id?.name || 'Nenhum'}</span>
                   </td>
 
                   <td>

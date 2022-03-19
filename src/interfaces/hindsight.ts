@@ -12,8 +12,8 @@ export interface IHindsight {
   name: string;
   stepOne: StepProps[];
   stepTwo: StepProps[];
-  employee: IEmployee;
-  user: string;
+  employee_id: IEmployee;
+  user_id: string;
   updatedAt: string;
   createdAt: string;
   __v: number;

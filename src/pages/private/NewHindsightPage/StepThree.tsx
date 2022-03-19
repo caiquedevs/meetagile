@@ -57,7 +57,7 @@ export default function StepTwo() {
 
     const payload = {
       ...navigationProps.hindsight,
-      employee: winningEmployee._id,
+      employee_id: winningEmployee._id,
     };
 
     request({
