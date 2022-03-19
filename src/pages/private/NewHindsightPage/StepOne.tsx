@@ -103,8 +103,8 @@ function StepOne() {
   return (
     <>
       <Header
-        subTitle="Terceira etapa"
-        title="Destaque da Sprint?"
+        subTitle="Primeira etapa"
+        title="O que foi bom nessa Sprint?"
         onBack={handleClickGoBack}
         className="dark:before:bg-green-400 before:bg-green-400 text-white"
       />

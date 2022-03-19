@@ -4,6 +4,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import request, { api } from '../../../services/api';
 import { UserProps } from '../../../interfaces/user';
 import { useAuth } from '../../../hooks/useAuth';
+import { toast } from 'react-toastify';
 
 interface ResponseProps {
   currentUser: UserProps;
@@ -53,7 +54,7 @@ export default function HomePage() {
     }
 
     function onError(error: any) {
-      alert(error.data.msg);
+      toast.error(error.data.msg);
     }
 
     function onFinally() {

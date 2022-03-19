@@ -25,7 +25,9 @@ function HomePage() {
             Seja bem vindo ao MeetAgile
           </span>
 
-          <p className="text-3xl font-roboto font-light">Seu novo gerenciador de Scrum</p>
+          <p className="text-3xl font-roboto font-light">
+            Seu novo gerenciador de retrospectiva
+          </p>
         </div>
 
         <div className="h-44 pt-10 flex justify-center animate-bounce">

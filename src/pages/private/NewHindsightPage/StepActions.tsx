@@ -116,7 +116,7 @@ function ActionsModal({ useActions }: ActionsModalProps) {
                   name="hindsightName"
                   value={name}
                   required={true}
-                  placeholder="Nome da retroespectiva"
+                  placeholder="Nome da retrospectiva"
                   onChange={handleChangeField}
                   className="input w-full input-bordered rounded focus:outline-none"
                 />

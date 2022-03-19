@@ -51,20 +51,51 @@ export default function StepTwo() {
       return employee;
     });
 
-    var winningEmployee = copyEmployees.reduce((acumulador: IStep, current: IStep) => {
-      return current?.votes! > acumulador?.votes! ? current : acumulador;
-    }, employees[0]);
+    let hasADraw = false;
+    let hasVote = false;
+
+    var winningEmployee = copyEmployees.reduce(
+      (acumulador: IStep, current: IStep, index) => {
+        if (current?.votes! > 0) hasVote = true;
+
+        if (index > 0 && current?.votes! > 0 && current?.votes === acumulador?.votes)
+          hasADraw = true;
+
+        return current?.votes! > acumulador?.votes! ? current : acumulador;
+      },
+      employees[0]
+    );
+
+    if (hasADraw) return toast.warning('Houve um empate, desempate para continuar!');
+    if (!hasVote) return toast.warning('Faça uma votação para continuar');
 
     const payload = {
       ...navigationProps?.hindsight,
       employee_id: winningEmployee._id,
     };
 
+    setLoadingFinish(true);
+
     request({
       method: 'PUT',
       url: `/hindsight/${navigationProps?.hindsight._id}`,
       data: payload,
     })
+      .then(onSuccess)
+      .catch(onError);
+
+    function onSuccess() {
+      onUpdateActions(winningEmployee);
+    }
+
+    function onError(error: any) {
+      toast.error(error.data.msg);
+      setLoadingFinish(false);
+    }
+  };
+
+  const onUpdateActions = (winningEmployee: IEmployee) => {
+    request({ method: 'PUT', url: `/action/${actions._id}`, data: actions })
       .then(onSuccess)
       .catch(onError);
 
@@ -80,25 +111,8 @@ export default function StepTwo() {
     }
   };
 
-  const onUpdateActions = () => {
-    setLoadingFinish(true);
-
-    request({ method: 'PUT', url: `/action/${actions._id}`, data: actions })
-      .then(onSuccess)
-      .catch(onError);
-
-    function onSuccess() {
-      onUpdateHindsight();
-    }
-
-    function onError(error: any) {
-      toast.error(error.data.msg);
-      setLoadingFinish(false);
-    }
-  };
-
   const onFinish = () => {
-    onUpdateActions();
+    onUpdateHindsight();
   };
 
   useEffect(() => {

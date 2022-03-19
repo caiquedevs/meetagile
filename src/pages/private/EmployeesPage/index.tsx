@@ -82,7 +82,7 @@ export default function EmployeesPage() {
     }
 
     function onError(error: any) {
-      alert(error.data.msg);
+      toast.error(error.data.msg);
     }
 
     function onFinally() {
@@ -134,7 +134,7 @@ export default function EmployeesPage() {
     }
 
     function onError(error: any) {
-      alert(error.data.msg);
+      toast.error(error.data.msg);
     }
 
     function onFinally() {

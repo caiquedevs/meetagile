@@ -79,7 +79,7 @@ export default function HindsightsForm({}: HindsightFormProps) {
 
     function onSuccess(response: any) {
       setHindsights((oldData) => oldData.filter((item) => item._id !== id));
-      toast.success('Retroespectiva deletada com sucesso!', {
+      toast.success('Retrospectiva deletada com sucesso!', {
         toastId: 'toastDeleteSuccess',
       });
     }
@@ -145,7 +145,7 @@ export default function HindsightsForm({}: HindsightFormProps) {
 
   return (
     <>
-      <Header title="Minhas retroespectivas" subTitle="Criar nova retroespectiva" />
+      <Header title="Minhas retrospectivas" subTitle="Criar nova retrospectiva" />
 
       <div className="w-full mt-8 flex flex-col">
         <div className="flex flex-col">
@@ -161,7 +161,7 @@ export default function HindsightsForm({}: HindsightFormProps) {
               name="hindsightName"
               value={hindsightName}
               required={true}
-              placeholder="Nome da retroespectiva"
+              placeholder="Nome da retrospectiva"
               onChange={handleChangeField}
               className="input input-bordered sm:w-full lg:w-7/12 xl:w-4/12 rounded focus:outline-none"
             />
