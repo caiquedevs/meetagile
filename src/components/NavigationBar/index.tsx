@@ -1,6 +1,7 @@
 import { useNavigate } from 'react-router-dom';
 import { VscColorMode } from 'react-icons/vsc';
 import { FiLogOut } from 'react-icons/fi';
+import { useLocation } from 'react-router-dom';
 
 import { useTheme } from '../../hooks/useTheme';
 import IRoute from '../../interfaces/route';
@@ -11,13 +12,16 @@ interface NavigationBarProps {}
 function NavigationBar(props: NavigationBarProps) {
   const { theme, setTheme } = useTheme();
   const navigate = useNavigate();
+  const location = useLocation();
 
   const handleClickLogout = () => {
     navigate('/login');
   };
 
   const handleChangeTheme = () => {
-    setTheme(theme ? '' : 'dark');
+    const currentTheme = theme === 'light' ? 'dark' : 'light';
+    setTheme(currentTheme);
+    localStorage.setItem('theme', currentTheme);
   };
 
   const renderIcons = (route: IRoute) => {
@@ -54,7 +58,7 @@ function NavigationBar(props: NavigationBarProps) {
       "
     >
       <div className="w-full flex flex-col">
-        <button className="flex justify-center py-6">
+        <button className="flex justify-center py-6 min-h-16 animate-fadeIn">
           <img src="/images/favicon.svg" alt="logo" />
         </button>
 

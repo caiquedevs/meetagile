@@ -24,7 +24,6 @@ export default function HindsightsForm({}: HindsightFormProps) {
   const [hindsight, setHindsights] = useState<IHindsight[]>([]);
   const [employees, setEmployees] = useState<IEmployee[]>([]);
   const [actions, setActions] = useState<IAction>({} as IAction);
-  console.log('actions', actions);
 
   const [hindsightName, setHindsightName] = useState('');
   const [loadingDelete, setLoadingDelete] = useState<string>('');
@@ -37,6 +36,11 @@ export default function HindsightsForm({}: HindsightFormProps) {
 
   const handleSubmit = (e: any) => {
     e.preventDefault();
+
+    if (!Boolean(employees.length)) {
+      return toast.warn('Cadastre alguns funcionários primeiro!');
+    }
+
     setLoadingSubmit(true);
 
     request({ method: 'POST', url: '/hindsight/register', data: { name: hindsightName } })
@@ -45,7 +49,7 @@ export default function HindsightsForm({}: HindsightFormProps) {
       .finally(onFinally);
 
     function onSuccess(response: IHindsight) {
-      navigate('step-one', { state: { hindsight: response, employees } });
+      navigate('step-one', { state: { hindsight: response, employees, actions } });
     }
 
     function onError(error: any) {
@@ -58,6 +62,10 @@ export default function HindsightsForm({}: HindsightFormProps) {
   };
 
   const onEdit = (hindsight: IHindsight) => {
+    if (!Boolean(employees.length)) {
+      return toast.warn('Cadastre alguns funcionários primeiro!');
+    }
+
     navigate('step-one', { state: { hindsight, employees, actions } });
   };
 

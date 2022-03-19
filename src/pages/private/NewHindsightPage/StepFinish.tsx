@@ -29,7 +29,7 @@ function StepFinish({}: StepFinishProps) {
   };
 
   useEffect(() => {
-    if (!navigationProps.hindsight) navigate('/new-hindsight');
+    if (!navigationProps?.hindsight) navigate('/new-hindsight');
     const audio = new Audio('/music/congrats.mp3');
 
     const playAudio = () => {
@@ -39,7 +39,7 @@ function StepFinish({}: StepFinishProps) {
         audioPromise
           .then((_) => {})
           .catch((err) => {
-            console.info(err);
+            console.error(err);
           });
       }
     };
@@ -50,7 +50,7 @@ function StepFinish({}: StepFinishProps) {
     return () => audio.pause();
   }, []);
 
-  if (!navigationProps.hindsight) return <></>;
+  if (!navigationProps?.hindsight) return <></>;
 
   return (
     <>
@@ -69,17 +69,17 @@ function StepFinish({}: StepFinishProps) {
         style={{ maxWidth: '399px' }}
       >
         <figure className="flex flex-col items-center justify-center">
-          {navigationProps.winningEmployee?.url ? (
+          {navigationProps?.winningEmployee?.url ? (
             <div className="avatar">
               <div className="w-20 mask mask-squircle">
-                <img src={navigationProps.winningEmployee.url} />
+                <img src={navigationProps?.winningEmployee.url} />
               </div>
             </div>
           ) : (
             <div className="avatar placeholder">
               <div className="bg-gray-400 dark:bg-gray-400 text-neutral-content mask mask-squircle w-20">
                 <span className="text-2xl font-roboto font-medium">
-                  {navigationProps.winningEmployee?.name[0]}
+                  {navigationProps?.winningEmployee?.name[0]}
                 </span>
               </div>
             </div>
@@ -87,10 +87,10 @@ function StepFinish({}: StepFinishProps) {
 
           <figcaption className="mt-3.5 flex flex-col items-center justify-center gap-2">
             <strong className="text-base text-center">
-              {navigationProps.winningEmployee?.name}
+              {navigationProps?.winningEmployee?.name}
             </strong>
             <span className="text-base text-center">
-              {navigationProps.winningEmployee?.office}
+              {navigationProps?.winningEmployee?.office}
             </span>
 
             <button

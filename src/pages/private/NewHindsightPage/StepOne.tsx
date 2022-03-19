@@ -29,8 +29,8 @@ function StepOne() {
   const location = useLocation();
   const { state: navigationProps } = location as PropsPage;
 
-  const [hindsight, setHindsight] = useState<IHindsight>(navigationProps.hindsight);
-  const [actions, setActions] = useState<IAction>(navigationProps.actions);
+  const [hindsight, setHindsight] = useState<IHindsight>(navigationProps?.hindsight);
+  const [actions, setActions] = useState<IAction>(navigationProps?.actions);
 
   const [mode, setMode] = useState<'create' | number>('create');
   const [currentEmployee, setCurrentEmployee] = useState<IEmployee | null>(null);
@@ -95,10 +95,10 @@ function StepOne() {
   };
 
   useEffect(() => {
-    if (!hindsight) navigate('/new-hindsight');
+    if (!navigationProps) navigate('/new-hindsight');
   }, []);
 
-  if (!hindsight) return <></>;
+  if (!navigationProps) return <></>;
 
   return (
     <>
@@ -141,7 +141,7 @@ function StepOne() {
                     <VotesField
                       value={props.row.votes!}
                       onChangeVotes={handleChangeVotes}
-                      max={navigationProps.employees.length}
+                      max={navigationProps?.employees.length}
                     />
                   </td>
 

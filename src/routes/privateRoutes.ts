@@ -19,6 +19,13 @@ const routes: IRoute[] = [
     component: NavigationPage,
   },
   {
+    icon: FiUsers,
+    path: '/employees',
+    name: 'employees',
+    isPrivate: true,
+    component: EmployeesPage,
+  },
+  {
     icon: FiPlusCircle,
     path: '/new-hindsight',
     name: 'newHindsight',
@@ -55,13 +62,10 @@ const routes: IRoute[] = [
       },
     ],
   },
-  {
-    icon: FiUsers,
-    path: '/employees',
-    name: 'employees',
-    isPrivate: true,
-    component: EmployeesPage,
-  },
 ];
+
+export const pathsForNavigationBar = routes
+  .filter((route) => route.icon)
+  .map((route) => route.path);
 
 export default routes;

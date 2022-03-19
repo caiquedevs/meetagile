@@ -7,17 +7,9 @@ import HomePage from '../pages/public/HomePage';
 import LoginPage from '../pages/public/LoginPage';
 import ForgotPasswordPage from '../pages/public/ForgotPasswordPage';
 import RegisterPage from '../pages/public/RegisterPage';
-import NavigationBar from '../components/NavigationBar';
 import { useAuth } from '../hooks/useAuth';
 
 const RoutesAplication = (): ReactElement => {
-  const whiteList = [
-    '/new-hindsight/step-one',
-    '/new-hindsight/step-two',
-    '/new-hindsight/step-three',
-    '/new-hindsight/step-finish',
-  ];
-
   const location = useLocation();
 
   function PrivateRoute({ children, route }: any) {
@@ -36,19 +28,13 @@ const RoutesAplication = (): ReactElement => {
       <Route path="/register" element={<RegisterPage />} />
 
       {privateRoutes.map((route) => {
-        const hasNavigationBar = route.icon && !whiteList.includes(location.pathname);
-
         return (
           <Route
             key={route.path}
             path={route.path}
             element={
               <PrivateRoute route={route}>
-                {hasNavigationBar ? <NavigationBar /> : null}
-
-                <div className={hasNavigationBar ? 'pl-16' : 'pl-0'}>
-                  <route.component />
-                </div>
+                <route.component />
               </PrivateRoute>
             }
           >

@@ -46,7 +46,7 @@ export default function HomePage() {
       };
 
       setAuth(payload);
-      sessionStorage.setItem('auth', JSON.stringify(payload));
+      localStorage.setItem('auth', JSON.stringify(payload));
       api.defaults.headers.Authorization = `Bearer ${response.token}`;
 
       navigate('/navigation');
@@ -62,6 +62,15 @@ export default function HomePage() {
   };
 
   useEffect(() => {
+    const payload = {
+      isLoggedIn: false,
+      token: null,
+      user: null,
+    };
+
+    setAuth(payload);
+    localStorage.setItem('auth', JSON.stringify(payload));
+    api.defaults.headers.Authorization = '';
     return () => {};
   }, []);
 

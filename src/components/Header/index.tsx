@@ -10,7 +10,6 @@ export interface HeaderProps {
 
 function HeaderComponent({ title, subTitle, onBack, className }: HeaderProps) {
   const hasClassName = className ? className : 'text-gray-500 dark:text-white';
-  console.log('hasClassName', hasClassName);
   return (
     <Header
       className={`w-full before:bg-gray-100 dark:before:bg-secondary-dark ${className}`}

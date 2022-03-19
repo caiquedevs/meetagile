@@ -29,8 +29,8 @@ export default function StepTwo() {
   const location = useLocation();
   const { state: navigationProps } = location as PropsPage;
 
-  const [employees, setEmployees] = useState<IStep[]>(navigationProps.employees);
-  const [actions, setActions] = useState<IAction>(navigationProps.actions);
+  const [employees, setEmployees] = useState<IStep[]>(navigationProps?.employees);
+  const [actions, setActions] = useState<IAction>(navigationProps?.actions);
 
   const [currentEmployee, setCurrentEmployee] = useState<IEmployee | null>(null);
   const [loadingFinish, setLoadingFinish] = useState(false);
@@ -56,13 +56,13 @@ export default function StepTwo() {
     }, employees[0]);
 
     const payload = {
-      ...navigationProps.hindsight,
+      ...navigationProps?.hindsight,
       employee_id: winningEmployee._id,
     };
 
     request({
       method: 'PUT',
-      url: `/hindsight/${navigationProps.hindsight._id}`,
+      url: `/hindsight/${navigationProps?.hindsight._id}`,
       data: payload,
     })
       .then(onSuccess)
@@ -102,10 +102,10 @@ export default function StepTwo() {
   };
 
   useEffect(() => {
-    if (!navigationProps.hindsight) navigate('/new-hindsight');
+    if (!navigationProps?.hindsight) navigate('/new-hindsight');
   }, []);
 
-  if (!navigationProps.hindsight) return <></>;
+  if (!navigationProps?.hindsight) return <></>;
 
   return (
     <>

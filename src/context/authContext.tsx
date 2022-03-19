@@ -16,7 +16,7 @@ interface AuthPropsContext {
 
 const initialValue: any = {
   load: () => {
-    const authStorage: AuthProps = JSON.parse(sessionStorage.getItem('auth')!);
+    const authStorage: AuthProps = JSON.parse(localStorage.getItem('auth')!);
 
     if (authStorage) {
       api.defaults.headers.Authorization = `Bearer ${authStorage.token}`;
@@ -31,7 +31,6 @@ export const AuthContext = createContext(initialValue.load);
 
 export default function AuthProvider({ children }: { children: ReactNode }) {
   const [auth, setAuth] = useState<AuthProps>(initialValue.load);
-  console.log('AuthProvider', auth);
 
   return (
     <AuthContext.Provider value={{ auth: auth, setAuth: setAuth }}>

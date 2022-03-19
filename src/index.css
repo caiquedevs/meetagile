@@ -40,6 +40,7 @@ html {
 
 .btn-navigation {
   @apply w-full flex justify-center py-4 text-blue-300 dark:text-zinc-500;
+  min-height: 51px;
 }
 
 .btn-navigation.active {

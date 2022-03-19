@@ -1,21 +1,24 @@
 import { ReactNode, useState, createContext, Dispatch } from 'react';
 
-type Theme = 'dark' | '';
+type ThemeProps = 'dark' | 'light';
 
-interface PropsThemeContext {
-  theme: Theme;
-  setTheme: Dispatch<React.SetStateAction<Theme>>;
+interface ThemePropsContext {
+  theme: ThemeProps;
+  setTheme: Dispatch<React.SetStateAction<ThemeProps>>;
 }
 
-const DEFAULT_VALUE: PropsThemeContext = {
-  theme: 'dark',
+const initialValue = (localStorage.getItem('theme') as ThemeProps) || 'light';
+
+const DEFAULT_VALUE: ThemePropsContext = {
+  theme: initialValue,
   setTheme: () => {},
 };
 
 export const ThemeContext = createContext(DEFAULT_VALUE);
 
 export default function ThemeProvider({ children }: { children: ReactNode }) {
-  const [theme, setTheme] = useState<Theme>(DEFAULT_VALUE.theme);
+  const [theme, setTheme] = useState<ThemeProps>(initialValue);
+  console.log('theme', theme);
 
   return (
     <ThemeContext.Provider value={{ theme, setTheme }}>{children}</ThemeContext.Provider>
