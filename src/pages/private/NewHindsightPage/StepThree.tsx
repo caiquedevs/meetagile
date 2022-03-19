@@ -45,29 +45,54 @@ export default function StepTwo() {
     setEmployees(payload);
   };
 
+  const onUpdateActions = (winningEmployee: IEmployee) => {
+    request({ method: 'PUT', url: `/action/${actions._id}`, data: actions })
+      .then(onSuccess)
+      .catch(onError);
+
+    function onSuccess() {
+      navigate('../step-finish', {
+        state: { ...navigationProps, actions, winningEmployee },
+      });
+    }
+
+    function onError(error: any) {
+      toast.error(error.data.msg);
+      setLoadingFinish(false);
+    }
+  };
+
   const onUpdateHindsight = () => {
-    const copyEmployees = employees.map((employee) => {
+    // Setar todos votos undefined como 0
+    const copyEmployees = employees?.map((employee) => {
       if (typeof employee.votes === 'undefined') employee.votes = 0;
       return employee;
     });
 
-    let hasADraw = false;
     let hasVote = false;
 
-    var winningEmployee = copyEmployees.reduce(
+    // Buscar maior votação
+    const winningEmployee = copyEmployees.reduce(
       (acumulador: IStep, current: IStep, index) => {
         if (current?.votes! > 0) hasVote = true;
-
-        if (index > 0 && current?.votes! > 0 && current?.votes === acumulador?.votes)
-          hasADraw = true;
-
         return current?.votes! > acumulador?.votes! ? current : acumulador;
       },
       employees[0]
     );
 
-    if (hasADraw) return toast.warning('Houve um empate, desempate para continuar!');
+    // Se não há nenhum voto
     if (!hasVote) return toast.warning('Faça uma votação para continuar');
+
+    // Buscar empates
+    const hasADraw = copyEmployees.filter(
+      (employee) =>
+        employee.votes === winningEmployee.votes && employee._id !== winningEmployee._id
+    );
+
+    //Se há algum empate
+    if (hasADraw.length) {
+      return toast.warning('Houve um impate, desempate para continuar!');
+    }
 
     const payload = {
       ...navigationProps?.hindsight,
@@ -86,23 +111,6 @@ export default function StepTwo() {
 
     function onSuccess() {
       onUpdateActions(winningEmployee);
-    }
-
-    function onError(error: any) {
-      toast.error(error.data.msg);
-      setLoadingFinish(false);
-    }
-  };
-
-  const onUpdateActions = (winningEmployee: IEmployee) => {
-    request({ method: 'PUT', url: `/action/${actions._id}`, data: actions })
-      .then(onSuccess)
-      .catch(onError);
-
-    function onSuccess() {
-      navigate('../step-finish', {
-        state: { ...navigationProps, actions, winningEmployee },
-      });
     }
 
     function onError(error: any) {
