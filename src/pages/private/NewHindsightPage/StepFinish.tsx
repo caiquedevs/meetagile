@@ -3,22 +3,33 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import Confetti from 'react-confetti';
 
 import { Header } from '../../../components';
+import { IHindsight } from '../../../interfaces/hindsight';
+import { IEmployee } from '../../../interfaces/employee';
+import { IAction } from '../../../interfaces/action';
 
 interface StepFinishProps {}
 
+interface PropsPage {
+  state: {
+    hindsight: IHindsight;
+    employees: IEmployee[];
+    actions: IAction[];
+    winningEmployee: IEmployee;
+  };
+}
+
 function StepFinish({}: StepFinishProps) {
   const navigate = useNavigate();
-  const {
-    state: { hindsight, winningEmployee },
-  }: any = useLocation();
 
-  console.log('winningEmployee', winningEmployee);
+  const location = useLocation();
+  const { state: navigationProps } = location as PropsPage;
+
   const handleClick = () => {
     navigate('/new-hindsight');
   };
 
   useEffect(() => {
-    if (!hindsight) navigate('/new-hindsight');
+    if (!navigationProps.hindsight) navigate('/new-hindsight');
     const audio = new Audio('/music/congrats.mp3');
 
     const playAudio = () => {
@@ -39,7 +50,7 @@ function StepFinish({}: StepFinishProps) {
     return () => audio.pause();
   }, []);
 
-  if (!hindsight) return <></>;
+  if (!navigationProps.hindsight) return <></>;
 
   return (
     <>
@@ -58,25 +69,29 @@ function StepFinish({}: StepFinishProps) {
         style={{ maxWidth: '399px' }}
       >
         <figure className="flex flex-col items-center justify-center">
-          {winningEmployee?.url ? (
+          {navigationProps.winningEmployee?.url ? (
             <div className="avatar">
               <div className="w-20 mask mask-squircle">
-                <img src={winningEmployee.url} />
+                <img src={navigationProps.winningEmployee.url} />
               </div>
             </div>
           ) : (
             <div className="avatar placeholder">
               <div className="bg-gray-400 dark:bg-gray-400 text-neutral-content mask mask-squircle w-20">
                 <span className="text-2xl font-roboto font-medium">
-                  {winningEmployee?.name[0]}
+                  {navigationProps.winningEmployee?.name[0]}
                 </span>
               </div>
             </div>
           )}
 
           <figcaption className="mt-3.5 flex flex-col items-center justify-center gap-2">
-            <strong className="text-base text-center">{winningEmployee?.name}</strong>
-            <span className="text-base text-center">{winningEmployee?.office}</span>
+            <strong className="text-base text-center">
+              {navigationProps.winningEmployee?.name}
+            </strong>
+            <span className="text-base text-center">
+              {navigationProps.winningEmployee?.office}
+            </span>
 
             <button
               type="button"

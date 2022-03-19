@@ -2,10 +2,11 @@ import { ChangeEvent, useEffect, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 
 import { Header, Options, Table, VotesField, VotingUser } from '../../../components';
-import StepActions from './StepActions';
+import { IAction } from '../../../interfaces/action';
 
 import { IEmployee } from '../../../interfaces/employee';
-import { HindsightProps } from '../../../interfaces/hindsight';
+import { IHindsight } from '../../../interfaces/hindsight';
+import StepActions from './StepActions';
 
 interface IStep {
   employeeName?: string;
@@ -14,22 +15,31 @@ interface IStep {
   _id?: string;
 }
 
-function StepTwo() {
-  const {
-    state: { hindsight, employees },
-  }: any = useLocation();
+interface PropsPage {
+  state: {
+    hindsight: IHindsight;
+    employees: IEmployee[];
+    actions: IAction;
+  };
+}
 
+function StepTwo() {
   const navigate = useNavigate();
 
-  const [data, setData] = useState(hindsight as HindsightProps);
+  const location = useLocation();
+  const { state: navigationProps } = location as PropsPage;
+
+  const [hindsight, setHindsight] = useState<IHindsight>(navigationProps.hindsight);
+  const [actions, setActions] = useState<IAction>(navigationProps.actions);
 
   const [mode, setMode] = useState<'create' | number>('create');
   const [currentEmployee, setCurrentEmployee] = useState<IEmployee | null>(null);
-  const [totalEmployees, setTotalEmployees] = useState(0);
   const [description, setDescription] = useState('');
 
   const handleClickGoBack = () => {
-    navigate('../step-one', { state: { hindsight: data, employees } });
+    navigate('../step-one', {
+      state: { ...navigationProps, hindsight, actions },
+    });
   };
 
   const onReset = () => {
@@ -43,9 +53,9 @@ function StepTwo() {
   };
 
   const onChangeVotes = (value: number, index: number) => {
-    const payload = { ...data };
+    const payload = { ...hindsight };
     payload.stepTwo[index as number].votes = value;
-    setData(payload);
+    setHindsight(payload);
   };
 
   const onCreate = () => {
@@ -55,28 +65,28 @@ function StepTwo() {
       votes: 0,
     };
 
-    const copyData = { ...data };
+    const copyData = { ...hindsight };
     copyData.stepTwo.unshift(payload);
-    setData(copyData);
+    setHindsight(copyData);
     onReset();
   };
 
   const onDelete = (index: number) => {
-    const payload = { ...data };
+    const payload = { ...hindsight };
     payload.stepTwo.splice(index, 1);
-    setData(payload);
+    setHindsight(payload);
     onReset();
   };
 
   const onEdit = () => {
-    const payload = { ...data };
+    const payload = { ...hindsight };
     payload.stepTwo[mode as number].description = description;
-    setData(payload);
+    setHindsight(payload);
     onReset();
   };
 
   const onFinish = () => {
-    navigate('../step-three', { state: { hindsight: data, employees } });
+    navigate('../step-three', { state: { ...navigationProps, hindsight, actions } });
   };
 
   const handleSubmit = (event: any) => {
@@ -96,13 +106,13 @@ function StepTwo() {
         subTitle="Segunda etapa"
         title="O que pode melhorar?"
         onBack={handleClickGoBack}
-        className="before:bg-red-400 dark:before:bg-red-400"
+        className="before:bg-red-400 dark:before:bg-red-400 text-white"
       />
 
       <div className="flex gap-16">
         <div className="w-full mt-8 flex flex-col gap-8 flex-1">
           <Table
-            data={data.stepTwo}
+            data={hindsight.stepTwo}
             colorHeader="text-white"
             headers={['Nome', 'Opnião', 'Concordância', '']}
           >
@@ -131,7 +141,7 @@ function StepTwo() {
                     <VotesField
                       value={props.row.votes!}
                       onChangeVotes={handleChangeVotes}
-                      max={employees.length}
+                      max={navigationProps.employees.length}
                     />
                   </td>
 
@@ -176,7 +186,7 @@ function StepTwo() {
         </div>
       </div>
 
-      <StepActions />
+      <StepActions useActions={[actions, setActions]} />
     </>
   );
 }

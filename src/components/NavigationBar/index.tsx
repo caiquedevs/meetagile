@@ -6,8 +6,6 @@ import { useTheme } from '../../hooks/useTheme';
 import IRoute from '../../interfaces/route';
 import privateRoutes from '../../routes/privateRoutes';
 
-import { memo } from 'react';
-
 interface NavigationBarProps {}
 
 function NavigationBar(props: NavigationBarProps) {
@@ -84,4 +82,4 @@ function NavigationBar(props: NavigationBarProps) {
   );
 }
 
-export default memo(NavigationBar);
+export default NavigationBar;

@@ -6,68 +6,106 @@ import request from '../../../services/api';
 import { IEmployee } from '../../../interfaces/employee';
 
 import { Header, Table, VotesField, VotingUser } from '../../../components';
+import { IHindsight } from '../../../interfaces/hindsight';
+import { IAction } from '../../../interfaces/action';
 import StepActions from './StepActions';
 
 interface IStep extends IEmployee {
   votes?: number;
 }
 
-function StepTwo() {
-  const {
-    state: { hindsight, employees },
-  }: any = useLocation();
+interface PropsPage {
+  state: {
+    hindsight: IHindsight;
+    employees: IEmployee[];
+    actions: IAction;
+    winningEmployee: IEmployee[];
+  };
+}
 
+export default function StepTwo() {
   const navigate = useNavigate();
-  const [data, setData] = useState<IStep[]>(employees as IStep[]);
+
+  const location = useLocation();
+  const { state: navigationProps } = location as PropsPage;
+
+  const [employees, setEmployees] = useState<IStep[]>(navigationProps.employees);
+  const [actions, setActions] = useState<IAction>(navigationProps.actions);
+
   const [currentEmployee, setCurrentEmployee] = useState<IEmployee | null>(null);
   const [loadingFinish, setLoadingFinish] = useState(false);
 
   const handleClickGoBack = () => {
-    navigate('../step-two', { state: { hindsight, employees } });
+    navigate('../step-two', { state: { ...navigationProps, employees, actions } });
   };
 
   const onChangeVotes = (value: number, index: number) => {
-    const payload = [...data];
+    const payload = [...employees];
     payload[index as number].votes = value;
-    setData(payload);
+    setEmployees(payload);
   };
 
-  const onFinish = () => {
-    setLoadingFinish(true);
+  const onUpdateHindsight = () => {
+    const copyEmployees = employees.map((employee) => {
+      if (typeof employee.votes === 'undefined') employee.votes = 0;
+      return employee;
+    });
 
-    var winningEmployee = data.reduce((acumulador: IStep, current: IStep) => {
-      return current.votes! > acumulador.votes! ? current : acumulador;
-    }, data[0]);
+    var winningEmployee = copyEmployees.reduce((acumulador: IStep, current: IStep) => {
+      return current?.votes! > acumulador?.votes! ? current : acumulador;
+    }, employees[0]);
 
     const payload = {
-      ...hindsight,
+      ...navigationProps.hindsight,
       employee: winningEmployee._id,
     };
 
-    request({ method: 'PUT', url: `/hindsight/${hindsight._id}`, data: payload })
+    request({
+      method: 'PUT',
+      url: `/hindsight/${navigationProps.hindsight._id}`,
+      data: payload,
+    })
       .then(onSuccess)
-      .catch(onError)
-      .finally(onFinally);
+      .catch(onError);
 
-    function onSuccess(response: any) {
-      setData(response);
-      navigate('../step-finish', { state: { hindsight, winningEmployee } });
+    function onSuccess() {
+      navigate('../step-finish', {
+        state: { ...navigationProps, actions, winningEmployee },
+      });
     }
 
     function onError(error: any) {
       toast.error(error.data.msg);
-    }
-
-    function onFinally() {
       setLoadingFinish(false);
     }
   };
 
+  const onUpdateActions = () => {
+    setLoadingFinish(true);
+
+    request({ method: 'PUT', url: `/action/${actions._id}`, data: actions })
+      .then(onSuccess)
+      .catch(onError);
+
+    function onSuccess() {
+      onUpdateHindsight();
+    }
+
+    function onError(error: any) {
+      toast.error(error.data.msg);
+      setLoadingFinish(false);
+    }
+  };
+
+  const onFinish = () => {
+    onUpdateActions();
+  };
+
   useEffect(() => {
-    if (!hindsight) navigate('/new-hindsight');
+    if (!navigationProps.hindsight) navigate('/new-hindsight');
   }, []);
 
-  if (!hindsight) return <></>;
+  if (!navigationProps.hindsight) return <></>;
 
   return (
     <>
@@ -75,7 +113,7 @@ function StepTwo() {
         subTitle="Terceira etapa"
         title="Destaque da Sprint?"
         onBack={handleClickGoBack}
-        className="before:bg-sky-500 dark:before:bg-sky-500"
+        className="before:bg-sky-500 dark:before:bg-sky-500 text-white"
       />
 
       <div className="flex gap-16">
@@ -130,13 +168,12 @@ function StepTwo() {
           <VotingUser
             current={[currentEmployee, setCurrentEmployee]}
             onFinish={onFinish}
+            loadingFinish={loadingFinish}
           />
         </div>
       </div>
 
-      <StepActions />
+      <StepActions useActions={[actions, setActions]} />
     </>
   );
 }
-
-export default StepTwo;

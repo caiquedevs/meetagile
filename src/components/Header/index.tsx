@@ -9,10 +9,11 @@ export interface HeaderProps {
 }
 
 function HeaderComponent({ title, subTitle, onBack, className }: HeaderProps) {
-  console.log('className', className);
+  const hasClassName = className ? className : 'text-gray-500 dark:text-white';
+  console.log('hasClassName', hasClassName);
   return (
     <Header
-      className={`w-full before:bg-secondary-dark dark:before:bg-secondary-dark ${className}`}
+      className={`w-full before:bg-gray-100 dark:before:bg-secondary-dark ${className}`}
     >
       <div className="flex gap-5">
         {onBack ? (
@@ -23,12 +24,16 @@ function HeaderComponent({ title, subTitle, onBack, className }: HeaderProps) {
 
         <div className="flex flex-col gap-1.5">
           {subTitle ? (
-            <h2 className="text-lg font-medium text-gray-500 dark:text-white">
+            <h2
+              className={`text-lg font-medium text-gray-500 dark:text-white ${hasClassName}`}
+            >
               {subTitle}
             </h2>
           ) : null}
           {title ? (
-            <h1 className="font-bold text-2.5xl text-gray-700 dark:text-white">
+            <h1
+              className={`font-bold text-2.5xl text-gray-700 dark:text-white ${hasClassName}`}
+            >
               {title}
             </h1>
           ) : null}

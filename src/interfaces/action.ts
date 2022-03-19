@@ -1,11 +1,10 @@
 import { UserProps } from './user';
 
-export interface IActions {
-  _id: string;
-  name: string;
-  status: string;
-  user_id: string;
-  createdAt: string;
-  updatedAt: string;
-  __v: number;
+export interface IAction {
+  _id?: string;
+  user_id?: string;
+  createdAt?: string;
+  updatedAt?: string;
+  data: { name: string; status: string }[];
+  __v?: number;
 }

@@ -1,16 +1,12 @@
-import { Grid, Row } from 'cdevs-ui';
-import { ChangeEvent, useEffect, useState } from 'react';
-import { FiMoreHorizontal } from 'react-icons/fi';
+import { memo, ChangeEvent, useState, Dispatch } from 'react';
 import { IoMdSend } from 'react-icons/io';
 import { MdPendingActions } from 'react-icons/md';
-import { toast } from 'react-toastify';
+
 import { Options, Table } from '../../../components';
-import { IActions } from '../../../interfaces/action';
-import request from '../../../services/api';
-import dataTable from '../../../utils/dataTable';
+import { IAction } from '../../../interfaces/action';
 
 interface ActionsModalProps {
-  autoShow?: boolean;
+  useActions: [IAction, Dispatch<React.SetStateAction<IAction>>];
 }
 
 const colorsSelect: Record<string, string> = {
@@ -19,14 +15,12 @@ const colorsSelect: Record<string, string> = {
   DONE: 'select-accent text-white bg-green-500',
 };
 
-function ActionsModal({ autoShow }: ActionsModalProps) {
-  const [loadingFetch, setLoadingFetch] = useState(false);
-  const [data, setData] = useState<any[]>([]);
-
+function ActionsModal({ useActions }: ActionsModalProps) {
   const [name, setName] = useState('');
-  const [mode, setMode] = useState<'create' | number>('create');
+  const [toogleModal, setToogleModal] = useState(false);
 
-  const [loadingSubmit, setLoadingSubmit] = useState(false);
+  const [mode, setMode] = useState<'create' | number>('create');
+  const [actions, setActions] = useActions;
 
   const onReset = () => {
     setMode('create');
@@ -36,34 +30,38 @@ function ActionsModal({ autoShow }: ActionsModalProps) {
   const onCreate = () => {
     const payload = { name, status: 'TO DO' };
 
-    const copyData = [...data];
-    copyData.unshift(payload);
-    setData(copyData);
+    const copyActions = { ...actions };
+    copyActions.data.unshift(payload);
+    setActions(copyActions);
     onReset();
   };
 
   const onDelete = (index: number) => {
-    const payload = [...data];
-    payload.splice(index, 1);
-    setData(payload);
+    const copyActions = { ...actions };
+    copyActions.data.splice(index, 1);
+    setActions(copyActions);
     onReset();
   };
 
   const onEdit = () => {
-    const payload = [...data];
-    payload[mode as number].name = name;
-    setData(payload);
+    const copyActions = { ...actions };
+    copyActions.data[mode as number].name = name;
+    setActions(copyActions);
     onReset();
   };
 
   const handleChangeSelect = ({ value, index, id }: any) => {
-    const payload = [...data];
-    payload[index as number].status = value;
-    setData(payload);
+    const copyActions = { ...actions };
+    copyActions.data[index as number].status = value;
+    setActions(copyActions);
   };
 
   const handleChangeField = (event: ChangeEvent<HTMLInputElement>) => {
     setName(event.target.value);
+  };
+
+  const handleChangeToogle = () => {
+    setToogleModal(!toogleModal);
   };
 
   const handleSubmit = (event: any) => {
@@ -71,46 +69,35 @@ function ActionsModal({ autoShow }: ActionsModalProps) {
     mode === 'create' ? onCreate() : onEdit();
   };
 
-  useEffect(() => {
-    setLoadingFetch(true);
-
-    request({ method: 'GET', url: '/actions' })
-      .then(onSuccess)
-      .catch(onError)
-      .finally(onFinally);
-
-    function onSuccess(response: any) {
-      setData(response);
-    }
-
-    function onError(error: any) {
-      toast.error(error.data.msg);
-    }
-
-    function onFinally() {
-      setLoadingFetch(false);
-    }
-  }, []);
-
   return (
     <>
       <label
         htmlFor="my-modal-4"
+        onClick={handleChangeToogle}
         className="
           btn w-max
           border-none  bg-orange-400 hover:bg-orange-400 text-white 
-          absolute bottom-10 right-10
+          fixed bottom-10 right-10
         "
       >
         <MdPendingActions size="23px" />
       </label>
 
-      <input type="checkbox" id="my-modal-4" className="modal-toggle" />
+      <input
+        type="checkbox"
+        id="my-modal-4"
+        className="modal-toggle"
+        checked={toogleModal}
+      />
 
       <label htmlFor="my-modal-4" className="modal">
-        <label className="modal-box rounded overflow-visible max-w-4xl" htmlFor="">
+        <label
+          className="modal-box rounded overflow-visible max-w-4xl"
+          htmlFor="my-modal-4"
+        >
           <label
             htmlFor="my-modal-4"
+            onClick={handleChangeToogle}
             className="btn btn-sm btn-circle absolute"
             style={{ top: '-13px', right: '-13px' }}
           >
@@ -134,15 +121,25 @@ function ActionsModal({ autoShow }: ActionsModalProps) {
                   className="input w-full input-bordered rounded focus:outline-none"
                 />
 
-                <button type="submit" disabled={loadingSubmit} className="btn btn-square">
+                <button type="submit" className="btn btn-square">
                   <IoMdSend size="20px" color="#ffffff" />
                 </button>
               </div>
             </form>
 
-            <div className="w-full mt-5 overflow-hidden h-auto">
-              <Table data={data} colorHeader="white" headers={['Ação', 'Status']}>
-                {({ row, index }: { row: IActions; index: number }) => {
+            <div className="w-full mt-5 h-auto">
+              <Table
+                data={actions?.data || []}
+                colorHeader="white"
+                headers={['Ação', 'Status']}
+              >
+                {({
+                  row,
+                  index,
+                }: {
+                  row: { name: string; _id: string; status: string };
+                  index: number;
+                }) => {
                   const handleClickDelete = () => onDelete(index);
 
                   const handleClickEdit = () => {
@@ -156,18 +153,18 @@ function ActionsModal({ autoShow }: ActionsModalProps) {
                   };
 
                   return (
-                    <tr key={row._id}>
+                    <tr key={row?._id!}>
                       <td>
-                        <span>{row.name}</span>
+                        <span>{row?.name!}</span>
                       </td>
 
                       <td>
                         <select
                           onChange={onChangeSelect}
-                          value={row.status}
-                          style={{ minWidth: 160 }}
-                          className={`select w-full focus:outline-none ${
-                            colorsSelect[row.status]
+                          value={row?.status!}
+                          style={{ minWidth: 150 }}
+                          className={`select w-full min-h-8 h-8 focus:outline-none ${
+                            colorsSelect[row?.status!]
                           }`}
                         >
                           <option className="bg-white text-gray-500 font-bold">
@@ -184,8 +181,8 @@ function ActionsModal({ autoShow }: ActionsModalProps) {
 
                       <td>
                         <Options
-                          loadingDelete={'a'}
-                          item={'a'}
+                          loadingDelete=""
+                          item=""
                           onEdit={handleClickEdit}
                           onDelete={handleClickDelete}
                         />
@@ -202,4 +199,4 @@ function ActionsModal({ autoShow }: ActionsModalProps) {
   );
 }
 
-export default ActionsModal;
+export default memo(ActionsModal);

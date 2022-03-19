@@ -7,7 +7,7 @@ export interface StepProps {
   votes: number;
 }
 
-export interface HindsightProps {
+export interface IHindsight {
   _id: string;
   name: string;
   stepOne: StepProps[];

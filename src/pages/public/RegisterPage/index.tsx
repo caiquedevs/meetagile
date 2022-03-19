@@ -1,14 +1,23 @@
 import { ChangeEvent, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { BsCheck2Circle } from 'react-icons/bs';
-import request from '../../../services/api';
-import { Container } from './styles';
+import request, { api } from '../../../services/api';
+
+import { UserProps } from '../../../interfaces/user';
+import { useAuth } from '../../../hooks/useAuth';
+import { toast } from 'react-toastify';
+
+interface ResponseProps {
+  currentUser: UserProps;
+  token: string;
+}
 
 function HomePage() {
   const navigate = useNavigate();
+  const { setAuth } = useAuth();
 
   const [registerSuccess, setRegisterSuccess] = useState(false);
-  const [loading, setLoading] = useState(false);
+  const [loadingRegister, setLoadingRegister] = useState(false);
   const [fields, setFields] = useState({
     teamName: '',
     email: '',
@@ -25,31 +34,40 @@ function HomePage() {
 
   const handleSubmit = (event: any) => {
     event.preventDefault();
-    return setRegisterSuccess(true);
-    setLoading(true);
+    setLoadingRegister(true);
 
-    request({ method: 'POST', url: '/user/registers', data: fields })
+    request({ method: 'POST', url: '/user/register', data: fields })
       .then(onSuccess)
       .catch(onError)
       .finally(onFinally);
 
-    function onSuccess(response: any) {
+    function onSuccess(response: ResponseProps) {
+      const payload = {
+        isLoggedIn: true,
+        token: response.token,
+        user: response.currentUser,
+      };
+
+      setAuth(payload);
+      sessionStorage.setItem('auth', JSON.stringify(payload));
+      api.defaults.headers.Authorization = `Bearer ${response.token}`;
+
       setRegisterSuccess(true);
     }
 
     function onError(error: any) {
-      alert(error.data.msg);
+      toast.error(error.data.msg);
     }
 
     function onFinally() {
-      setLoading(false);
+      setLoadingRegister(false);
     }
   };
 
   if (registerSuccess) return <SuccessPage />;
 
   return (
-    <Container className="bg-gray-100">
+    <section className="bg-gray-100">
       <form
         onSubmit={handleSubmit}
         className="h-screen flex flex-col items-center justify-center"
@@ -73,31 +91,41 @@ function HomePage() {
             <div className="w-full flex flex-col gap-2.5">
               <input
                 type="text"
+                name="teamName"
+                required={true}
                 placeholder="Nome do time"
+                value={fields.teamName}
+                onChange={handleChangeField}
                 className="input input-bordered input-md w-full"
               />
 
               <input
-                type="text"
+                type="email"
+                name="email"
+                required={true}
                 placeholder="Email"
+                value={fields.email}
+                onChange={handleChangeField}
                 className="input input-bordered input-md w-full"
               />
 
               <input
-                type="text"
+                type="password"
+                name="password"
+                required={true}
                 placeholder="Senha"
-                className="input input-bordered input-md w-full"
-              />
-
-              <input
-                type="text"
-                placeholder="CPF/CNPJ"
+                value={fields.password}
+                onChange={handleChangeField}
                 className="input input-bordered input-md w-full"
               />
             </div>
 
             <div className="w-full flex flex-col items-center gap-3">
-              <button type="submit" className="w-full btn btn-primary text-white">
+              <button
+                type="submit"
+                disabled={loadingRegister}
+                className="w-full btn btn-primary text-white disabled:loading"
+              >
                 Continuar
               </button>
 
@@ -108,7 +136,7 @@ function HomePage() {
           </div>
         </div>
       </form>
-    </Container>
+    </section>
   );
 }
 
@@ -120,7 +148,7 @@ function SuccessPage() {
   };
 
   return (
-    <Container className=" h-screen flex flex-col items-center justify-center bg-gray-100">
+    <section className=" h-screen flex flex-col items-center justify-center bg-gray-100">
       <div className="card w-4/12 bg-base-100 shadow-sm rounded-lg">
         <div className="card-body py-14 px-16 gap-7">
           <div className="flex items-center justify-center">
@@ -148,7 +176,7 @@ function SuccessPage() {
           </div>
         </div>
       </div>
-    </Container>
+    </section>
   );
 }
 

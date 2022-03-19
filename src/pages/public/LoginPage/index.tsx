@@ -1,11 +1,9 @@
-import { ChangeEvent, useState } from 'react';
+import { ChangeEvent, useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 
 import request, { api } from '../../../services/api';
 import { UserProps } from '../../../interfaces/user';
 import { useAuth } from '../../../hooks/useAuth';
-
-import { Container } from './styles';
 
 interface ResponseProps {
   currentUser: UserProps;
@@ -17,7 +15,7 @@ const initialState = {
   password: '',
 };
 
-function HomePage() {
+export default function HomePage() {
   const navigate = useNavigate();
 
   const { setAuth } = useAuth();
@@ -63,8 +61,12 @@ function HomePage() {
     }
   };
 
+  useEffect(() => {
+    return () => {};
+  }, []);
+
   return (
-    <Container>
+    <section>
       <form
         onSubmit={handleSubmit}
         className="h-screen flex flex-col items-center justify-center bg-gray-100"
@@ -125,8 +127,6 @@ function HomePage() {
           </div>
         </div>
       </form>
-    </Container>
+    </section>
   );
 }
-
-export default HomePage;

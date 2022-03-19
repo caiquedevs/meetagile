@@ -8,9 +8,10 @@ import { shuffleArray } from '../../utils/shuffleArray';
 type VotingUserProps = {
   onFinish: () => void;
   current: [any, any];
+  loadingFinish?: boolean;
 };
 
-export function VotingUser({ onFinish, current }: VotingUserProps) {
+export function VotingUser({ onFinish, loadingFinish, current }: VotingUserProps) {
   const { state }: any = useLocation();
 
   const [index, setIndex] = useState(0);
@@ -101,7 +102,8 @@ export function VotingUser({ onFinish, current }: VotingUserProps) {
         <button
           type="button"
           onClick={handleClickFinish}
-          className="btn btn-outline px-6 py-2 hover:!text-gray-500 hover:!border-gray-500 rounded"
+          disabled={loadingFinish}
+          className="btn btn-outline px-6 py-2 hover:!text-gray-500 hover:!border-gray-500 rounded disabled:loading"
         >
           Finalizar Etapa
         </button>
