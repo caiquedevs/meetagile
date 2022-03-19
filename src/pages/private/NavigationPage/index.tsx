@@ -20,7 +20,9 @@ function NavigationPage() {
   };
 
   const handleClickChangeTheme = () => {
-    setTheme(theme ? '' : 'dark');
+    const currentTheme = theme === 'light' ? 'dark' : 'light';
+    setTheme(currentTheme);
+    localStorage.setItem('theme', currentTheme);
   };
 
   const handleClickLogin = () => {
