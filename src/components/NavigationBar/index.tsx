@@ -48,6 +48,10 @@ function NavigationBar(props: NavigationBarProps) {
     );
   };
 
+  const handleClickLogo = () => {
+    navigate('/navigation');
+  };
+
   return (
     <div
       className="
@@ -58,7 +62,10 @@ function NavigationBar(props: NavigationBarProps) {
       "
     >
       <div className="w-full flex flex-col">
-        <button className="flex justify-center py-6 min-h-16 animate-fadeIn">
+        <button
+          onClick={handleClickLogo}
+          className="flex justify-center py-6 min-h-16 animate-fadeIn"
+        >
           <img src="/images/favicon.svg" alt="logo" />
         </button>
 

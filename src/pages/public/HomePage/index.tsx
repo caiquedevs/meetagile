@@ -13,9 +13,11 @@ function HomePage() {
       <section className="h-screen flex flex-col">
         <header className="pt-10 px-12 flex items-center justify-between">
           <img src="/images/logo-primary.svg" alt="logo" />
-          <button className="py-2.5 px-9 font-roboto bg-gray-100 hover:bg-gray-200">
-            Login/Cadastre-se
-          </button>
+          <a href="#form">
+            <button className="py-2.5 px-9 font-roboto bg-gray-100 hover:bg-gray-200">
+              Login/Cadastre-se
+            </button>
+          </a>
         </header>
 
         <div className="flex flex-1 flex-col items-center justify-center gap-4">
