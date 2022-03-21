@@ -51,12 +51,11 @@ function HomePage() {
 
             <div className="flex flex-col items-center gap-4 text-center">
               <strong className="font-roboto font-bold text-2xl text-gray-600">
-                Responda para participar da conversa
+                Escolha se gostaria de se logar ou se registrar.
               </strong>
 
               <p className="font-poppins font-normal text-base text-gray-500 text-center">
-                Quando entrar no Twitter, você poderá responder ao Tweet de Twitter Brasil
-                em KS
+                Quando fazer o login você já irá poder gerenciar suas retrospectivas!
               </p>
             </div>
 
