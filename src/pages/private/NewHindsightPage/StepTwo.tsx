@@ -37,6 +37,24 @@ function StepTwo() {
   const [currentEmployee, setCurrentEmployee] = useState<IEmployee | null>(null);
   const [description, setDescription] = useState('');
 
+  const headersTable = [
+    {
+      label: 'Nome',
+      value: 'employeeName',
+      className: 'hidden sm:table-cell',
+    },
+    {
+      label: 'Opnião',
+      value: 'description',
+      className: 'hidden sm:table-cell',
+    },
+    {
+      label: 'Concordância',
+      value: 'votes',
+      className: 'hidden sm:table-cell',
+    },
+  ];
+
   const handleClickGoBack = () => {
     navigate('../step-one', {
       state: { ...navigationProps, hindsight, actions },
@@ -112,16 +130,12 @@ function StepTwo() {
         title="O que pode melhorar?"
         onBack={handleClickGoBack}
         onNext={navigationProps.hindMode === 'view' && handleClickNext}
-        className="before:bg-red-400 dark:before:bg-red-400 text-white"
+        className="before:!bg-red-400 dark:before:!bg-red-400 text-white"
       />
 
-      <div className="flex gap-16">
-        <div className="w-full mt-8 flex flex-col gap-8 flex-1">
-          <Table
-            data={hindsight.stepTwo}
-            colorHeader="text-white"
-            headers={['Nome', 'Opnião', 'Concordância', '']}
-          >
+      <div className="w-full flex flex-col lg:flex-row lg:gap-16 pb-16 md:pb-16 px-8 md:px-14">
+        <div className="w-full -mt-14 flex-1 flex flex-col gap-8">
+          <Table data={hindsight.stepTwo} colorHeader="text-white" headers={headersTable}>
             {(props: { row: IStep; index: number }) => {
               const handleClickDelete = () => onDelete(props.index);
               const handleClickEdit = () => {
@@ -169,7 +183,7 @@ function StepTwo() {
         </div>
 
         {navigationProps.hindMode !== 'view' ? (
-          <div style={{ marginTop: '-74px' }}>
+          <div className="lg:-mt-40">
             <VotingUser
               current={[currentEmployee, setCurrentEmployee]}
               onFinish={onFinish}

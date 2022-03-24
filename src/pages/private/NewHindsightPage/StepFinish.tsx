@@ -57,10 +57,10 @@ function StepFinish({}: StepFinishProps) {
     <>
       <Confetti />
 
-      <Header className="before:bg-sky-500 dark:before:bg-sky-500" />
+      <Header className="before:!bg-sky-500 dark:before:!bg-sky-500" />
 
-      <div className="flex justify-center mb-9">
-        <span className="text-6xl text-white font-roboto font-bold uppercase">
+      <div className="flex justify-center mb-9 -mt-40">
+        <span className=" text-3xl lg:text-6xl text-white font-roboto font-bold uppercase">
           Destaque da Sprint
         </span>
       </div>

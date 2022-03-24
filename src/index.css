@@ -46,15 +46,6 @@ html {
   @apply border-gray-400 text-gray-500 hover:bg-transparent hover:border-primary hover:text-primary;
 }
 
-.btn-navigation {
-  @apply w-full flex justify-center py-4 text-blue-300 dark:text-zinc-500;
-  min-height: 51px;
-}
-
-.btn-navigation.active {
-  @apply bg-secondary-light text-white dark:bg-secondary-dark;
-}
-
 body {
   margin: 0;
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu',

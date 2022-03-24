@@ -49,6 +49,29 @@ export default function StepTwo() {
   const [currentEmployee, setCurrentEmployee] = useState<IEmployee | null>(null);
   const [loadingFinish, setLoadingFinish] = useState(false);
 
+  const headersTable = [
+    {
+      label: 'Foto',
+      value: 'url',
+      className: 'hidden sm:table-cell',
+    },
+    {
+      label: 'Nome',
+      value: 'employeeName',
+      className: 'hidden sm:table-cell',
+    },
+    {
+      label: 'Posição',
+      value: 'office',
+      className: 'hidden sm:table-cell',
+    },
+    {
+      label: 'Votes',
+      value: 'votes',
+      className: 'hidden sm:table-cell',
+    },
+  ];
+
   const handleClickGoBack = () => {
     navigate('../step-two', { state: { ...navigationProps, employees, actions } });
   };
@@ -169,16 +192,12 @@ export default function StepTwo() {
         subTitle="Terceira etapa"
         title="Destaque da Sprint?"
         onBack={handleClickGoBack}
-        className="before:bg-sky-500 dark:before:bg-sky-500 text-white"
+        className="before:!bg-sky-500 dark:before:!bg-sky-500 text-white"
       />
 
-      <div className="flex gap-16">
-        <div className="w-full mt-8 flex flex-col gap-8 flex-1">
-          <Table
-            data={employees}
-            colorHeader="text-white"
-            headers={['Foto', 'Nome', 'Posição', 'Votos']}
-          >
+      <div className="w-full flex flex-col lg:flex-row lg:gap-16 pb-16 md:pb-16 px-8 md:px-14">
+        <div className="w-full -mt-14 flex-1 flex flex-col gap-8">
+          <Table data={employees} colorHeader="text-white" headers={headersTable}>
             {(props: { row: IStep; index: number }) => {
               const handleChangeVotes = (value: number) => {
                 onChangeVotes(value, props.index);
@@ -221,7 +240,7 @@ export default function StepTwo() {
           </Table>
         </div>
 
-        <div className="w-auto flex flex-col" style={{ marginTop: '-74px' }}>
+        <div className="w-auto flex flex-col lg:-mt-40">
           {navigationProps.hindMode !== 'view' ? (
             <VotingUser
               current={[currentEmployee, setCurrentEmployee]}

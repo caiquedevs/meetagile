@@ -38,6 +38,24 @@ function StepOne() {
   const [currentEmployee, setCurrentEmployee] = useState<IEmployee | null>(null);
   const [description, setDescription] = useState('');
 
+  const headersTable = [
+    {
+      label: 'Nome',
+      value: 'employeeName',
+      className: 'hidden sm:table-cell',
+    },
+    {
+      label: 'Opnião',
+      value: 'description',
+      className: 'hidden sm:table-cell',
+    },
+    {
+      label: 'Concordância',
+      value: 'votes',
+      className: 'hidden sm:table-cell',
+    },
+  ];
+
   const handleClickGoBack = () => {
     navigate('/new-hindsight');
   };
@@ -115,16 +133,12 @@ function StepOne() {
         title="O que foi bom nessa Sprint?"
         onBack={handleClickGoBack}
         onNext={navigationProps.hindMode === 'view' && handleClickNext}
-        className="dark:before:bg-green-500 before:bg-green-500 text-white"
+        className="dark:before:!bg-emerald-400 before:!bg-emerald-400 !text-white"
       />
 
-      <div className="flex gap-16">
-        <div className="w-full mt-8 flex flex-col gap-8 flex-1">
-          <Table
-            data={hindsight.stepOne}
-            colorHeader="text-white"
-            headers={['Nome', 'Opnião', 'Concordância', '']}
-          >
+      <div className="w-full flex flex-col lg:flex-row lg:gap-16 pb-16 md:pb-16 px-8 md:px-14">
+        <div className="w-full -mt-14 flex-1 flex flex-col gap-8">
+          <Table data={hindsight.stepOne} colorHeader="text-white" headers={headersTable}>
             {(props: { row: IStep; index: number }) => {
               const handleClickDelete = () => onDelete(props.index);
               const handleClickEdit = () => {
@@ -172,7 +186,7 @@ function StepOne() {
         </div>
 
         {navigationProps.hindMode !== 'view' ? (
-          <div style={{ marginTop: '-74px' }}>
+          <div className="lg:-mt-40">
             <VotingUser
               current={[currentEmployee, setCurrentEmployee]}
               onFinish={onFinish}
@@ -191,7 +205,7 @@ function StepOne() {
 
               <button
                 type="submit"
-                className="btn mt-2 rounded border-none hover:bg-green-500 bg-green-500"
+                className="btn mt-2 rounded border-none hover:bg-emerald-400 bg-emerald-400"
               >
                 {mode === 'create' ? 'Cadastrar' : 'Salvar alterações'}
               </button>
@@ -201,7 +215,7 @@ function StepOne() {
                   type="button"
                   onClick={onFinish}
                   disabled={false}
-                  className="btn btn-outline mt-2 px-6 py-2 hover:!text-green-500 hover:!border-green-500 rounded disabled:loading"
+                  className="btn btn-outline mt-2 px-6 py-2 hover:!text-emerald-500 hover:!border-emerald-500 rounded disabled:loading"
                 >
                   Pular etapa
                 </button>

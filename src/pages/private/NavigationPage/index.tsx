@@ -16,11 +16,15 @@ function NavigationPage() {
   };
 
   return (
-    <section className="container-page">
+    <section className="container-navigation-page">
       <div className="flex flex-col gap-7">
         <div className="flex flex-col ">
-          <h2 className="subtitle-header">Navegação rápida</h2>
-          <h1 className="title-header">Navegue entre essas paginas</h1>
+          <h2 className="text-base md:text-lg font-medium text-gray-500 dark:text-white text-center">
+            Navegação rápida
+          </h2>
+          <h1 className="font-bold text-2xl sm:text-2.5xl text-gray-700 dark:text-white text-center">
+            Navegue entre essas paginas
+          </h1>
         </div>
 
         <ul className="mt-8 flex flex-col gap-5 lg:flex-row">

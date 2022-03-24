@@ -62,8 +62,8 @@ export function VotingUser({
 
   return (
     <div
-      className="py-9 flex flex-col items-center gap-5 bg-white border border-gray-300 rounded"
-      style={{ minWidth: '399px' }}
+      style={{ minWidth: '300px' }}
+      className="py-9 flex flex-col items-center gap-5 bg-white border border-gray-300 rounded lg:!min-w-400px"
     >
       <div className="w-full px-9 flex justify-between absolute top-24 left-0">
         <button

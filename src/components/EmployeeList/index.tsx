@@ -60,7 +60,7 @@ function EmployeesList({
   };
 
   return (
-    <div className="flex flex-1" style={{ marginTop: '-74px' }}>
+    <div className="flex flex-1 m-0 lg:-mt-40">
       <ul className="w-full grid grid-cols-userList gap-x-9 gap-y-8">
         {employees.map(renderItemList)}
       </ul>

@@ -1,11 +1,11 @@
 import { ChangeEvent, useEffect, useState } from 'react';
 import { IEmployee } from '../../../interfaces/employee';
+import { toast } from 'react-toastify';
 
-import { Header, Container } from '../../../components';
-import EmployeesList from '../../../components/EmployeeList';
+import { Header, EmployeeList, Container } from '../../../components';
 import request from '../../../services/api';
 
-import { toast } from 'react-toastify';
+import './styles.css';
 
 type IMode = 'edit' | 'create';
 
@@ -145,61 +145,59 @@ export default function EmployeesPage() {
   }, []);
 
   return (
-    <Container className="bg-white dark:bg-gray-50">
+    <section className="container-employees-page">
       <Header title="Gerenciar funcionários" subTitle="Meus funcionários" />
 
-      <section className="w-full flex gap-16">
-        <div className="flex flex-col flex-1">
-          <form onSubmit={handleSubmit}>
-            <div className="w-full mt-8 flex flex-col">
-              <label className="label">
-                <span className="label-text font-roboto text-base text-gray-700 dark:text-white">
-                  Preencha os campos a baixo
-                </span>
-              </label>
+      <section className="w-full flex flex-col lg:flex-row gap-10 lg:gap-16 pb-16 md:pb-16 px-8 md:px-14">
+        <form className="flex flex-col flex-1 -mt-16" onSubmit={handleSubmit}>
+          <div className="w-full  flex flex-col">
+            <label className="label">
+              <span className="label-text font-roboto text-base text-gray-700 dark:text-white">
+                Preencha os campos a baixo
+              </span>
+            </label>
 
-              <div className="flex flex-col gap-3">
-                <input
-                  type="text"
-                  name="name"
-                  value={fields.name}
-                  required={true}
-                  placeholder="Nome *"
-                  onChange={handleChangeField}
-                  className="input input-bordered w-full rounded-md focus:outline-none"
-                />
-                <input
-                  type="text"
-                  name="office"
-                  value={fields.office}
-                  required={true}
-                  placeholder="Posição *"
-                  onChange={handleChangeField}
-                  className="input input-bordered w-full rounded-md focus:outline-none"
-                />
+            <div className="flex flex-col gap-3">
+              <input
+                type="text"
+                name="name"
+                value={fields.name}
+                required={true}
+                placeholder="Nome *"
+                onChange={handleChangeField}
+                className="input input-bordered w-full rounded-md focus:outline-none"
+              />
+              <input
+                type="text"
+                name="office"
+                value={fields.office}
+                required={true}
+                placeholder="Posição *"
+                onChange={handleChangeField}
+                className="input input-bordered w-full rounded-md focus:outline-none"
+              />
 
-                <input
-                  type="text"
-                  name="url"
-                  value={fields.url}
-                  placeholder="Url da imagem"
-                  onChange={handleChangeField}
-                  className="input input-bordered w-full rounded-md focus:outline-none"
-                />
-              </div>
+              <input
+                type="text"
+                name="url"
+                value={fields.url}
+                placeholder="Url da imagem"
+                onChange={handleChangeField}
+                className="input input-bordered w-full rounded-md focus:outline-none"
+              />
             </div>
+          </div>
 
-            <div className="w-full mt-7 flex flex-col gap-3.5">
-              <button
-                type="submit"
-                disabled={loadingCreate}
-                className="btn btn-primary disabled:loading animate-none"
-              >
-                {mode === 'edit' ? 'Salvar alterações' : 'Cadastrar'}
-              </button>
-            </div>
-          </form>
-        </div>
+          <div className="w-full mt-7 flex flex-col gap-3.5">
+            <button
+              type="submit"
+              disabled={loadingCreate}
+              className="btn btn-primary disabled:loading animate-none"
+            >
+              {mode === 'edit' ? 'Salvar alterações' : 'Cadastrar'}
+            </button>
+          </div>
+        </form>
 
         {loadingFetch || (!loadingFetch && !employees.length) ? (
           <div className="flex flex-col flex-1">
@@ -255,7 +253,7 @@ export default function EmployeesPage() {
         ) : null}
 
         {!loadingFetch && employees.length > 0 ? (
-          <EmployeesList
+          <EmployeeList
             employees={employees}
             onEdit={handleClickEdit}
             onDelete={onDelete}
@@ -263,6 +261,6 @@ export default function EmployeesPage() {
           />
         ) : null}
       </section>
-    </Container>
+    </section>
   );
 }

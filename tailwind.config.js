@@ -41,6 +41,9 @@ module.exports = {
         desktop: '1280px',
         // => @media (min-width: 1280px) { ... }
       },
+      minWidth: {
+        '400px': '400px',
+      },
     },
   },
   plugins: [require('daisyui')],

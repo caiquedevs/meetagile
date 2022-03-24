@@ -1,5 +1,7 @@
-.container-page {
-  @apply min-h-screen p-16 
+.container-navigation-page {
+  @apply min-h-screen 
+  py-16 md:py-16
+  px-8 md:px-14
   flex flex-col items-center justify-between 
   bg-white dark:bg-gray-50;
 }
@@ -12,7 +14,7 @@
   bg-base-100 rounded hover:bg-gray-100 duration-150;
 }
 
-.container:before {
+.container-navigation-page:before {
   content: '';
   width: calc(100% + 8rem);
   border-bottom: 1px solid #d2d4d7;

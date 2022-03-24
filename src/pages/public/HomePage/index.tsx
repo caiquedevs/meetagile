@@ -11,10 +11,10 @@ function HomePage() {
   return (
     <Container>
       <section className="h-screen flex flex-col">
-        <header className="pt-10 px-12 flex items-center justify-between">
+        <header className="pt-10 px-8 sm:px-12 flex items-center justify-between">
           <img src="/images/logo-primary.svg" alt="logo" />
           <a href="#form">
-            <button className="py-2.5 px-9 font-roboto bg-gray-100 hover:bg-gray-200">
+            <button className="py-2.5 px-9 hidden sm:flex font-roboto bg-gray-100 hover:bg-gray-200">
               Login/Cadastre-se
             </button>
           </a>
@@ -23,11 +23,11 @@ function HomePage() {
         <div className="flex flex-1 flex-col items-center justify-center gap-4">
           <span className="text-4xl font-roboto font-light uppercase">Olá!</span>
 
-          <span className="text-5xl	font-poppins font-bold uppercase">
+          <span className="text-4xl sm:text-5xl	font-poppins font-bold uppercase text-center">
             Seja bem vindo ao MeetAgile
           </span>
 
-          <p className="text-3xl font-roboto font-light">
+          <p className="text-2xl sm:text-3xl font-roboto font-light text-center">
             Seu novo gerenciador de retrospectiva
           </p>
         </div>
@@ -43,8 +43,8 @@ function HomePage() {
         id="form"
         className="h-screen flex flex-col items-center justify-center bg-gray-100"
       >
-        <div className="card w-4/12 bg-base-100 shadow-sm rounded-lg">
-          <div className="card-body py-14 px-16 gap-7">
+        <div className="card w-full max-w-lg bg-base-100 shadow-sm rounded-lg">
+          <div className="card-body px-8 md:px-16 py-14 gap-7">
             <div className="flex justify-center">
               <img src="/images/logo.svg" alt="logo" />
             </div>

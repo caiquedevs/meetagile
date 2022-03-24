@@ -29,13 +29,13 @@ export const Table = styled.table`
         border-bottom: 1px solid #d2d4d7;
 
         &:first-child {
-          padding-left: 30px;
+          /* padding-left: 30px; */
           border-radius: 5px 0 0 5px;
           border-left: 1px solid #d2d4d7;
         }
 
         &:last-child {
-          padding-right: 30px;
+          /* padding-right: 30px; */
 
           text-align: -webkit-right;
 

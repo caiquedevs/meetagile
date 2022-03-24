@@ -19,7 +19,7 @@ function App() {
     <div className={theme}>
       {hasNavigationBar ? <NavigationBar /> : null}
 
-      <div>
+      <div className={hasNavigationBar ? `md:pl-16` : 'pl-0'}>
         {/* className={hasNavigationBar ? `pl-16` : 'pl-0'} */}
         <Routes />
         <ToastContainer

@@ -1,5 +1,5 @@
 import { FiArrowLeft, FiArrowRight } from 'react-icons/fi';
-import { Header } from './styles';
+import './styles.css';
 
 export interface HeaderProps {
   title?: string;
@@ -14,10 +14,8 @@ function HeaderComponent({ title, subTitle, onBack, onNext, className }: HeaderP
   const hasIcons = onBack || onNext ? 'ml-11' : '';
 
   return (
-    <Header
-      className={`w-full before:bg-gray-100 dark:before:bg-secondary-dark ${className}`}
-    >
-      <div className="flex gap-5">
+    <header id="header-generic" className={className}>
+      <div className="flex gap-5 pt-16 md:pt-16 px-8 md:px-14">
         <div className="flex flex-col gap-1.5">
           <div className="flex gap-5 items-center">
             {onBack ? (
@@ -28,7 +26,7 @@ function HeaderComponent({ title, subTitle, onBack, onNext, className }: HeaderP
 
             {subTitle ? (
               <h2
-                className={`text-lg font-medium text-gray-500 dark:text-white ${hasClassName}`}
+                className={`text-base md:text-lg font-medium text-gray-500 dark:text-white ${hasClassName}`}
               >
                 {subTitle}
               </h2>
@@ -43,14 +41,14 @@ function HeaderComponent({ title, subTitle, onBack, onNext, className }: HeaderP
 
           {title ? (
             <h1
-              className={`font-bold text-2.5xl text-gray-700 dark:text-white ${hasClassName} ${hasIcons}`}
+              className={`font-bold text-2xl sm:text-2.5xl text-gray-700 dark:text-white ${hasClassName} ${hasIcons}`}
             >
               {title}
             </h1>
           ) : null}
         </div>
       </div>
-    </Header>
+    </header>
   );
 }
 

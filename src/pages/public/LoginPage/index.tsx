@@ -79,12 +79,12 @@ export default function HomePage() {
     <section>
       <form
         onSubmit={handleSubmit}
-        className="h-screen flex flex-col items-center justify-center bg-gray-100"
+        className="min-h-screen flex flex-col items-center justify-center bg-gray-100"
       >
-        <div className="card w-4/12 bg-base-100 shadow-sm rounded-lg">
-          <div className="card-body py-14 px-16 gap-7">
-            <div className="flex justify-center">
-              <img src="/images/logo.svg" alt="logo" />
+        <div className="card w-full max-w-lg bg-base-100 shadow-sm rounded-lg">
+          <div className="card-body px-8 md:px-16 py-14 gap-7">
+            <div className="flex justify-center h-20">
+              <img src="/images/logo.svg" alt="logo" className="animate-fadeIn" />
             </div>
 
             <strong className="font-roboto font-bold text-2xl text-gray-600 text-center">

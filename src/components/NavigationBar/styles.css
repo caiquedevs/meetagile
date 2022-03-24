@@ -1,6 +1,34 @@
 nav {
-  @apply w-16 h-screen 
-  hidden flex-col items-center justify-between 
-  fixed top-0 left-0 z-10 
-  bg-primary-light dark:bg-primary-dark tablet:flex-row;
+  @apply w-full md:w-16
+  h-14 md:h-full
+  px-3 md:px-0
+  flex md:flex-col 
+  items-center justify-between 
+  fixed bottom-0 left-0 z-10 
+  bg-primary-light dark:bg-primary-dark;
+}
+
+nav.navigation-mobile {
+  @apply md:hidden;
+}
+
+nav.navigation-desktop {
+  @apply hidden md:flex;
+}
+
+.btn-navigation {
+  @apply w-auto md:w-full
+  p-3 md:p-0 md:py-4
+  flex justify-center text-blue-300 dark:text-zinc-500;
+}
+
+.btn-navigation.active {
+  @apply text-white 
+  md:bg-secondary-light md:dark:bg-secondary-dark;
+}
+
+.navigation-mobile .btn-navigation:nth-child(3) {
+  @apply -mt-6 md:mt-0 
+  p-5 text-white rounded-full 
+  bg-secondary-light  dark:bg-secondary-dark;
 }

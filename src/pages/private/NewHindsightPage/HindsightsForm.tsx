@@ -26,6 +26,33 @@ export default function HindsightsForm() {
   const [loadingSubmit, setLoadingSubmit] = useState<boolean>(false);
   const [loadingDelete, setLoadingDelete] = useState<string>('');
   const [hindsightName, setHindsightName] = useState<string>('');
+  ['Nome', 'Criado', 'Alterado', 'Status', 'Destaque'];
+
+  const headersTable = [
+    {
+      label: 'Nome',
+      value: 'name',
+    },
+    {
+      label: 'Criado',
+      value: 'created_at',
+      className: 'hidden sm:table-cell',
+    },
+    {
+      label: 'Alterado',
+      value: 'updated_at',
+      className: 'hidden lg:table-cell',
+    },
+    {
+      label: 'Status',
+      value: 'name',
+    },
+    {
+      label: 'Destaque',
+      value: 'name',
+      className: 'hidden lg:table-cell',
+    },
+  ];
 
   const handleChangeField = (event: ChangeEvent<HTMLInputElement>) => {
     setHindsightName(event.target.value);
@@ -153,7 +180,8 @@ export default function HindsightsForm() {
   return (
     <>
       <Header subTitle="Minhas retrospectivas" title="Gerenciar retrospectivas" />
-      <div className="w-full mt-8 flex flex-col">
+
+      <div className="w-full -mt-16 flex flex-col pb-16 md:pb-16 px-8 md:px-14">
         <div className="flex flex-col">
           <label className="label">
             <span className="label-text font-roboto text-base text-gray-700 dark:text-white">
@@ -161,7 +189,7 @@ export default function HindsightsForm() {
             </span>
           </label>
 
-          <form onSubmit={handleSubmit} className="flex gap-2">
+          <form onSubmit={handleSubmit} className="flex gap-2 flex-col sm:flex-row">
             <input
               type="text"
               name="hindsightName"
@@ -186,7 +214,7 @@ export default function HindsightsForm() {
           <Table
             data={hindsight}
             colorHeader="black"
-            headers={['Nome', 'Criado', 'Alterado', 'Status', 'Destaque']}
+            headers={headersTable}
             loadingFetch={loadingFetch}
             className="animate-fadeIn"
           >
@@ -201,7 +229,7 @@ export default function HindsightsForm() {
                     <span>{props.row?.name}</span>
                   </td>
 
-                  <td>
+                  <td className="hidden sm:table-cell">
                     <span>
                       {formatDistanceStrict(new Date(props.row?.createdAt), new Date(), {
                         locale: pt,
@@ -209,7 +237,7 @@ export default function HindsightsForm() {
                     </span>
                   </td>
 
-                  <td>
+                  <td className="hidden lg:table-cell">
                     <span>
                       {formatDistanceStrict(new Date(props.row?.updatedAt), new Date(), {
                         locale: pt,
@@ -225,7 +253,7 @@ export default function HindsightsForm() {
                     )}
                   </td>
 
-                  <td>
+                  <td className="hidden lg:table-cell">
                     <span>{props.row?.winningEmployee?.name || 'Nenhum'}</span>
                   </td>
 

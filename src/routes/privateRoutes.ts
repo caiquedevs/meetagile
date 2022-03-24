@@ -9,6 +9,7 @@ import EmployeesPage from '../pages/private/EmployeesPage';
 import IRoute from '../interfaces/route';
 
 import { FiHome, FiPlusCircle, FiUsers } from 'react-icons/fi';
+import { BsPlusLg } from 'react-icons/bs';
 
 const routes: IRoute[] = [
   {
@@ -26,7 +27,7 @@ const routes: IRoute[] = [
     component: EmployeesPage,
   },
   {
-    icon: FiPlusCircle,
+    icon: BsPlusLg,
     path: '/new-hindsight',
     name: 'newHindsight',
     isPrivate: true,

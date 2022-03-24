@@ -1,9 +1,8 @@
-import { memo } from 'react';
 import { Table } from './styles';
 
 interface TableProps {
   data: any[];
-  headers: string[];
+  headers: { label: string; value: string; className?: string }[];
   colorHeader: string;
   children: any;
   loadingFetch?: boolean;
@@ -70,8 +69,8 @@ function TableComponent({
         {!data.length ? null : (
           <tr className={colorHeader}>
             {headers.map((header, index) => (
-              <th key={index}>
-                <span>{header}</span>
+              <th key={index} className={header.className}>
+                <span>{header.label}</span>
               </th>
             ))}
           </tr>

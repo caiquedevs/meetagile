@@ -1,0 +1,16 @@
+header#header-generic {
+  @apply w-full before:bg-gray-100 dark:before:bg-secondary-dark  h-56;
+}
+
+header#header-generic:before {
+  content: '';
+
+  width: 100%;
+  height: 100%;
+
+  display: block;
+  position: absolute;
+
+  border-bottom: 1px solid #efefef;
+  box-shadow: 4px 4px 4px rgba(0, 0, 0, 0.03);
+}

@@ -1,28 +1,20 @@
-import { useNavigate } from 'react-router-dom';
+import { memo } from 'react';
 import { VscColorMode } from 'react-icons/vsc';
 import { FiLogOut } from 'react-icons/fi';
-import { useLocation } from 'react-router-dom';
+import { useNavigate, useLocation, Link } from 'react-router-dom';
+
+import IRoute from '../../interfaces/route';
 
 import { useTheme } from '../../hooks/useTheme';
-import IRoute from '../../interfaces/route';
 import privateRoutes from '../../routes/privateRoutes';
 
 import './styles.css';
 
-interface NavigationBarProps {}
-
-function NavigationBar(props: NavigationBarProps) {
-  const navigate = useNavigate();
+function NavigationBar() {
   const location = useLocation();
+  const navigate = useNavigate();
 
   const { theme, setTheme } = useTheme();
-
-  const whiteList = ['/navigation'];
-  const hiddenBarMobile = !whiteList.includes(location.pathname) ? 'flex' : 'lg:flex';
-
-  const handleClickLogout = () => {
-    navigate('/login');
-  };
 
   const handleChangeTheme = () => {
     const currentTheme = theme === 'light' ? 'dark' : 'light';
@@ -33,63 +25,64 @@ function NavigationBar(props: NavigationBarProps) {
   const renderIcons = (route: IRoute) => {
     if (!route.icon) return null;
 
-    const btnActive = location.pathname.includes(route.path) ? 'active' : '';
-
-    const handleClickButton = () => {
-      if (location.pathname !== route.path) {
-        navigate(route.path);
-      }
+    const handleClick = () => {
+      if (location.pathname === route.path) return;
+      navigate(route.path);
     };
 
+    const btnActive = location.pathname.includes(route.path)
+      ? 'btn-navigation active'
+      : 'btn-navigation';
+
     return (
-      <li key={route.name}>
-        <button
-          type="button"
-          onClick={handleClickButton}
-          className={`btn-navigation ${btnActive}`}
-        >
-          <route.icon size="19px" />
-        </button>
-      </li>
+      <button type="button" onClick={handleClick} key={route.name} className={btnActive}>
+        <route.icon size="19px" />
+      </button>
     );
   };
 
-  const handleClickLogo = () => {
-    navigate('/navigation');
-  };
-
   return (
-    <nav className={hiddenBarMobile}>
-      <div className="w-full flex flex-col">
-        <button
-          onClick={handleClickLogo}
-          className="flex justify-center py-6 min-h-16 animate-fadeIn"
-        >
-          <img src="/images/favicon.svg" alt="logo" />
+    <>
+      <nav className="navigation-mobile">
+        {privateRoutes.map(renderIcons)}
+
+        <button type="button" onClick={handleChangeTheme} className="btn-navigation">
+          <VscColorMode size="19px" />
         </button>
 
-        <ul>{privateRoutes.map(renderIcons)}</ul>
-      </div>
+        <Link to="/login" className="btn-navigation">
+          <FiLogOut size="19px" />
+        </Link>
+      </nav>
 
-      <div className="flex flex-col w-full">
-        <button
-          type="button"
-          onClick={handleChangeTheme}
-          className="flex justify-center py-4 opacity-50"
-        >
-          <VscColorMode size="19px" color="#ffffff" />
-        </button>
+      <nav className="navigation-desktop">
+        <div className="w-full flex flex-col">
+          <Link
+            to="/navigation"
+            className="flex justify-center py-6 min-h-16 animate-fadeIn"
+          >
+            <img src="/images/favicon.svg" alt="logo" />
+          </Link>
 
-        <button
-          type="button"
-          onClick={handleClickLogout}
-          className="flex justify-center py-6 opacity-50"
-        >
-          <FiLogOut size="19px" color="#ffffff" />
-        </button>
-      </div>
-    </nav>
+          {privateRoutes.map(renderIcons)}
+        </div>
+
+        <div className="flex flex-col w-full">
+          <button
+            type="button"
+            onClick={handleChangeTheme}
+            className="flex justify-center py-4 opacity-50"
+          >
+            <VscColorMode size="19px" color="#ffffff" />
+          </button>
+
+          <Link to="/login" className="flex justify-center py-6 opacity-50">
+            <FiLogOut size="19px" color="#ffffff" />
+          </Link>
+        </div>
+      </nav>
+    </>
   );
 }
 
-export default NavigationBar;
+export default memo(NavigationBar);
