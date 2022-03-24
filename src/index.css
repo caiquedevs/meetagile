@@ -30,6 +30,14 @@ html {
   scroll-behavior: smooth;
 }
 
+.subtitle-header {
+  @apply text-lg font-roboto font-medium text-center text-gray-500 dark:text-gray-300;
+}
+
+.title-header {
+  @apply font-bold font-roboto text-2.5xl text-center text-gray-700 dark:text-white;
+}
+
 .btn.btn-primary {
   @apply rounded border-none bg-primary-light dark:bg-primary-dark disabled:bg-gray-500 disabled:dark:bg-gray-500 disabled:text-gray-400;
 }

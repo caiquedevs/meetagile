@@ -1,0 +1,6 @@
+nav {
+  @apply w-16 h-screen 
+  hidden flex-col items-center justify-between 
+  fixed top-0 left-0 z-10 
+  bg-primary-light dark:bg-primary-dark tablet:flex-row;
+}

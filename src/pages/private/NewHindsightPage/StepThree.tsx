@@ -19,17 +19,31 @@ interface PropsPage {
     hindsight: IHindsight;
     employees: IEmployee[];
     actions: IAction;
-    winningEmployee: IEmployee[];
+    winningEmployee: IEmployee;
+    hindMode: 'create' | 'edit' | 'view';
   };
 }
 
 export default function StepTwo() {
   const navigate = useNavigate();
-
   const location = useLocation();
+
   const { state: navigationProps } = location as PropsPage;
 
-  const [employees, setEmployees] = useState<IStep[]>(navigationProps?.employees);
+  if (
+    navigationProps?.hindMode === 'view' ||
+    (navigationProps?.hindMode === 'edit' &&
+      navigationProps?.hindsight?.stepThree?.length > 0)
+  ) {
+    var formatedEmployees = navigationProps?.hindsight?.stepThree.map((item) => ({
+      ...item.employee,
+      votes: item.votes,
+    }));
+  } else {
+    formatedEmployees = navigationProps?.employees;
+  }
+
+  const [employees, setEmployees] = useState<IStep[]>(formatedEmployees);
   const [actions, setActions] = useState<IAction>(navigationProps?.actions);
 
   const [currentEmployee, setCurrentEmployee] = useState<IEmployee | null>(null);
@@ -94,9 +108,15 @@ export default function StepTwo() {
       return toast.warning('Houve um impate, desempate para continuar!');
     }
 
-    const payload = {
+    const stepThree = copyEmployees.map((employee) => ({
+      employee: employee._id!,
+      votes: employee.votes!,
+    }));
+
+    const payload: IHindsight = {
       ...navigationProps?.hindsight,
-      employee_id: winningEmployee._id,
+      stepThree,
+      winningEmployee: winningEmployee._id!,
     };
 
     setLoadingFinish(true);
@@ -121,6 +141,20 @@ export default function StepTwo() {
 
   const onFinish = () => {
     onUpdateHindsight();
+  };
+
+  const skipStep = () => {
+    navigate('../step-finish', {
+      state: {
+        ...navigationProps,
+        actions,
+        winningEmployee: navigationProps.hindsight.winningEmployee,
+      },
+    });
+  };
+
+  const handleClickBackToInit = () => {
+    navigate('/new-hindsight');
   };
 
   useEffect(() => {
@@ -163,7 +197,7 @@ export default function StepTwo() {
                       <div className="avatar placeholder">
                         <div className="bg-gray-400 dark:bg-gray-400 text-neutral-content mask mask-squircle w-10">
                           <span className="text-base font-roboto font-medium">
-                            {props.row.name[0]}
+                            {props?.row?.name[0] || ''}
                           </span>
                         </div>
                       </div>
@@ -178,6 +212,7 @@ export default function StepTwo() {
                       value={props.row.votes || 0}
                       onChangeVotes={handleChangeVotes}
                       max={employees.length + 1}
+                      disabled={navigationProps?.hindMode === 'view'}
                     />
                   </td>
                 </tr>
@@ -186,12 +221,65 @@ export default function StepTwo() {
           </Table>
         </div>
 
-        <div style={{ marginTop: '-74px' }}>
-          <VotingUser
-            current={[currentEmployee, setCurrentEmployee]}
-            onFinish={onFinish}
-            loadingFinish={loadingFinish}
-          />
+        <div className="w-auto flex flex-col" style={{ marginTop: '-74px' }}>
+          {navigationProps.hindMode !== 'view' ? (
+            <VotingUser
+              current={[currentEmployee, setCurrentEmployee]}
+              onFinish={onFinish}
+              loadingFinish={loadingFinish}
+            />
+          ) : (
+            <VotingUser>
+              <h2 className="text-sky-500 text-2xl font-bold uppercase">
+                Destaque da Sprint
+              </h2>
+              <figure className="flex flex-col items-center justify-center">
+                {navigationProps?.hindsight.winningEmployee?.url ? (
+                  <div className="avatar">
+                    <div className="w-20 mask mask-squircle">
+                      <img src={navigationProps?.hindsight.winningEmployee.url} />
+                    </div>
+                  </div>
+                ) : (
+                  <div className="avatar placeholder">
+                    <div className="bg-gray-400 dark:bg-gray-400 text-neutral-content mask mask-squircle w-20">
+                      <span className="text-2xl font-roboto font-medium">
+                        {navigationProps?.hindsight.winningEmployee?.name[0]}
+                      </span>
+                    </div>
+                  </div>
+                )}
+
+                <figcaption className="mt-3.5 flex flex-col items-center justify-center gap-2">
+                  <strong className="text-base text-center">
+                    {navigationProps?.hindsight.winningEmployee?.name}
+                  </strong>
+                  <span className="text-base text-center">
+                    {navigationProps?.hindsight.winningEmployee?.office}
+                  </span>
+
+                  <button
+                    type="button"
+                    onClick={handleClickBackToInit}
+                    className="btn mt-3 border-none bg-sky-500 hover:bg-sky-500 w-max mx-auto"
+                  >
+                    Voltar para o inicio
+                  </button>
+                </figcaption>
+              </figure>
+            </VotingUser>
+          )}
+
+          {navigationProps.hindMode === 'edit' ? (
+            <button
+              type="button"
+              disabled={false}
+              onClick={skipStep}
+              className="btn btn-outline mt-2 px-6 py-2 hover:!text-sky-500 hover:!border-sky-500 rounded disabled:loading"
+            >
+              Pular etapa
+            </button>
+          ) : null}
         </div>
       </div>
 

@@ -1,21 +1,38 @@
 import { memo, ChangeEvent, useState, Dispatch } from 'react';
 import { IoMdSend } from 'react-icons/io';
+import { useLocation } from 'react-router-dom';
 import { MdPendingActions } from 'react-icons/md';
 
 import { Options, Table } from '../../../components';
 import { IAction } from '../../../interfaces/action';
+import { IHindsight } from '../../../interfaces/hindsight';
+import { IEmployee } from '../../../interfaces/employee';
 
 interface ActionsModalProps {
   useActions: [IAction, Dispatch<React.SetStateAction<IAction>>];
 }
 
+interface PropsPage {
+  state: {
+    hindsight: IHindsight;
+    employees: IEmployee[];
+    actions: IAction;
+    hindMode: 'create' | 'edit' | 'view';
+  };
+}
+
 const colorsSelect: Record<string, string> = {
-  'TO DO': 'select-error text-white bg-red-500',
-  'IN PROGRESS': 'select-warning text-white bg-yellow-500',
-  DONE: 'select-accent text-white bg-green-500',
+  'TO DO':
+    'select-error text-white bg-red-500 disabled:bg-none disabled:bg-red-500 disabled:text-white',
+  'IN PROGRESS':
+    'select-warning text-white bg-yellow-500 disabled:bg-none disabled:bg-yellow-500 disabled:text-white',
+  DONE: 'select-accent text-white bg-green-500 disabled:bg-none disabled:bg-green-500 disabled:text-white',
 };
 
 function ActionsModal({ useActions }: ActionsModalProps) {
+  const location = useLocation();
+  const { state: navigationProps } = location as PropsPage;
+
   const [name, setName] = useState('');
   const [toogleModal, setToogleModal] = useState(false);
 
@@ -99,33 +116,35 @@ function ActionsModal({ useActions }: ActionsModalProps) {
             htmlFor="my-modal-4"
             onClick={handleChangeToogle}
             className="btn btn-sm btn-circle absolute"
-            style={{ top: '-13px', right: '-13px' }}
+            style={{ top: '-13px', right: '-13px', lineHeight: 0 }}
           >
             ✕
           </label>
 
           <div className="overflow-y-auto" style={{ height: 'calc(100vh - 8em)' }}>
-            <form onSubmit={handleSubmit} className="form-control mt-3">
-              <label className="label">
-                <span className="label-text">Gerenciar ações</span>
-              </label>
+            {navigationProps.hindMode !== 'view' ? (
+              <form onSubmit={handleSubmit} className="form-control mt-3">
+                <label className="label">
+                  <span className="label-text">Gerenciar ações</span>
+                </label>
 
-              <div className="input-group w-full">
-                <input
-                  type="text"
-                  name="hindsightName"
-                  value={name}
-                  required={true}
-                  placeholder="Nome da retrospectiva"
-                  onChange={handleChangeField}
-                  className="input w-full input-bordered rounded focus:outline-none"
-                />
+                <div className="input-group w-full">
+                  <input
+                    type="text"
+                    name="hindsightName"
+                    value={name}
+                    required={true}
+                    placeholder="Nome da retrospectiva"
+                    onChange={handleChangeField}
+                    className="input w-full input-bordered rounded focus:outline-none"
+                  />
 
-                <button type="submit" className="btn btn-square">
-                  <IoMdSend size="20px" color="#ffffff" />
-                </button>
-              </div>
-            </form>
+                  <button type="submit" className="btn btn-square">
+                    <IoMdSend size="20px" color="#ffffff" />
+                  </button>
+                </div>
+              </form>
+            ) : null}
 
             <div className="w-full mt-5 h-auto">
               <Table
@@ -163,9 +182,12 @@ function ActionsModal({ useActions }: ActionsModalProps) {
                           onChange={onChangeSelect}
                           value={row?.status!}
                           style={{ minWidth: 150 }}
-                          className={`select w-full min-h-8 h-8 focus:outline-none ${
-                            colorsSelect[row?.status!]
-                          }`}
+                          disabled={true}
+                          className={`
+                            select w-full min-h-8 h-8 
+                            focus:outline-none 
+                            ${colorsSelect[row?.status!]}
+                          `}
                         >
                           <option className="bg-white text-gray-500 font-bold">
                             TO DO
@@ -180,12 +202,14 @@ function ActionsModal({ useActions }: ActionsModalProps) {
                       </td>
 
                       <td>
-                        <Options
-                          loadingDelete=""
-                          item=""
-                          onEdit={handleClickEdit}
-                          onDelete={handleClickDelete}
-                        />
+                        {navigationProps.hindMode !== 'view' ? (
+                          <Options
+                            loadingDelete=""
+                            item=""
+                            onEdit={handleClickEdit}
+                            onDelete={handleClickDelete}
+                          />
+                        ) : null}
                       </td>
                     </tr>
                   );

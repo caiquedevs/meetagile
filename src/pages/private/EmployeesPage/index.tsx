@@ -173,7 +173,7 @@ export default function EmployeesPage() {
                   name="office"
                   value={fields.office}
                   required={true}
-                  placeholder="Cargo *"
+                  placeholder="Posição *"
                   onChange={handleChangeField}
                   className="input input-bordered w-full rounded-md focus:outline-none"
                 />

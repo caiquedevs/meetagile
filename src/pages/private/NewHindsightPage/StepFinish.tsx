@@ -34,6 +34,7 @@ function StepFinish({}: StepFinishProps) {
 
     const playAudio = () => {
       const audioPromise = audio.play();
+      audio.volume = 0.2;
 
       if (audioPromise !== undefined) {
         audioPromise

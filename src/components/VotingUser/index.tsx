@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, ReactNode } from 'react';
 import { FiChevronLeft, FiChevronRight } from 'react-icons/fi';
 import { useLocation } from 'react-router-dom';
 
@@ -6,17 +6,34 @@ import { IEmployee } from '../../interfaces/employee';
 import { shuffleArray } from '../../utils/shuffleArray';
 
 type VotingUserProps = {
-  onFinish: () => void;
-  current: [any, any];
+  onFinish?: () => void;
+  current?: [any, any];
   loadingFinish?: boolean;
+  children?: ReactNode;
 };
 
-export function VotingUser({ onFinish, loadingFinish, current }: VotingUserProps) {
+export function VotingUser({
+  onFinish,
+  loadingFinish,
+  current,
+  children,
+}: VotingUserProps) {
   const { state }: any = useLocation();
 
   const [index, setIndex] = useState(0);
   const [randomEmployees, setRandomEmployees] = useState<IEmployee[]>([]);
-  const [currentEmployee, setCurrentEmployee] = current;
+  const [currentEmployee, setCurrentEmployee] = current || [];
+
+  if (children) {
+    return (
+      <div
+        className="py-9 flex flex-col items-center justify-center gap-5 bg-white border border-gray-300 rounded"
+        style={{ minWidth: '399px', minHeight: '252px' }}
+      >
+        {children}
+      </div>
+    );
+  }
 
   const handleClickNext = () => {
     if (index + 1 === randomEmployees.length) return;
@@ -29,7 +46,7 @@ export function VotingUser({ onFinish, loadingFinish, current }: VotingUserProps
   };
 
   const handleClickFinish = () => {
-    onFinish();
+    onFinish && onFinish();
   };
 
   useEffect(() => {
@@ -105,7 +122,7 @@ export function VotingUser({ onFinish, loadingFinish, current }: VotingUserProps
           disabled={loadingFinish}
           className="btn btn-outline px-6 py-2 hover:!text-gray-500 hover:!border-gray-500 rounded disabled:loading"
         >
-          Finalizar Etapa
+          Concluir Etapa
         </button>
       ) : null}
     </div>

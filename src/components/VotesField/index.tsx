@@ -5,9 +5,10 @@ type Props = {
   value: number;
   onChangeVotes: (value: number) => void;
   max: number;
+  disabled?: boolean;
 };
 
-export default function VotesField({ value, onChangeVotes, max }: Props) {
+export default function VotesField({ value, onChangeVotes, max, disabled }: Props) {
   const handleClickIncrement = () => {
     onChangeVotes(value + 1);
   };
@@ -18,25 +19,29 @@ export default function VotesField({ value, onChangeVotes, max }: Props) {
 
   return (
     <div className="flex items-center gap-1.5">
-      <button
-        type="button"
-        disabled={value === 0}
-        onClick={handleClickDecrement}
-        className="text-red-400 disabled:text-gray-300"
-      >
-        <FiMinusCircle size="18px" />
-      </button>
+      {!disabled ? (
+        <button
+          type="button"
+          disabled={disabled || value === 0}
+          onClick={handleClickDecrement}
+          className="text-red-400 disabled:text-gray-300"
+        >
+          <FiMinusCircle size="18px" />
+        </button>
+      ) : null}
 
       <span>{value}</span>
 
-      <button
-        type="button"
-        disabled={value === max - 1}
-        onClick={handleClickIncrement}
-        className="text-green-500 disabled:text-gray-300"
-      >
-        <FiPlusCircle size="18px" />
-      </button>
+      {!disabled ? (
+        <button
+          type="button"
+          disabled={disabled || value === max - 1}
+          onClick={handleClickIncrement}
+          className="text-green-500 disabled:text-gray-300"
+        >
+          <FiPlusCircle size="18px" />
+        </button>
+      ) : null}
     </div>
   );
 }

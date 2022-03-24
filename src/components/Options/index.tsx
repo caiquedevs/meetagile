@@ -1,9 +1,13 @@
+import { ReactNode } from 'react';
+
 type Props = {
   onEdit: () => void;
   onDelete: () => void;
   item: any;
   loadingDelete: string;
   className?: string;
+  children?: ReactNode;
+  disabled?: boolean;
 };
 
 export default function Options({
@@ -11,12 +15,18 @@ export default function Options({
   onDelete,
   item,
   loadingDelete,
+  children,
+  disabled,
   ...props
 }: Props) {
   return (
     //
     <div className={`dropdown dropdown-left ${props.className}`}>
-      <button tabIndex={0} className="btn btn-square btn-ghost btn-sm">
+      <button
+        tabIndex={0}
+        className="btn btn-square btn-ghost btn-sm"
+        disabled={disabled}
+      >
         <svg
           xmlns="http://www.w3.org/2000/svg"
           fill="none"
@@ -56,6 +66,7 @@ export default function Options({
             Excluir
           </button>
         </li>
+        {children}
       </ul>
     </div>
   );

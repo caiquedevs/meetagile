@@ -11,13 +11,16 @@ function App() {
   const { theme } = useTheme();
   const location = useLocation();
 
+  const whiteList = ['/navigation'];
+
   const hasNavigationBar = pathsForNavigationBar.includes(location.pathname);
 
   return (
     <div className={theme}>
       {hasNavigationBar ? <NavigationBar /> : null}
 
-      <div className={hasNavigationBar ? 'pl-16' : 'pl-0'}>
+      <div>
+        {/* className={hasNavigationBar ? `pl-16` : 'pl-0'} */}
         <Routes />
         <ToastContainer
           position="top-right"

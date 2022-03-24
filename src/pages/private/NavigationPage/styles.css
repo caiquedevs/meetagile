@@ -1,0 +1,22 @@
+.container-page {
+  @apply min-h-screen p-16 
+  flex flex-col items-center justify-between 
+  bg-white dark:bg-gray-50;
+}
+
+.item-navigation {
+  min-width: 180px;
+  border: 1px solid #d2d4d7;
+
+  @apply w-full py-11 px-8 flex flex-col items-center gap-7 
+  bg-base-100 rounded hover:bg-gray-100 duration-150;
+}
+
+.container:before {
+  content: '';
+  width: calc(100% + 8rem);
+  border-bottom: 1px solid #d2d4d7;
+
+  @apply bg-gray-100 dark:bg-secondary-dark h-56 
+  flex absolute top-0 right-0;
+}

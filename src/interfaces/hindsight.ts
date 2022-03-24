@@ -7,12 +7,18 @@ export interface StepProps {
   votes: number;
 }
 
+export interface StepThreeProps {
+  employee: any;
+  votes: number;
+}
+
 export interface IHindsight {
   _id: string;
   name: string;
   stepOne: StepProps[];
   stepTwo: StepProps[];
-  employee_id: IEmployee;
+  stepThree: StepThreeProps[];
+  winningEmployee: any;
   user_id: string;
   updatedAt: string;
   createdAt: string;

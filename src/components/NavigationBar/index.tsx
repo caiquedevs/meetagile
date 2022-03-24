@@ -7,12 +7,18 @@ import { useTheme } from '../../hooks/useTheme';
 import IRoute from '../../interfaces/route';
 import privateRoutes from '../../routes/privateRoutes';
 
+import './styles.css';
+
 interface NavigationBarProps {}
 
 function NavigationBar(props: NavigationBarProps) {
-  const { theme, setTheme } = useTheme();
   const navigate = useNavigate();
   const location = useLocation();
+
+  const { theme, setTheme } = useTheme();
+
+  const whiteList = ['/navigation'];
+  const hiddenBarMobile = !whiteList.includes(location.pathname) ? 'flex' : 'lg:flex';
 
   const handleClickLogout = () => {
     navigate('/login');
@@ -53,14 +59,7 @@ function NavigationBar(props: NavigationBarProps) {
   };
 
   return (
-    <div
-      className="
-      w-16 h-screen 
-      flex flex-col items-center justify-between 
-      fixed top-0 left-0 z-10 
-      bg-primary-light dark:bg-primary-dark
-      "
-    >
+    <nav className={hiddenBarMobile}>
       <div className="w-full flex flex-col">
         <button
           onClick={handleClickLogo}
@@ -89,7 +88,7 @@ function NavigationBar(props: NavigationBarProps) {
           <FiLogOut size="19px" color="#ffffff" />
         </button>
       </div>
-    </div>
+    </nav>
   );
 }
 

@@ -20,6 +20,7 @@ interface PropsPage {
     hindsight: IHindsight;
     employees: IEmployee[];
     actions: IAction;
+    hindMode: 'create' | 'edit' | 'view';
   };
 }
 
@@ -40,6 +41,10 @@ function StepTwo() {
     navigate('../step-one', {
       state: { ...navigationProps, hindsight, actions },
     });
+  };
+
+  const handleClickNext = () => {
+    navigate('../step-three', { state: { ...navigationProps, hindsight, actions } });
   };
 
   const onReset = () => {
@@ -106,6 +111,7 @@ function StepTwo() {
         subTitle="Segunda etapa"
         title="O que pode melhorar?"
         onBack={handleClickGoBack}
+        onNext={navigationProps.hindMode === 'view' && handleClickNext}
         className="before:bg-red-400 dark:before:bg-red-400 text-white"
       />
 
@@ -142,16 +148,19 @@ function StepTwo() {
                       value={props.row.votes!}
                       onChangeVotes={handleChangeVotes}
                       max={navigationProps?.employees.length}
+                      disabled={navigationProps?.hindMode === 'view'}
                     />
                   </td>
 
                   <td>
-                    <Options
-                      item={props.row}
-                      loadingDelete=""
-                      onDelete={handleClickDelete}
-                      onEdit={handleClickEdit}
-                    />
+                    {navigationProps.hindMode !== 'view' ? (
+                      <Options
+                        item={props.row}
+                        loadingDelete=""
+                        onDelete={handleClickDelete}
+                        onEdit={handleClickEdit}
+                      />
+                    ) : null}
                   </td>
                 </tr>
               );
@@ -159,31 +168,44 @@ function StepTwo() {
           </Table>
         </div>
 
-        <div style={{ marginTop: '-74px' }}>
-          <VotingUser
-            current={[currentEmployee, setCurrentEmployee]}
-            onFinish={onFinish}
-          />
-
-          <form onSubmit={handleSubmit} className="flex flex-col mt-2">
-            <input
-              type="text"
-              name="hindsightName"
-              placeholder="O que o Felipiano tem a dizer?"
-              required={true}
-              value={description}
-              onChange={handleChangeField}
-              className="input input-bordered w-full rounded focus:outline-none "
+        {navigationProps.hindMode !== 'view' ? (
+          <div style={{ marginTop: '-74px' }}>
+            <VotingUser
+              current={[currentEmployee, setCurrentEmployee]}
+              onFinish={onFinish}
             />
 
-            <button
-              type="submit"
-              className="btn mt-2 rounded border-none hover:bg-red-400 bg-red-400"
-            >
-              {mode === 'create' ? 'Cadastrar' : 'Salvar alterações'}
-            </button>
-          </form>
-        </div>
+            <form onSubmit={handleSubmit} className="flex flex-col mt-2">
+              <input
+                type="text"
+                name="hindsightName"
+                placeholder="O que o Felipiano tem a dizer?"
+                required={true}
+                value={description}
+                onChange={handleChangeField}
+                className="input input-bordered w-full rounded focus:outline-none "
+              />
+
+              <button
+                type="submit"
+                className="btn mt-2 rounded border-none hover:bg-red-400 bg-red-400"
+              >
+                {mode === 'create' ? 'Cadastrar' : 'Salvar alterações'}
+              </button>
+
+              {navigationProps.hindMode === 'edit' ? (
+                <button
+                  type="button"
+                  onClick={onFinish}
+                  disabled={false}
+                  className="btn btn-outline mt-2 px-6 py-2 hover:!text-red-400 hover:!border-red-400 rounded disabled:loading"
+                >
+                  Pular etapa
+                </button>
+              ) : null}
+            </form>
+          </div>
+        ) : null}
       </div>
 
       <StepActions useActions={[actions, setActions]} />

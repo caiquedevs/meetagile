@@ -1,4 +1,5 @@
 import { ChangeEvent, useEffect, useState } from 'react';
+import { FiChevronLeft, FiChevronRight } from 'react-icons/fi';
 import { useLocation, Location, useNavigate } from 'react-router-dom';
 
 import { Header, Options, Table, VotesField, VotingUser } from '../../../components';
@@ -20,13 +21,14 @@ interface PropsPage {
     hindsight: IHindsight;
     employees: IEmployee[];
     actions: IAction;
+    hindMode: 'create' | 'edit' | 'view';
   };
 }
 
 function StepOne() {
   const navigate = useNavigate();
-
   const location = useLocation();
+
   const { state: navigationProps } = location as PropsPage;
 
   const [hindsight, setHindsight] = useState<IHindsight>(navigationProps?.hindsight);
@@ -38,6 +40,12 @@ function StepOne() {
 
   const handleClickGoBack = () => {
     navigate('/new-hindsight');
+  };
+
+  const handleClickNext = () => {
+    navigate('../step-two', {
+      state: { ...navigationProps, hindsight, actions },
+    });
   };
 
   const onReset = () => {
@@ -106,7 +114,8 @@ function StepOne() {
         subTitle="Primeira etapa"
         title="O que foi bom nessa Sprint?"
         onBack={handleClickGoBack}
-        className="dark:before:bg-green-400 before:bg-green-400 text-white"
+        onNext={navigationProps.hindMode === 'view' && handleClickNext}
+        className="dark:before:bg-green-500 before:bg-green-500 text-white"
       />
 
       <div className="flex gap-16">
@@ -142,16 +151,19 @@ function StepOne() {
                       value={props.row.votes!}
                       onChangeVotes={handleChangeVotes}
                       max={navigationProps?.employees.length}
+                      disabled={navigationProps?.hindMode === 'view'}
                     />
                   </td>
 
                   <td>
-                    <Options
-                      item={props.row}
-                      loadingDelete=""
-                      onDelete={handleClickDelete}
-                      onEdit={handleClickEdit}
-                    />
+                    {navigationProps.hindMode !== 'view' ? (
+                      <Options
+                        item={props.row}
+                        loadingDelete=""
+                        onDelete={handleClickDelete}
+                        onEdit={handleClickEdit}
+                      />
+                    ) : null}
                   </td>
                 </tr>
               );
@@ -159,31 +171,44 @@ function StepOne() {
           </Table>
         </div>
 
-        <div style={{ marginTop: '-74px' }}>
-          <VotingUser
-            current={[currentEmployee, setCurrentEmployee]}
-            onFinish={onFinish}
-          />
-
-          <form onSubmit={handleSubmit} className="flex flex-col mt-2">
-            <input
-              type="text"
-              name="hindsightName"
-              placeholder="O que o Felipiano tem a dizer?"
-              required={true}
-              value={description}
-              onChange={handleChangeField}
-              className="input input-bordered w-full rounded focus:outline-none "
+        {navigationProps.hindMode !== 'view' ? (
+          <div style={{ marginTop: '-74px' }}>
+            <VotingUser
+              current={[currentEmployee, setCurrentEmployee]}
+              onFinish={onFinish}
             />
 
-            <button
-              type="submit"
-              className="btn mt-2 rounded border-none hover:bg-green-400 bg-green-400"
-            >
-              {mode === 'create' ? 'Cadastrar' : 'Salvar alterações'}
-            </button>
-          </form>
-        </div>
+            <form onSubmit={handleSubmit} className="flex flex-col mt-2">
+              <input
+                type="text"
+                name="hindsightName"
+                placeholder={`O que o ${currentEmployee?.name} tem a dizer?`}
+                required={true}
+                value={description}
+                onChange={handleChangeField}
+                className="input input-bordered w-full rounded focus:outline-none "
+              />
+
+              <button
+                type="submit"
+                className="btn mt-2 rounded border-none hover:bg-green-500 bg-green-500"
+              >
+                {mode === 'create' ? 'Cadastrar' : 'Salvar alterações'}
+              </button>
+
+              {navigationProps.hindMode === 'edit' ? (
+                <button
+                  type="button"
+                  onClick={onFinish}
+                  disabled={false}
+                  className="btn btn-outline mt-2 px-6 py-2 hover:!text-green-500 hover:!border-green-500 rounded disabled:loading"
+                >
+                  Pular etapa
+                </button>
+              ) : null}
+            </form>
+          </div>
+        ) : null}
       </div>
 
       <StepActions useActions={[actions, setActions]} />

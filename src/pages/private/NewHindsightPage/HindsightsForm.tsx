@@ -1,34 +1,31 @@
 import { ChangeEvent, useEffect, useState } from 'react';
-import { Outlet, useLocation, useNavigate } from 'react-router-dom';
-
+import { useLocation, useNavigate } from 'react-router-dom';
+import { formatDistanceStrict } from 'date-fns';
 import { toast } from 'react-toastify';
+import { pt } from 'date-fns/locale';
+import { RiEye2Line } from 'react-icons/ri';
 
 import { IEmployee } from '../../../interfaces/employee';
 import { IHindsight } from '../../../interfaces/hindsight';
+import { IAction } from '../../../interfaces/action';
 import request from '../../../services/api';
 
 import { Table, Header, Options } from '../../../components';
 
-import { formatDistanceStrict } from 'date-fns';
-import { pt } from 'date-fns/locale';
-import { IAction } from '../../../interfaces/action';
-
-type HindsightFormProps = {};
-
-export default function HindsightsForm({}: HindsightFormProps) {
-  const whiteList = ['/new-hindsight', '/new-hindsight/'];
-
+export default function HindsightsForm() {
   const location = useLocation();
   const navigate = useNavigate();
+
+  const whiteList = ['/new-hindsight', '/new-hindsight/'];
 
   const [hindsight, setHindsights] = useState<IHindsight[]>([]);
   const [employees, setEmployees] = useState<IEmployee[]>([]);
   const [actions, setActions] = useState<IAction>({} as IAction);
 
-  const [hindsightName, setHindsightName] = useState('');
-  const [loadingDelete, setLoadingDelete] = useState<string>('');
   const [loadingFetch, setLoadingFetch] = useState<boolean>(false);
   const [loadingSubmit, setLoadingSubmit] = useState<boolean>(false);
+  const [loadingDelete, setLoadingDelete] = useState<string>('');
+  const [hindsightName, setHindsightName] = useState<string>('');
 
   const handleChangeField = (event: ChangeEvent<HTMLInputElement>) => {
     setHindsightName(event.target.value);
@@ -36,6 +33,7 @@ export default function HindsightsForm({}: HindsightFormProps) {
 
   const handleSubmit = (e: any) => {
     e.preventDefault();
+    const hindMode = 'create';
 
     if (!Boolean(employees.length)) {
       return toast.warn('Cadastre alguns funcionários primeiro!');
@@ -49,7 +47,9 @@ export default function HindsightsForm({}: HindsightFormProps) {
       .finally(onFinally);
 
     function onSuccess(response: IHindsight) {
-      navigate('step-one', { state: { hindsight: response, employees, actions } });
+      navigate('step-one', {
+        state: { hindsight: response, employees, actions, hindMode },
+      });
     }
 
     function onError(error: any) {
@@ -62,11 +62,13 @@ export default function HindsightsForm({}: HindsightFormProps) {
   };
 
   const onEdit = (hindsight: IHindsight) => {
+    const hindMode = 'edit';
+
     if (!Boolean(employees.length)) {
       return toast.warn('Cadastre alguns funcionários primeiro!');
     }
 
-    navigate('step-one', { state: { hindsight, employees, actions } });
+    navigate('step-one', { state: { hindsight, employees, actions, hindMode } });
   };
 
   const onDelete = (id: string) => {
@@ -91,6 +93,11 @@ export default function HindsightsForm({}: HindsightFormProps) {
     function onFinally() {
       setLoadingDelete('');
     }
+  };
+
+  const onPreview = (hindsight: IHindsight) => {
+    const hindMode = 'view';
+    navigate('step-one', { state: { hindsight, employees, actions, hindMode } });
   };
 
   useEffect(() => {
@@ -145,8 +152,7 @@ export default function HindsightsForm({}: HindsightFormProps) {
 
   return (
     <>
-      <Header title="Minhas retrospectivas" subTitle="Criar nova retrospectiva" />
-
+      <Header subTitle="Minhas retrospectivas" title="Gerenciar retrospectivas" />
       <div className="w-full mt-8 flex flex-col">
         <div className="flex flex-col">
           <label className="label">
@@ -186,6 +192,7 @@ export default function HindsightsForm({}: HindsightFormProps) {
           >
             {(props: { row: IHindsight }) => {
               const handleClickEdit = () => onEdit(props.row);
+              const handleClickPreview = () => onPreview(props.row);
               const handleClickDelete = () => onDelete(props.row._id);
 
               return (
@@ -211,14 +218,15 @@ export default function HindsightsForm({}: HindsightFormProps) {
                   </td>
 
                   <td>
-                    {props.row?.employee_id?.name ? (
+                    {props.row?.winningEmployee?.name ? (
                       <span className="text-green-500 font-medium">Finalizado</span>
                     ) : (
                       <span className="text-yellow-500 font-medium">Pendente</span>
                     )}
                   </td>
+
                   <td>
-                    <span>{props.row?.employee_id?.name || 'Nenhum'}</span>
+                    <span>{props.row?.winningEmployee?.name || 'Nenhum'}</span>
                   </td>
 
                   <td>
@@ -227,7 +235,23 @@ export default function HindsightsForm({}: HindsightFormProps) {
                       item={props.row!}
                       onEdit={handleClickEdit}
                       onDelete={handleClickDelete}
-                    />
+                    >
+                      {props.row?.winningEmployee?.name ? (
+                        <li>
+                          <button
+                            type="button"
+                            onClick={handleClickPreview}
+                            className="
+                            btn 
+                            font-medium text-gray-600 hover:bg-gray-200 active:text-white 
+                            border-none bg-transparent active:bg-primary-light dark:active:bg-primary-dark
+                          "
+                          >
+                            Relatório
+                          </button>
+                        </li>
+                      ) : null}
+                    </Options>
                   </td>
                 </tr>
               );
