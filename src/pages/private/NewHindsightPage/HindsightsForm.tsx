@@ -26,7 +26,6 @@ export default function HindsightsForm() {
   const [loadingSubmit, setLoadingSubmit] = useState<boolean>(false);
   const [loadingDelete, setLoadingDelete] = useState<string>('');
   const [hindsightName, setHindsightName] = useState<string>('');
-  ['Nome', 'Criado', 'Alterado', 'Status', 'Destaque'];
 
   const headersTable = [
     {

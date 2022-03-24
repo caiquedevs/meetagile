@@ -23,12 +23,12 @@ nav.navigation-desktop {
 }
 
 .btn-navigation.active {
-  @apply text-white 
+  @apply !text-white 
   md:bg-secondary-light md:dark:bg-secondary-dark;
 }
 
 .navigation-mobile .btn-navigation:nth-child(3) {
   @apply -mt-6 md:mt-0 
   p-5 text-white rounded-full 
-  bg-secondary-light  dark:bg-secondary-dark;
+  bg-secondary-light  dark:bg-secondary-dark dark:text-zinc-500;
 }

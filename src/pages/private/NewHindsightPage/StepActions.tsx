@@ -39,6 +39,17 @@ function ActionsModal({ useActions }: ActionsModalProps) {
   const [mode, setMode] = useState<'create' | number>('create');
   const [actions, setActions] = useActions;
 
+  const headersTable = [
+    {
+      label: 'Ação',
+      value: 'name',
+    },
+    {
+      label: 'Status',
+      value: 'status',
+    },
+  ];
+
   const onReset = () => {
     setMode('create');
     setName('');
@@ -109,19 +120,19 @@ function ActionsModal({ useActions }: ActionsModalProps) {
 
       <label htmlFor="my-modal-4" className="modal">
         <label
-          className="modal-box rounded overflow-visible max-w-4xl"
+          className="modal-box rounded overflow-visible max-w-4xl max-h-full min-h-full sm:max-h-fit sm:min-h-max"
           htmlFor="my-modal-4"
         >
           <label
             htmlFor="my-modal-4"
             onClick={handleChangeToogle}
-            className="btn btn-sm btn-circle absolute"
-            style={{ top: '-13px', right: '-13px', lineHeight: 0 }}
+            className="btn btn-sm btn-circle absolute -top-0 -right-0 md:-top-3 md:-right-3"
+            style={{ lineHeight: 0 }}
           >
             ✕
           </label>
 
-          <div className="overflow-y-auto" style={{ height: 'calc(100vh - 8em)' }}>
+          <div className="overflow-y-auto" style={{ height: 'calc(100vh - 5em)' }}>
             {navigationProps.hindMode !== 'view' ? (
               <form onSubmit={handleSubmit} className="form-control mt-3">
                 <label className="label">
@@ -150,7 +161,7 @@ function ActionsModal({ useActions }: ActionsModalProps) {
               <Table
                 data={actions?.data || []}
                 colorHeader="white"
-                headers={['Ação', 'Status']}
+                headers={headersTable}
               >
                 {({
                   row,
@@ -182,7 +193,7 @@ function ActionsModal({ useActions }: ActionsModalProps) {
                           onChange={onChangeSelect}
                           value={row?.status!}
                           style={{ minWidth: 150 }}
-                          disabled={true}
+                          disabled={navigationProps.hindMode === 'view'}
                           className={`
                             select w-full min-h-8 h-8 
                             focus:outline-none 
