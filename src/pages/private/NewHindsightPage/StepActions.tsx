@@ -59,7 +59,7 @@ function ActionsModal({ useActions }: ActionsModalProps) {
     const payload = { name, status: 'TO DO' };
 
     const copyActions = { ...actions };
-    copyActions.data.unshift(payload);
+    copyActions.data.push(payload);
     setActions(copyActions);
     onReset();
   };

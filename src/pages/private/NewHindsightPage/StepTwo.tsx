@@ -89,7 +89,7 @@ function StepTwo() {
     };
 
     const copyData = { ...hindsight };
-    copyData.stepTwo.unshift(payload);
+    copyData.stepTwo.push(payload);
     setHindsight(copyData);
     onReset();
   };
