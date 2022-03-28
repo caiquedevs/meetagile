@@ -3,7 +3,7 @@ import { IoMdSend } from 'react-icons/io';
 import { useLocation } from 'react-router-dom';
 import { MdPendingActions } from 'react-icons/md';
 
-import { Options, Table } from '../../../components';
+import { Header, Options, Table } from '../../../components';
 import { IAction } from '../../../interfaces/action';
 import { IHindsight } from '../../../interfaces/hindsight';
 import { IEmployee } from '../../../interfaces/employee';
@@ -59,7 +59,7 @@ function ActionsModal({ useActions }: ActionsModalProps) {
     const payload = { name, status: 'TO DO' };
 
     const copyActions = { ...actions };
-    copyActions.data.push(payload);
+    copyActions.data.unshift(payload);
     setActions(copyActions);
     onReset();
   };
@@ -115,28 +115,37 @@ function ActionsModal({ useActions }: ActionsModalProps) {
         type="checkbox"
         id="my-modal-4"
         className="modal-toggle"
+        onChange={() => {}}
         checked={toogleModal}
       />
 
       <label htmlFor="my-modal-4" className="modal">
         <label
-          className="modal-box rounded overflow-visible max-w-4xl max-h-full min-h-full sm:max-h-fit sm:min-h-max"
+          className="!p-0 modal-box rounded overflow-visible max-w-4xl max-h-full min-h-full sm:max-h-fit sm:min-h-max"
           htmlFor="my-modal-4"
         >
           <label
             htmlFor="my-modal-4"
             onClick={handleChangeToogle}
             className="btn btn-sm btn-circle absolute -top-0 -right-0 md:-top-3 md:-right-3"
-            style={{ lineHeight: 0 }}
+            style={{ lineHeight: 0, zIndex: 100 }}
           >
             ✕
           </label>
 
           <div className="overflow-y-auto" style={{ height: 'calc(100vh - 5em)' }}>
+            <Header
+              subTitle="Minhas ações"
+              title="Gerenciar minhas ações"
+              className="dark:before:!bg-orange-400 before:!bg-orange-400 !text-white before:rounded-tl"
+            />
+
             {navigationProps.hindMode !== 'view' ? (
-              <form onSubmit={handleSubmit} className="form-control mt-3">
+              <form onSubmit={handleSubmit} className="form-control -mt-14 px-8">
                 <label className="label">
-                  <span className="label-text">Gerenciar ações</span>
+                  <span className="label-text text-white dark:text-white">
+                    {mode === 'create' ? 'Criar nova ação' : 'Editar ação'}
+                  </span>
                 </label>
 
                 <div className="input-group w-full">
@@ -157,10 +166,14 @@ function ActionsModal({ useActions }: ActionsModalProps) {
               </form>
             ) : null}
 
-            <div className="w-full mt-5 h-auto">
+            <div
+              className={`w-full mt-5 h-auto px-8 ${
+                navigationProps.hindMode === 'view' ? '-mt-14' : ''
+              }`}
+            >
               <Table
                 data={actions?.data || []}
-                colorHeader="white"
+                colorHeader={navigationProps.hindMode === 'view' ? 'text-white' : ''}
                 headers={headersTable}
               >
                 {({
@@ -183,12 +196,12 @@ function ActionsModal({ useActions }: ActionsModalProps) {
                   };
 
                   return (
-                    <tr key={row?._id!}>
-                      <td>
+                    <tr key={row?._id!} className="tr-actions">
+                      <td className="py-3 px-5">
                         <span>{row?.name!}</span>
                       </td>
 
-                      <td>
+                      <td className="py-3 px-5">
                         <select
                           onChange={onChangeSelect}
                           value={row?.status!}
@@ -212,7 +225,7 @@ function ActionsModal({ useActions }: ActionsModalProps) {
                         </select>
                       </td>
 
-                      <td>
+                      <td className="py-3 px-5">
                         {navigationProps.hindMode !== 'view' ? (
                           <Options
                             loadingDelete=""

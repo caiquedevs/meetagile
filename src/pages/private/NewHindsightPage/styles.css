@@ -3,3 +3,8 @@
   flex flex-col items-center justify-start 
   bg-white dark:bg-gray-50;
 }
+
+.tr-actions:hover td {
+  transition: 0.3s background;
+  background-color: #d6d6d6 !important;
+}

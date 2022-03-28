@@ -22,7 +22,7 @@ export default function HindsightsForm() {
   const [employees, setEmployees] = useState<IEmployee[]>([]);
   const [actions, setActions] = useState<IAction>({} as IAction);
 
-  const [loadingFetch, setLoadingFetch] = useState<boolean>(false);
+  const [loadingFetch, setLoadingFetch] = useState<boolean>(true);
   const [loadingSubmit, setLoadingSubmit] = useState<boolean>(false);
   const [loadingDelete, setLoadingDelete] = useState<string>('');
   const [hindsightName, setHindsightName] = useState<string>('');
@@ -129,15 +129,15 @@ export default function HindsightsForm() {
   useEffect(() => {
     if (!whiteList.includes(location.pathname)) return;
 
-    setLoadingFetch(true);
-
     request({ method: 'GET', url: '/hindsights' })
       .then(onSuccess)
       .catch(onError)
       .finally(onFinally);
 
     function onSuccess(response: any) {
-      setHindsights(response);
+      setHindsights(response.hindsights);
+      setEmployees(response.employees);
+      setActions(response.actions);
     }
 
     function onError(error: any) {
@@ -146,33 +146,6 @@ export default function HindsightsForm() {
 
     function onFinally() {
       setLoadingFetch(false);
-    }
-  }, []);
-
-  useEffect(() => {
-    if (!whiteList.includes(location.pathname)) return;
-    request({ method: 'GET', url: '/employees' }).then(onSuccess).catch(onError);
-
-    function onSuccess(response: any) {
-      setEmployees(response);
-    }
-
-    function onError(error: any) {
-      toast.error(error.data.msg);
-    }
-  }, []);
-
-  useEffect(() => {
-    if (!whiteList.includes(location.pathname)) return;
-
-    request({ method: 'GET', url: '/actions' }).then(onSuccess).catch(onError);
-
-    function onSuccess(response: IAction) {
-      setActions(response);
-    }
-
-    function onError(error: any) {
-      toast.error(error.data.msg);
     }
   }, []);
 
@@ -201,8 +174,10 @@ export default function HindsightsForm() {
 
             <button
               type="submit"
-              disabled={loadingSubmit}
-              className="btn btn-primary px-10 disabled:loading animate-none"
+              disabled={loadingFetch || loadingSubmit}
+              className={`btn btn-primary px-10 animate-none ${
+                loadingSubmit ? 'disabled:loading' : ''
+              }`}
             >
               Iniciar
             </button>

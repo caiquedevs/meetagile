@@ -1,4 +1,4 @@
-import { useState, useEffect, ReactNode } from 'react';
+import { useState, useEffect, ReactNode, memo } from 'react';
 import { FiChevronLeft, FiChevronRight } from 'react-icons/fi';
 import { useLocation } from 'react-router-dom';
 
@@ -129,4 +129,4 @@ export function VotingUser({
   );
 }
 
-export default VotingUser;
+export default memo(VotingUser);

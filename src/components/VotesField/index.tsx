@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { memo } from 'react';
 import { FiMinusCircle, FiPlusCircle } from 'react-icons/fi';
 
 type Props = {
@@ -8,7 +8,7 @@ type Props = {
   disabled?: boolean;
 };
 
-export default function VotesField({ value, onChangeVotes, max, disabled }: Props) {
+function VotesField({ value, onChangeVotes, max, disabled }: Props) {
   const handleClickIncrement = () => {
     onChangeVotes(value + 1);
   };
@@ -45,3 +45,5 @@ export default function VotesField({ value, onChangeVotes, max, disabled }: Prop
     </div>
   );
 }
+
+export default memo(VotesField);

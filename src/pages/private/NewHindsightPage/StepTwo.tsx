@@ -193,7 +193,7 @@ function StepTwo() {
               <input
                 type="text"
                 name="hindsightName"
-                placeholder="O que o Felipiano tem a dizer?"
+                placeholder={`O que o ${currentEmployee?.name} tem a dizer?`}
                 required={true}
                 value={description}
                 onChange={handleChangeField}

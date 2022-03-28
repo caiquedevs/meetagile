@@ -1,3 +1,4 @@
+import { memo } from 'react';
 import { FiArrowLeft, FiArrowRight } from 'react-icons/fi';
 import './styles.css';
 
@@ -52,4 +53,4 @@ function HeaderComponent({ title, subTitle, onBack, onNext, className }: HeaderP
   );
 }
 
-export default HeaderComponent;
+export default memo(HeaderComponent);

@@ -289,7 +289,8 @@ export default function StepTwo() {
             </VotingUser>
           )}
 
-          {navigationProps.hindMode === 'edit' ? (
+          {navigationProps.hindMode === 'edit' &&
+          navigationProps.hindsight.winningEmployee ? (
             <button
               type="button"
               disabled={false}
