@@ -150,7 +150,7 @@ function StepTwo() {
               return (
                 <tr key={props.row._id}>
                   <td>
-                    <span>{props.row.employeeName}</span>
+                    <span className="min-w-max">{props.row.employeeName}</span>
                   </td>
 
                   <td>
