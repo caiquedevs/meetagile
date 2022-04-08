@@ -15,7 +15,7 @@ export default function Modal({ useIsOpen, ...props }: Props) {
   const [isOpen, setIsOpen] = useIsOpen;
 
   const classContainer = classNames(
-    'w-full h-screen fixed inset-0 animate-fadeIn ease-in-out duration-500',
+    'w-full h-screen fixed inset-0 z-20',
     props.containerStyle
   );
 
@@ -24,7 +24,7 @@ export default function Modal({ useIsOpen, ...props }: Props) {
     props.backDropStyle
   );
 
-  const classModal = classNames('mx-auto z-10', props.modalStyle);
+  const classModal = classNames('mx-auto z-10 animate-scale', props.modalStyle);
 
   const onOpen = () => setIsOpen(true);
   const onClose = () => setIsOpen(false);
