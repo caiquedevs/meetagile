@@ -302,8 +302,6 @@ export default function StepTwo() {
           ) : null}
         </div>
       </div>
-
-      <StepActions useActions={[actions, setActions]} />
     </>
   );
 }

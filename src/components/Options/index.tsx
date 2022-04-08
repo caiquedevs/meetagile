@@ -1,8 +1,8 @@
 import { ReactNode } from 'react';
 
 type Props = {
-  onEdit: () => void;
-  onDelete: () => void;
+  onEdit?: () => void;
+  onDelete?: () => void;
   item: any;
   loadingDelete: string;
   className?: string;

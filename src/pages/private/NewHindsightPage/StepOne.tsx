@@ -224,8 +224,6 @@ function StepOne() {
           </div>
         ) : null}
       </div>
-
-      <StepActions useActions={[actions, setActions]} />
     </>
   );
 }

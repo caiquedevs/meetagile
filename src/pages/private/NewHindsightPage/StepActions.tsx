@@ -1,16 +1,12 @@
-import { memo, ChangeEvent, useState, Dispatch } from 'react';
+import { memo, ChangeEvent, useState } from 'react';
 import { IoMdSend } from 'react-icons/io';
 import { useLocation } from 'react-router-dom';
 import { MdPendingActions } from 'react-icons/md';
 
-import { Header, Options, Table } from '../../../components';
+import { Header, Modal, Options, Table } from '../../../components';
 import { IAction } from '../../../interfaces/action';
 import { IHindsight } from '../../../interfaces/hindsight';
 import { IEmployee } from '../../../interfaces/employee';
-
-interface ActionsModalProps {
-  useActions: [IAction, Dispatch<React.SetStateAction<IAction>>];
-}
 
 interface PropsPage {
   state: {
@@ -29,15 +25,16 @@ const colorsSelect: Record<string, string> = {
   DONE: 'select-accent text-white bg-green-500 disabled:bg-none disabled:bg-green-500 disabled:text-white',
 };
 
-function ActionsModal({ useActions }: ActionsModalProps) {
+function StepActions() {
   const location = useLocation();
   const { state: navigationProps } = location as PropsPage;
 
-  const [name, setName] = useState('');
-  const [toogleModal, setToogleModal] = useState(false);
+  const [actions, setActions] = useState(navigationProps.actions);
+  const [isOpenModal, setIsOpenModal] = useState(false);
+  const [isOpenModalEdit, setIsOpenModalEdit] = useState(false);
 
-  const [mode, setMode] = useState<'create' | number>('create');
-  const [actions, setActions] = useActions;
+  const [actionName, setActionName] = useState('');
+  const [actionNameEdit, setActionNameEdit] = useState({ value: '', index: -1 });
 
   const headersTable = [
     {
@@ -50,32 +47,34 @@ function ActionsModal({ useActions }: ActionsModalProps) {
     },
   ];
 
-  const onReset = () => {
-    setMode('create');
-    setName('');
-  };
-
-  const onCreate = () => {
-    const payload = { name, status: 'TO DO' };
-
-    const copyActions = { ...actions };
-    copyActions.data.unshift(payload);
-    setActions(copyActions);
-    onReset();
-  };
+  const onOpenModal = () => setIsOpenModal(true);
+  const onOpenModalEdit = () => setIsOpenModalEdit(true);
+  const onCloseModalEdit = () => setIsOpenModalEdit(false);
 
   const onDelete = (index: number) => {
     const copyActions = { ...actions };
     copyActions.data.splice(index, 1);
+
     setActions(copyActions);
-    onReset();
+    setActionName('');
   };
 
   const onEdit = () => {
     const copyActions = { ...actions };
-    copyActions.data[mode as number].name = name;
+    copyActions.data[actionNameEdit.index].name = actionNameEdit.value;
+
+    onCloseModalEdit();
     setActions(copyActions);
-    onReset();
+    setActionNameEdit({ value: '', index: -1 });
+  };
+
+  const onCreate = () => {
+    const payload = { name: actionName, status: 'TO DO' };
+    const copyActions = { ...actions };
+    copyActions.data.unshift(payload);
+
+    setActions(copyActions);
+    setActionName('');
   };
 
   const handleChangeSelect = ({ value, index, id }: any) => {
@@ -85,66 +84,54 @@ function ActionsModal({ useActions }: ActionsModalProps) {
   };
 
   const handleChangeField = (event: ChangeEvent<HTMLInputElement>) => {
-    setName(event.target.value);
+    setActionName(event.target.value);
   };
 
-  const handleChangeToogle = () => {
-    setToogleModal(!toogleModal);
+  const handleChangeFieldEdit = (event: ChangeEvent<HTMLInputElement>) => {
+    setActionNameEdit({ ...actionNameEdit, value: event.target.value });
   };
 
   const handleSubmit = (event: any) => {
     event.preventDefault();
-    mode === 'create' ? onCreate() : onEdit();
+    onCreate();
+  };
+
+  const handleSubmitEdit = (event: any) => {
+    event.preventDefault();
+    onEdit();
   };
 
   return (
     <>
-      <label
-        htmlFor="my-modal-4"
-        onClick={handleChangeToogle}
-        className="
-          btn w-max
-          border-none  bg-orange-400 hover:bg-orange-400 text-white 
-          fixed bottom-10 right-10
-        "
-      >
-        <MdPendingActions size="23px" />
-      </label>
-
-      <input
-        type="checkbox"
-        id="my-modal-4"
-        className="modal-toggle"
-        onChange={() => {}}
-        checked={toogleModal}
-      />
-
-      <label htmlFor="my-modal-4" className="modal">
-        <label
-          className="!p-0 modal-box rounded overflow-visible max-w-4xl max-h-full min-h-full sm:max-h-fit sm:min-h-max"
-          htmlFor="my-modal-4"
-        >
-          <label
-            htmlFor="my-modal-4"
-            onClick={handleChangeToogle}
-            className="btn btn-sm btn-circle absolute -top-0 -right-0 md:-top-3 md:-right-3"
-            style={{ lineHeight: 0, zIndex: 100 }}
+      <footer className="w-full pb-10 pr-10 flex justify-end align-end fixed bottom-0 left-0">
+        <div className="w-14 h-14 flex items-center justify-center">
+          <button
+            type="button"
+            onClick={onOpenModal}
+            className="btn-open-modal btn text-white border-none bg-orange-400 hover:bg-orange-400"
           >
-            ✕
-          </label>
+            <MdPendingActions size="23px" />
+          </button>
+        </div>
 
-          <div className="overflow-y-auto" style={{ height: 'calc(100vh - 5em)' }}>
+        <Modal
+          hiddenScrollBody={true}
+          useIsOpen={[isOpenModal, setIsOpenModal]}
+          modalStyle="w-full lg:max-w-4xl max-w-full min-h-screen pb-8 bg-white radius rounded-md"
+          backDropStyle="p-9 px-5 lg:px-9"
+        >
+          <div>
             <Header
               subTitle="Minhas ações"
               title="Gerenciar minhas ações"
-              className="dark:before:!bg-orange-400 before:!bg-orange-400 !text-white before:rounded-tl"
+              className="dark:before:!bg-orange-400 before:!bg-orange-400 !text-white before:rounded-tr before:rounded-tl"
             />
 
             {navigationProps.hindMode !== 'view' ? (
               <form onSubmit={handleSubmit} className="form-control -mt-14 px-8">
                 <label className="label">
                   <span className="label-text text-white dark:text-white">
-                    {mode === 'create' ? 'Criar nova ação' : 'Editar ação'}
+                    Criar nova ação
                   </span>
                 </label>
 
@@ -152,7 +139,7 @@ function ActionsModal({ useActions }: ActionsModalProps) {
                   <input
                     type="text"
                     name="hindsightName"
-                    value={name}
+                    value={actionName}
                     required={true}
                     placeholder="Nome da retrospectiva"
                     onChange={handleChangeField}
@@ -168,7 +155,7 @@ function ActionsModal({ useActions }: ActionsModalProps) {
 
             <div
               className={`w-full mt-5 h-auto px-8 ${
-                navigationProps.hindMode === 'view' ? '-mt-14' : ''
+                navigationProps.hindMode === 'view' ? '!-mt-14' : ''
               }`}
             >
               <Table
@@ -186,8 +173,8 @@ function ActionsModal({ useActions }: ActionsModalProps) {
                   const handleClickDelete = () => onDelete(index);
 
                   const handleClickEdit = () => {
-                    setMode(index!);
-                    setName(row.name!);
+                    setActionNameEdit({ value: row.name, index });
+                    onOpenModalEdit();
                   };
 
                   const onChangeSelect = (event: any) => {
@@ -228,8 +215,8 @@ function ActionsModal({ useActions }: ActionsModalProps) {
                       <td className="py-3 px-5">
                         {navigationProps.hindMode !== 'view' ? (
                           <Options
-                            loadingDelete=""
                             item=""
+                            loadingDelete=""
                             onEdit={handleClickEdit}
                             onDelete={handleClickDelete}
                           />
@@ -239,12 +226,44 @@ function ActionsModal({ useActions }: ActionsModalProps) {
                   );
                 }}
               </Table>
+
+              <Modal
+                useIsOpen={[isOpenModalEdit, setIsOpenModalEdit]}
+                backDropStyle="p-9 px-5 lg:px-9 flex flex-col items-center justify-center"
+                modalStyle="w-max h-max lg:max-w-4xl max-w-max p-8 flex flex-col bg-white radius rounded-md"
+              >
+                <form onSubmit={handleSubmitEdit} className="flex flex-col">
+                  <label className="label">
+                    <span className="label-text text-gray-700 dark:text-gray-700">
+                      Editar ação
+                    </span>
+                  </label>
+
+                  <input
+                    type="text"
+                    name="hindsightNameEdit"
+                    value={actionNameEdit.value}
+                    required={true}
+                    placeholder="Nome da retrospectiva"
+                    onChange={handleChangeFieldEdit}
+                    className="input w-96 input-bordered rounded focus:outline-none"
+                    autoFocus
+                  />
+
+                  <button
+                    type="submit"
+                    className="btn w-full mt-3 bg-orange-500 border-none hover:bg-orange-600"
+                  >
+                    Salvar alterações
+                  </button>
+                </form>
+              </Modal>
             </div>
           </div>
-        </label>
-      </label>
+        </Modal>
+      </footer>
     </>
   );
 }
 
-export default memo(ActionsModal);
+export default memo(StepActions);

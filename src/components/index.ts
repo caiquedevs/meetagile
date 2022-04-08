@@ -6,6 +6,7 @@ import Options from './Options';
 import Table from './Table';
 import VotingUser from './VotingUser';
 import VotesField from './VotesField';
+import Modal from './Modal';
 
 export {
   EmployeeList,
@@ -16,4 +17,5 @@ export {
   Table,
   VotingUser,
   VotesField,
+  Modal
 };
