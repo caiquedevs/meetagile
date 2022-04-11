@@ -60,12 +60,6 @@ function StepOne() {
     navigate('/new-hindsight');
   };
 
-  const handleClickNext = () => {
-    navigate('../step-two', {
-      state: { ...navigationProps, hindsight, actions },
-    });
-  };
-
   const onReset = () => {
     setMode('create');
     setDescription('');
@@ -109,7 +103,7 @@ function StepOne() {
     onReset();
   };
 
-  const onFinish = () => {
+  const handleClickNext = () => {
     navigate('../step-two', {
       state: { ...navigationProps, hindsight, actions },
     });
@@ -132,7 +126,7 @@ function StepOne() {
         subTitle="Primeira etapa"
         title="O que foi bom nessa Sprint?"
         onBack={handleClickGoBack}
-        onNext={navigationProps.hindMode === 'view' && handleClickNext}
+        onNext={navigationProps.hindMode !== 'create' && handleClickNext}
         className="dark:before:!bg-emerald-400 before:!bg-emerald-400 !text-white"
       />
 
@@ -189,7 +183,7 @@ function StepOne() {
           <div className="lg:-mt-40">
             <VotingUser
               current={[currentEmployee, setCurrentEmployee]}
-              onFinish={onFinish}
+              onFinish={handleClickNext}
             />
 
             <form onSubmit={handleSubmit} className="flex flex-col mt-2">
@@ -209,17 +203,6 @@ function StepOne() {
               >
                 {mode === 'create' ? 'Cadastrar' : 'Salvar alterações'}
               </button>
-
-              {navigationProps.hindMode === 'edit' ? (
-                <button
-                  type="button"
-                  onClick={onFinish}
-                  disabled={false}
-                  className="btn btn-outline mt-2 px-6 py-2 hover:!text-emerald-500 hover:!border-emerald-500 rounded disabled:loading"
-                >
-                  Pular etapa
-                </button>
-              ) : null}
             </form>
           </div>
         ) : null}

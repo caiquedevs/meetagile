@@ -61,10 +61,6 @@ function StepTwo() {
     });
   };
 
-  const handleClickNext = () => {
-    navigate('../step-three', { state: { ...navigationProps, hindsight, actions } });
-  };
-
   const onReset = () => {
     setMode('create');
     setDescription('');
@@ -108,7 +104,7 @@ function StepTwo() {
     onReset();
   };
 
-  const onFinish = () => {
+  const handleClickNext = () => {
     navigate('../step-three', { state: { ...navigationProps, hindsight, actions } });
   };
 
@@ -129,7 +125,7 @@ function StepTwo() {
         subTitle="Segunda etapa"
         title="O que pode melhorar?"
         onBack={handleClickGoBack}
-        onNext={navigationProps.hindMode === 'view' && handleClickNext}
+        onNext={navigationProps.hindMode !== 'create' && handleClickNext}
         className="before:!bg-red-400 dark:before:!bg-red-400 text-white"
       />
 
@@ -186,7 +182,7 @@ function StepTwo() {
           <div className="lg:-mt-40">
             <VotingUser
               current={[currentEmployee, setCurrentEmployee]}
-              onFinish={onFinish}
+              onFinish={handleClickNext}
             />
 
             <form onSubmit={handleSubmit} className="flex flex-col mt-2">
@@ -206,17 +202,6 @@ function StepTwo() {
               >
                 {mode === 'create' ? 'Cadastrar' : 'Salvar alterações'}
               </button>
-
-              {navigationProps.hindMode === 'edit' ? (
-                <button
-                  type="button"
-                  onClick={onFinish}
-                  disabled={false}
-                  className="btn btn-outline mt-2 px-6 py-2 hover:!text-red-400 hover:!border-red-400 rounded disabled:loading"
-                >
-                  Pular etapa
-                </button>
-              ) : null}
             </form>
           </div>
         ) : null}

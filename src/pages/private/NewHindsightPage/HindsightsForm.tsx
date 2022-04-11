@@ -3,7 +3,6 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import { formatDistanceStrict } from 'date-fns';
 import { toast } from 'react-toastify';
 import { pt } from 'date-fns/locale';
-import { RiEye2Line } from 'react-icons/ri';
 
 import { IEmployee } from '../../../interfaces/employee';
 import { IHindsight } from '../../../interfaces/hindsight';
@@ -11,6 +10,7 @@ import { IAction } from '../../../interfaces/action';
 import request from '../../../services/api';
 
 import { Table, Header, Options } from '../../../components';
+import { PropsNavigate } from '../NewHindsightPage';
 
 export default function HindsightsForm() {
   const location = useLocation();
@@ -73,9 +73,11 @@ export default function HindsightsForm() {
       .finally(onFinally);
 
     function onSuccess(response: IHindsight) {
-      navigate('step-one', {
+      const payload: PropsNavigate = {
         state: { hindsight: response, employees, actions, hindMode },
-      });
+      };
+
+      navigate('step-one', payload);
     }
 
     function onError(error: any) {
@@ -94,7 +96,11 @@ export default function HindsightsForm() {
       return toast.warn('Cadastre alguns funcionários primeiro!');
     }
 
-    navigate('step-one', { state: { hindsight, employees, actions, hindMode } });
+    const payload: PropsNavigate = {
+      state: { hindsight, employees, actions, hindMode },
+    };
+
+    navigate('step-one', payload);
   };
 
   const onDelete = (id: string) => {
@@ -123,7 +129,12 @@ export default function HindsightsForm() {
 
   const onPreview = (hindsight: IHindsight) => {
     const hindMode = 'view';
-    navigate('step-one', { state: { hindsight, employees, actions, hindMode } });
+
+    const payload: PropsNavigate = {
+      state: { hindsight, employees, actions, hindMode },
+    };
+
+    navigate('step-one', payload);
   };
 
   useEffect(() => {

@@ -166,16 +166,6 @@ export default function StepTwo() {
     onUpdateHindsight();
   };
 
-  const skipStep = () => {
-    navigate('../step-finish', {
-      state: {
-        ...navigationProps,
-        actions,
-        winningEmployee: navigationProps.hindsight.winningEmployee,
-      },
-    });
-  };
-
   const handleClickBackToInit = () => {
     navigate('/new-hindsight');
   };
@@ -288,18 +278,6 @@ export default function StepTwo() {
               </figure>
             </VotingUser>
           )}
-
-          {navigationProps.hindMode === 'edit' &&
-          navigationProps.hindsight.winningEmployee ? (
-            <button
-              type="button"
-              disabled={false}
-              onClick={skipStep}
-              className="btn btn-outline mt-2 px-6 py-2 hover:!text-sky-500 hover:!border-sky-500 rounded disabled:loading"
-            >
-              Pular etapa
-            </button>
-          ) : null}
         </div>
       </div>
     </>

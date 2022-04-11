@@ -1,18 +1,30 @@
-import { Dispatch, SetStateAction, useEffect } from 'react';
+import {
+  ForwardedRef,
+  forwardRef,
+  useEffect,
+  useImperativeHandle,
+  useState,
+} from 'react';
 import classNames from 'classnames';
 import { IoMdClose } from 'react-icons/io';
 
-type Props = {
+export interface ModalInterface {
+  onOpen: () => void;
+  onClose: () => void;
+  onToogle: () => void;
+}
+
+interface Props {
   children: any;
   hiddenScrollBody?: boolean;
   modalStyle?: string;
   containerStyle?: string;
   backDropStyle?: string;
-  useIsOpen: [boolean, Dispatch<SetStateAction<boolean>>];
-};
+}
 
-export default function Modal({ useIsOpen, ...props }: Props) {
-  const [isOpen, setIsOpen] = useIsOpen;
+function Modal(props: Props, ref: ForwardedRef<ModalInterface | undefined>) {
+  const [isOpen, setIsOpen] = useState(false);
+  console.log({ isOpen, ref });
 
   const classContainer = classNames(
     'w-full h-screen fixed inset-0 z-20',
@@ -29,6 +41,16 @@ export default function Modal({ useIsOpen, ...props }: Props) {
   const onOpen = () => setIsOpen(true);
   const onClose = () => setIsOpen(false);
   const onToogle = () => setIsOpen(!isOpen);
+
+  useImperativeHandle(
+    ref,
+    () => ({
+      onOpen,
+      onClose,
+      onToogle,
+    }),
+    []
+  );
 
   useEffect(() => {
     if (!props.hiddenScrollBody) return;
@@ -70,3 +92,5 @@ export default function Modal({ useIsOpen, ...props }: Props) {
     </section>
   );
 }
+
+export default forwardRef(Modal);

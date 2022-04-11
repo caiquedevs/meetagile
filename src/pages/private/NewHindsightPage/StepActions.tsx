@@ -1,4 +1,4 @@
-import { memo, ChangeEvent, useState } from 'react';
+import { memo, ChangeEvent, useState, useRef, useEffect, useLayoutEffect } from 'react';
 import { IoMdSend } from 'react-icons/io';
 import { useLocation } from 'react-router-dom';
 import { MdPendingActions } from 'react-icons/md';
@@ -7,6 +7,7 @@ import { Header, Modal, Options, Table } from '../../../components';
 import { IAction } from '../../../interfaces/action';
 import { IHindsight } from '../../../interfaces/hindsight';
 import { IEmployee } from '../../../interfaces/employee';
+import { ModalInterface } from '../../../components/Modal';
 
 interface PropsPage {
   state: {
@@ -29,6 +30,9 @@ function StepActions() {
   const location = useLocation();
   const { state: navigationProps } = location as PropsPage;
 
+  const modalRef = useRef<ModalInterface>();
+  const modalEditRef = useRef<ModalInterface>();
+
   const [actions, setActions] = useState(navigationProps.actions);
   const [isOpenModal, setIsOpenModal] = useState(false);
   const [isOpenModalEdit, setIsOpenModalEdit] = useState(false);
@@ -47,9 +51,9 @@ function StepActions() {
     },
   ];
 
-  const onOpenModal = () => setIsOpenModal(true);
-  const onOpenModalEdit = () => setIsOpenModalEdit(true);
-  const onCloseModalEdit = () => setIsOpenModalEdit(false);
+  const onOpenModal = () => modalRef.current?.onOpen();
+  const onOpenModalEdit = () => modalEditRef.current?.onOpen();
+  const onCloseModalEdit = () => modalEditRef.current?.onClose();
 
   const onDelete = (index: number) => {
     const copyActions = { ...actions };
@@ -101,6 +105,16 @@ function StepActions() {
     onEdit();
   };
 
+  useEffect(() => {
+    console.log(modalRef);
+    return () => {};
+  }, [modalRef]);
+
+  useLayoutEffect(() => {
+    console.log(modalRef);
+    return () => {};
+  }, [modalRef]);
+
   return (
     <>
       <footer className="w-full pb-10 pr-10 flex justify-end align-end fixed bottom-0 left-0">
@@ -115,8 +129,8 @@ function StepActions() {
         </div>
 
         <Modal
+          ref={modalRef}
           hiddenScrollBody={true}
-          useIsOpen={[isOpenModal, setIsOpenModal]}
           modalStyle="w-full lg:max-w-4xl max-w-full min-h-screen pb-8 bg-white radius rounded-md"
           backDropStyle="p-9 px-5 lg:px-9"
         >
@@ -228,7 +242,7 @@ function StepActions() {
               </Table>
 
               <Modal
-                useIsOpen={[isOpenModalEdit, setIsOpenModalEdit]}
+                ref={modalEditRef}
                 backDropStyle="p-9 px-5 lg:px-9 flex flex-col items-center justify-center"
                 modalStyle="w-max h-max lg:max-w-4xl max-w-max p-8 flex flex-col bg-white radius rounded-md"
               >
@@ -266,4 +280,4 @@ function StepActions() {
   );
 }
 
-export default memo(StepActions);
+export default StepActions;

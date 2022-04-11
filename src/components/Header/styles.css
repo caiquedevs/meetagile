@@ -11,6 +11,5 @@ header#header-generic:before {
   display: block;
   position: absolute;
 
-  border-bottom: 1px solid #efefef;
-  box-shadow: 4px 4px 4px rgba(0, 0, 0, 0.03);
+  border-bottom: 1px solid #d2d4d7;
 }
