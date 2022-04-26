@@ -40,22 +40,62 @@ body {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   height: 100%;
+  background-color: #f5f6fa;
 }
 
-.subtitle-header {
-  @apply text-lg font-roboto font-medium text-center text-gray-500 dark:text-gray-300;
+.shadow-card {
+  box-shadow: 4px 4px 4px rgba(0, 0, 0, 0.08);
+  border: 1px solid #dddfe2;
 }
 
-.title-header {
-  @apply font-bold font-roboto text-2.5xl text-center text-gray-700 dark:text-white;
+.input.input-primary {
+  @apply w-full h-12 rounded-md bg-white border border-gray-300 px-4 placeholder:text-sm;
+}
+
+.btn {
+  @apply active:scale-95 ease-in-out duration-200 hover:brightness-90 uppercase font-roboto text-sm text-white font-bold;
 }
 
 .btn.btn-primary {
-  @apply rounded border-none bg-primary-light dark:bg-primary-dark disabled:bg-gray-500 disabled:dark:bg-gray-500 disabled:text-gray-400;
+  @apply w-full h-12 
+  rounded border-none 
+  bg-teal-500 dark:bg-primary-dark 
+  disabled:bg-gray-500 disabled:text-white/50 disabled:active:scale-100 disabled:hover:brightness-100;
 }
 
 .btn.btn-outline {
-  @apply border-gray-400 text-gray-500 hover:bg-transparent hover:border-primary hover:text-primary;
+  @apply w-full h-12 
+  rounded border border-teal-500 
+  uppercase font-roboto text-sm text-teal-500 font-bold
+  bg-transparent;
+}
+
+.swiper {
+  width: 100%;
+  height: 100%;
+}
+
+.mySwiper.employees-dashboard {
+  @apply px-16;
+}
+
+.swiper-button-next {
+  @apply !right-9 rounded-md active:scale-90 ease-in-out duration-200 hover:bg-gray-300;
+}
+
+.swiper-button-prev {
+  @apply !left-9 rounded-md active:scale-90 ease-in-out duration-200 hover:bg-gray-300;
+}
+
+.voting-employee-swiper .swiper-button-prev:after,
+.voting-employee-swiper .swiper-button-next:after {
+  font-size: 25px;
+  @apply text-xl text-black font-bold;
+}
+
+.swiper-button-next.swiper-button-disabled,
+.swiper-button-prev.swiper-button-disabled {
+  opacity: 0.25 !important;
 }
 
 a {
@@ -70,6 +110,7 @@ ul {
 img {
   width: min-content;
   max-width: 100%;
+  @apply animate-fadeIn;
 }
 
 span,
@@ -79,4 +120,14 @@ small {
 
 code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New', monospace;
+}
+
+select {
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  background: transparent;
+  background-image: url("data:image/svg+xml;utf8,<svg fill='white' height='24' viewBox='0 0 24 24' width='24' xmlns='http://www.w3.org/2000/svg'><path d='M7 10l5 5 5-5z'/><path d='M0 0h24v24H0z' fill='none'/></svg>");
+  background-repeat: no-repeat;
+  background-position-x: 95%;
+  background-position-y: 5px;
 }

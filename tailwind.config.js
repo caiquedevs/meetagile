@@ -13,14 +13,20 @@ module.exports = {
         'primary-dark': '#212832',
         'secondary-dark': '#363A40',
 
+        'gray-450': '#7C7C7C',
         'sky-550': '#078FF3',
         'zinc-750': '#363A40',
+        'teal-350': '#42E5CC',
+        'gray-default': '#DDDFE2',
       },
       fontSize: {
         '2.5xl': '1.7rem',
       },
       gridTemplateColumns: {
         userList: 'repeat(auto-fit, minmax(260px, 1fr))',
+      },
+      lineHeight: {
+        initial: 'initial',
       },
       keyframes: {
         fadeIn: {
@@ -31,10 +37,19 @@ module.exports = {
           '0%': { opacity: 0, transform: 'scale(0.5)' },
           '100%': { opacity: 1, transform: 'scale(1)' },
         },
+        'pulse-intense': {
+          '0%, 100%': {
+            opacity: 1,
+          },
+          '50%': {
+            opacity: 0.3,
+          },
+        },
       },
       animation: {
+        'pulse-intense': 'pulse-intense 1.5s cubic-bezier(0.4, 0, 0.6, 1) infinite',
         fadeIn: 'fadeIn 0.5s ease-in-out',
-        scale: 'scale 0.3s cubic-bezier(.4,0,.2,1)',
+        scale: 'scale 0.2s cubic-bezier(.4,0,.2,1)',
       },
       screens: {
         tablet: '640px',
@@ -48,12 +63,12 @@ module.exports = {
       },
       minWidth: {
         '400px': '400px',
+        '300px': '300px',
+      },
+      maxWidth: {
+        '400px': '400px',
+        '300px': '300px',
       },
     },
-  },
-  plugins: [require('daisyui')],
-
-  daisyui: {
-    themes: ['light'],
   },
 };

@@ -8,8 +8,9 @@ export interface StepProps {
 }
 
 export interface StepThreeProps {
-  employee: any;
+  employee: IEmployee;
   votes: number;
+  votedFor: string | null | undefined;
 }
 
 export interface IHindsight {

@@ -1,37 +1,51 @@
-import NavigationPage from '../pages/private/NavigationPage';
-import NewHindsightPage from '../pages/private/NewHindsightPage';
-import StepOne from '../pages/private/NewHindsightPage/StepOne';
-import StepTwo from '../pages/private/NewHindsightPage/StepTwo';
-import StepThree from '../pages/private/NewHindsightPage/StepThree';
-import StepFinish from '../pages/private/NewHindsightPage/StepFinish';
-import EmployeesPage from '../pages/private/EmployeesPage';
+import DashboardPage from '../pages/private/DashboardPage';
+import StepOne from '../pages/private/NewHindsight/StepOne';
+import StepTwo from '../pages/private/NewHindsight/StepTwo';
+import StepThree from '../pages/private/NewHindsight/StepThree';
+import StepFinish from '../pages/private/NewHindsight/StepFinish';
 
 import IRoute from '../interfaces/route';
 
-import { FiHome, FiPlusCircle, FiUsers } from 'react-icons/fi';
-import { BsPlusLg } from 'react-icons/bs';
+import { ModalFormEmployee, ModalShowEmployee, ModalFormHindsight } from '../components';
+import NewHindsight from '../pages/private/NewHindsight';
 
 const routes: IRoute[] = [
   {
-    icon: FiHome,
-    path: '/navigation',
-    name: 'navigation',
+    icon: null,
+    path: '/dashboard',
+    name: 'dashboard',
     isPrivate: true,
-    component: NavigationPage,
+    component: DashboardPage,
+    children: [
+      {
+        icon: null,
+        path: 'form-employee',
+        name: 'formEmployee',
+        isPrivate: true,
+        component: ModalFormEmployee,
+      },
+      {
+        icon: null,
+        path: 'show-employee',
+        name: 'showEmployee',
+        isPrivate: true,
+        component: ModalShowEmployee,
+      },
+      {
+        icon: null,
+        path: 'form-hindsight',
+        name: 'formHindsight',
+        isPrivate: true,
+        component: ModalFormHindsight,
+      },
+    ],
   },
   {
-    icon: FiUsers,
-    path: '/employees',
-    name: 'employees',
-    isPrivate: true,
-    component: EmployeesPage,
-  },
-  {
-    icon: BsPlusLg,
+    icon: null,
     path: '/new-hindsight',
     name: 'newHindsight',
     isPrivate: true,
-    component: NewHindsightPage,
+    component: NewHindsight,
     children: [
       {
         icon: null,
@@ -64,9 +78,5 @@ const routes: IRoute[] = [
     ],
   },
 ];
-
-export const pathsForNavigationBar = routes
-  .filter((route) => route.icon)
-  .map((route) => route.path);
 
 export default routes;

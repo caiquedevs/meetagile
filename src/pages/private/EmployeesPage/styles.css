@@ -1,5 +1,0 @@
-.container-employees-page {
-  @apply min-h-screen 
-  flex flex-col items-center justify-start 
-  bg-white dark:bg-gray-50;
-}
