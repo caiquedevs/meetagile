@@ -165,12 +165,13 @@ function StepOne() {
 
                   <td>
                     {navigationProps.hindMode !== 'view' ? (
-                      <Options
-                        item={props.row}
-                        loadingDelete=""
-                        onDelete={handleClickDelete}
-                        onEdit={handleClickEdit}
-                      />
+                      // <Options
+                      //   item={props.row}
+                      //   loadingDelete=""
+                      //   onDelete={handleClickDelete}
+                      //   onEdit={handleClickEdit}
+                      // />
+                      <></>
                     ) : null}
                   </td>
                 </tr>

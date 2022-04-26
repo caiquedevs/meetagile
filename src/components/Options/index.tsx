@@ -1,73 +1,63 @@
-import { ReactNode } from 'react';
+import { Menu, Transition } from '@headlessui/react';
+import { Fragment } from 'react';
+import { BsThreeDots } from 'react-icons/bs';
+import { IconType } from 'react-icons';
 
-type Props = {
-  onEdit?: () => void;
-  onDelete?: () => void;
-  item: any;
-  loadingDelete: string;
-  className?: string;
-  children?: ReactNode;
-  disabled?: boolean;
-};
+type ListItem = { label: string; icon: IconType; onClick: (data: any) => void };
 
-export default function Options({
-  onEdit,
-  onDelete,
-  item,
-  loadingDelete,
-  children,
-  disabled,
-  ...props
-}: Props) {
+interface PageProps {
+  list: ListItem[];
+  currentItem: any;
+}
+
+export default function OptionsComponent({ list, currentItem }: PageProps) {
+  const renderItemList = (item: ListItem, index: number) => {
+    const handleClick = () => item.onClick(currentItem);
+
+    return (
+      <div className="px-1 py-1" key={index}>
+        <Menu.Item>
+          <button
+            type="button"
+            onClick={handleClick}
+            className="w-full px-2 py-2 flex items-center gap-3 rounded-md hover:bg-gray-200 ease-in-out duration-200 font-roboto text-sm uppercase"
+          >
+            <item.icon className="text-teal-400 text-lg" />
+            {item.label}
+          </button>
+        </Menu.Item>
+      </div>
+    );
+  };
+
   return (
-    //
-    <div className={`dropdown dropdown-left ${props.className}`}>
-      <button
-        tabIndex={0}
-        className="btn btn-square btn-ghost btn-sm"
-        disabled={disabled}
-      >
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          fill="none"
-          viewBox="0 0 24 24"
-          className="inline-block w-5 h-5 stroke-current"
+    <Menu as="div" className="relative inline-block text-left">
+      <div>
+        <Menu.Button
+          className="
+            w-full px-2 py-1
+            justify-center inline-flex 
+            font-medium text-gray-800 
+            rounded-md hover:bg-gray-300 ease-in-out duration-300
+          "
         >
-          <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            strokeWidth="2"
-            d="M5 12h.01M12 12h.01M19 12h.01M6 12a1 1 0 11-2 0 1 1 0 012 0zm7 0a1 1 0 11-2 0 1 1 0 012 0zm7 0a1 1 0 11-2 0 1 1 0 012 0z"
-          ></path>
-        </svg>
-      </button>
+          <BsThreeDots size="22px" />
+        </Menu.Button>
+      </div>
 
-      <ul
-        tabIndex={0}
-        className="dropdown-content menu bg-base-100 p-2 drop-shadow border rounded w-max "
+      <Transition
+        as={Fragment}
+        enter="transition ease-out duration-100"
+        enterFrom="transform opacity-0 scale-95"
+        enterTo="transform opacity-100 scale-100"
+        leave="transition ease-in duration-75"
+        leaveFrom="transform opacity-100 scale-100"
+        leaveTo="transform opacity-0 scale-95"
       >
-        <li>
-          <button
-            type="button"
-            onClick={onEdit}
-            className="btn font-medium text-gray-600 hover:bg-gray-200 active:text-white border-none bg-transparent active:bg-primary-light dark:active:bg-primary-dark"
-          >
-            Editar
-          </button>
-        </li>
-        <li>
-          <button
-            type="button"
-            onClick={onDelete}
-            className={`btn font-medium text-gray-600 hover:bg-gray-200 active:text-white border-none bg-transparent active:bg-primary-light dark:active:bg-primary-dark ${
-              loadingDelete === item._id ? 'loading' : ''
-            }`}
-          >
-            Excluir
-          </button>
-        </li>
-        {children}
-      </ul>
-    </div>
+        <Menu.Items className="absolute right-14 top-0 bg-white rounded-md shadow-card z-10 px-1 py-2">
+          {list.map(renderItemList)}
+        </Menu.Items>
+      </Transition>
+    </Menu>
   );
 }

@@ -13,14 +13,20 @@ module.exports = {
         'primary-dark': '#212832',
         'secondary-dark': '#363A40',
 
+        'gray-450': '#7C7C7C',
         'sky-550': '#078FF3',
         'zinc-750': '#363A40',
+        'teal-350': '#42E5CC',
+        'gray-border': '#DDDFE2',
       },
       fontSize: {
         '2.5xl': '1.7rem',
       },
       gridTemplateColumns: {
         userList: 'repeat(auto-fit, minmax(260px, 1fr))',
+      },
+      lineHeight: {
+        initial: 'initial',
       },
       keyframes: {
         fadeIn: {
@@ -34,7 +40,7 @@ module.exports = {
       },
       animation: {
         fadeIn: 'fadeIn 0.5s ease-in-out',
-        scale: 'scale 0.3s cubic-bezier(.4,0,.2,1)',
+        scale: 'scale 0.2s cubic-bezier(.4,0,.2,1)',
       },
       screens: {
         tablet: '640px',
@@ -50,10 +56,5 @@ module.exports = {
         '400px': '400px',
       },
     },
-  },
-  plugins: [require('daisyui')],
-
-  daisyui: {
-    themes: ['light'],
   },
 };

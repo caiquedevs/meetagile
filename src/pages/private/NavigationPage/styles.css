@@ -11,7 +11,7 @@
   border: 1px solid #d2d4d7;
 
   @apply w-full py-11 px-8 flex flex-col items-center gap-7 
-  bg-base-100 rounded hover:bg-gray-100 duration-150;
+  rounded hover:bg-gray-100 duration-150;
 }
 
 .container-navigation-page:before {

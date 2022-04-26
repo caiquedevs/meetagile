@@ -10,7 +10,7 @@ import { IAction } from '../../../interfaces/action';
 import request from '../../../services/api';
 
 import { Table, Header, Options } from '../../../components';
-import { PropsNavigate } from '../NewHindsightPage';
+import { PropsNavigate } from '.';
 
 export default function HindsightsForm() {
   const location = useLocation();

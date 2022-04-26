@@ -1,96 +1,100 @@
+import { Dialog, Transition } from '@headlessui/react';
 import {
   ForwardedRef,
   forwardRef,
-  useEffect,
+  Fragment,
+  ReactNode,
   useImperativeHandle,
   useState,
 } from 'react';
-import classNames from 'classnames';
-import { IoMdClose } from 'react-icons/io';
 
 export interface ModalInterface {
-  onOpen: () => void;
-  onClose: () => void;
-  onToogle: () => void;
+  closeModal: () => any;
+  openModal: (payload?: any) => void;
+  toogleModal: () => void;
+  getPayload: () => void;
 }
 
-interface Props {
-  children: any;
-  hiddenScrollBody?: boolean;
-  modalStyle?: string;
-  containerStyle?: string;
-  backDropStyle?: string;
+interface PageProps {
+  children: ReactNode;
+  modalChildren?: any;
 }
 
-function Modal(props: Props, ref: ForwardedRef<ModalInterface | undefined>) {
-  const [isOpen, setIsOpen] = useState(false);
-  console.log({ isOpen, ref });
+function ModalComponent(props: PageProps, ref: ForwardedRef<ModalInterface | undefined>) {
+  let [isOpen, setIsOpen] = useState(false);
+  let [payload, setPayload] = useState<any>(undefined);
+  console.log('payload', payload);
 
-  const classContainer = classNames(
-    'w-full h-screen fixed inset-0 z-20',
-    props.containerStyle
-  );
+  const toogleModal = () => setIsOpen(!isOpen);
+  const getPayload = () => payload;
 
-  const classBackDrop = classNames(
-    'w-full h-full bg-black/50 overflow-y-scroll z-10 scroll-smooth',
-    props.backDropStyle
-  );
+  const closeModal = () => {
+    setIsOpen(false);
+    return payload;
+  };
 
-  const classModal = classNames('mx-auto z-10 animate-scale', props.modalStyle);
-
-  const onOpen = () => setIsOpen(true);
-  const onClose = () => setIsOpen(false);
-  const onToogle = () => setIsOpen(!isOpen);
+  const openModal = (info: any) => {
+    setPayload(info);
+    setIsOpen(true);
+  };
 
   useImperativeHandle(
     ref,
     () => ({
-      onOpen,
-      onClose,
-      onToogle,
+      closeModal,
+      openModal,
+      toogleModal,
+      getPayload,
+      payload,
     }),
-    []
+    [payload]
   );
-
-  useEffect(() => {
-    if (!props.hiddenScrollBody) return;
-
-    let scrollbarWidth = window.innerWidth - document.body.clientWidth + 'px';
-
-    if (isOpen) {
-      document.body.style.overflow = 'hidden';
-      document.body.style.paddingRight = scrollbarWidth;
-    }
-
-    return () => {
-      document.body.style.overflow = 'initial';
-      document.body.style.paddingRight = 'initial';
-    };
-  }, [isOpen]);
 
   if (!isOpen) return null;
 
   return (
-    <section className={classContainer}>
-      <div id="backdrop-modal" className={classBackDrop}>
-        <div className={classModal}>
-          <button
-            type="button"
-            onClick={onClose}
-            className="
-              w-8 h-8 p-0
-              flex items-center justify-center 
-              absolute -top-3 -right-3 z-10
-              bg-gray-700 rounded-full text-white text-lg
-            "
+    <Transition appear show={isOpen} as={Fragment}>
+      <Dialog
+        as="div"
+        className="fixed inset-0 z-10 overflow-y-auto"
+        onClose={closeModal}
+      >
+        <Dialog.Overlay className="fixed inset-0 bg-black opacity-30" />
+        <div className="min-h-screen px-4 text-center">
+          <Transition.Child
+            as={Fragment}
+            enter="ease-out duration-300"
+            enterFrom="opacity-0"
+            enterTo="opacity-100"
+            leave="ease-in duration-200"
+            leaveFrom="opacity-100"
+            leaveTo="opacity-0"
           >
-            <IoMdClose />
-          </button>
-          {props.children}
+            <Dialog.Overlay className="fixed inset-0" />
+          </Transition.Child>
+
+          {/* This element is to trick the browser into centering the modal contents. */}
+          <span className="inline-block h-screen align-middle" aria-hidden="true">
+            &#8203;
+          </span>
+
+          <Transition.Child
+            as={Fragment}
+            enter="ease-out duration-300"
+            enterFrom="opacity-0 scale-95"
+            enterTo="opacity-100 scale-100"
+            leave="ease-in duration-200"
+            leaveFrom="opacity-100 scale-100"
+            leaveTo="opacity-0 scale-95"
+          >
+            {props.children}
+          </Transition.Child>
         </div>
-      </div>
-    </section>
+
+        {props?.modalChildren}
+      </Dialog>
+    </Transition>
   );
 }
 
-export default forwardRef(Modal);
+export default forwardRef(ModalComponent);

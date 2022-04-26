@@ -72,7 +72,7 @@ function HomePage() {
         onSubmit={handleSubmit}
         className="min-h-screen flex flex-col items-center justify-center"
       >
-        <div className="card w-full max-w-lg bg-base-100 shadow-sm rounded-lg">
+        <div className="card w-full max-w-lg shadow-sm rounded-lg">
           <div className="card-body px-8 md:px-16 py-14 gap-7">
             <div className="flex justify-center h-20">
               <img src="/images/logo.svg" alt="logo" className="animate-fadeIn" />
@@ -149,7 +149,7 @@ function SuccessPage() {
 
   return (
     <section className=" h-screen flex flex-col items-center justify-center bg-gray-100">
-      <div className="card w-4/12 bg-base-100 shadow-sm rounded-lg">
+      <div className="card w-4/12 shadow-sm rounded-lg">
         <div className="card-body py-14 px-16 gap-7">
           <div className="flex items-center justify-center">
             <BsCheck2Circle className="iconCheck text-green-500" size="195px" />

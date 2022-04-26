@@ -1,19 +1,11 @@
-nav {
-  @apply w-full md:w-16
-  h-14 md:h-full
-  px-3 md:px-0
-  flex md:flex-col 
-  items-center justify-between 
-  fixed bottom-0 left-0 z-10 
-  bg-primary-light dark:bg-primary-dark;
-}
-
 nav.navigation-mobile {
   @apply md:hidden;
 }
 
 nav.navigation-desktop {
   @apply hidden md:flex;
+  border-bottom: 1px solid #dddfe2;
+  box-shadow: 4px 0px 4px rgba(0, 0, 0, 0.08);
 }
 
 .btn-navigation {

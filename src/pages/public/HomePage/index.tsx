@@ -43,11 +43,11 @@ function HomePage() {
         id="form"
         className="h-screen flex flex-col items-center justify-center bg-gray-100"
       >
-        <div className="card w-full max-w-lg bg-base-100 shadow-sm rounded-lg">
+        <div className="card w-full max-w-lg shadow-sm rounded-lg">
           <div className="card-body px-8 md:px-16 py-14 gap-7">
-            <div className="flex justify-center">
+            <figure className="flex justify-center">
               <img src="/images/logo.svg" alt="logo" />
-            </div>
+            </figure>
 
             <div className="flex flex-col items-center gap-4 text-center">
               <strong className="font-roboto font-bold text-2xl text-gray-600">

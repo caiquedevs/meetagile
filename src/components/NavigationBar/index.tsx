@@ -55,31 +55,30 @@ function NavigationBar() {
         </Link>
       </nav>
 
-      <nav className="navigation-desktop">
-        <div className="w-full flex flex-col">
-          <Link
-            to="/navigation"
-            className="flex justify-center py-6 min-h-16 animate-fadeIn"
-          >
-            <img src="/images/favicon.svg" alt="logo" />
-          </Link>
+      <nav className="navigation-desktop w-full hidden md:flex">
+        <header className="w-full h-14 px-16 flex items-center justify-between bg-white">
+          <figure className="flex justify-center">
+            <img
+              src="images/logo-primary.svg"
+              alt="logo"
+              className="w-auto h-5 object-cover"
+            />
+          </figure>
 
-          {privateRoutes.map(renderIcons)}
-        </div>
+          <div className="h-full px-5 flex items-center gap-6">
+            <button type="button" onClick={handleChangeTheme}>
+              <VscColorMode size="19px" color="#000" />
+            </button>
 
-        <div className="flex flex-col w-full">
-          <button
-            type="button"
-            onClick={handleChangeTheme}
-            className="flex justify-center py-4 opacity-50"
-          >
-            <VscColorMode size="19px" color="#ffffff" />
-          </button>
+            <Link to="/login">
+              <FiLogOut size="19px" color="#000" />
+            </Link>
 
-          <Link to="/login" className="flex justify-center py-6 opacity-50">
-            <FiLogOut size="19px" color="#ffffff" />
-          </Link>
-        </div>
+            <div className="w-8 h-8 flex items-center justify-center text-white bg-gray-500 rounded-full">
+              C
+            </div>
+          </div>
+        </header>
       </nav>
     </>
   );
