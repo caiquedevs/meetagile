@@ -147,6 +147,14 @@ export default function StepThree({}: Props) {
     return () => {};
   }, []);
 
+  useEffect(() => {
+    if (!navigationProps) navigate('/dashboard');
+
+    return () => {};
+  }, []);
+
+  if (!navigationProps) return <></>;
+
   return (
     <section className="w-full min-h-screen bg-white">
       <header

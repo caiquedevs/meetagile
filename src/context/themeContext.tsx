@@ -7,7 +7,8 @@ interface ThemePropsContext {
   setTheme: Dispatch<React.SetStateAction<ThemeProps>>;
 }
 
-const initialValue = (localStorage.getItem('theme') as ThemeProps) || 'light';
+// const initialValue = (localStorage.getItem('theme') as ThemeProps) || 'light';
+const initialValue = 'light';
 
 const DEFAULT_VALUE: ThemePropsContext = {
   theme: initialValue,
@@ -18,7 +19,6 @@ export const ThemeContext = createContext(DEFAULT_VALUE);
 
 export default function ThemeProvider({ children }: { children: ReactNode }) {
   const [theme, setTheme] = useState<ThemeProps>(initialValue);
-  console.log('theme', theme);
 
   return (
     <ThemeContext.Provider value={{ theme, setTheme }}>{children}</ThemeContext.Provider>
