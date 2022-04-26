@@ -24,6 +24,32 @@ export default function StepFinish() {
     navigate('/dashboard');
   };
 
+  useEffect(() => {
+    if (!navigationProps) navigate('/dashboard');
+
+    const audio = new Audio('/music/congrats.mp3');
+
+    const playAudio = () => {
+      const audioPromise = audio.play();
+      audio.volume = 0.2;
+
+      if (audioPromise !== undefined) {
+        audioPromise
+          .then((_) => {})
+          .catch((err) => {
+            console.error(err);
+          });
+      }
+    };
+
+    audio.load();
+    playAudio();
+
+    return () => audio.pause();
+  }, []);
+
+  if (!navigationProps) return <></>;
+
   return (
     <section className="w-full min-h-screen bg-white">
       <ReactConfetti />
