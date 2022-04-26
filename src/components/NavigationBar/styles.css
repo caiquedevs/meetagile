@@ -4,6 +4,9 @@ nav.navigation-mobile {
 
 nav.navigation-desktop {
   @apply hidden md:flex;
+}
+
+nav.navigation-desktop header {
   border-bottom: 1px solid #dddfe2;
   box-shadow: 4px 0px 4px rgba(0, 0, 0, 0.08);
 }

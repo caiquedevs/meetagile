@@ -6,6 +6,7 @@ import request, { api } from '../../../services/api';
 import { UserProps } from '../../../interfaces/user';
 import { useAuth } from '../../../hooks/useAuth';
 import { toast } from 'react-toastify';
+import { Button } from '../../../components';
 
 interface ResponseProps {
   currentUser: UserProps;
@@ -72,10 +73,14 @@ function HomePage() {
         onSubmit={handleSubmit}
         className="min-h-screen flex flex-col items-center justify-center"
       >
-        <div className="card w-full max-w-lg shadow-sm rounded-lg">
-          <div className="card-body px-8 md:px-16 py-14 gap-7">
+        <div className="card w-full max-w-lg shadow-sm rounded-lg bg-white">
+          <div className="flex flex-col px-8 md:px-16 py-14 gap-7">
             <div className="flex justify-center h-20">
-              <img src="/images/logo.svg" alt="logo" className="animate-fadeIn" />
+              <img
+                src="/images/logo.svg"
+                alt="logo"
+                className="animate-fadeIn w-auto h-16"
+              />
             </div>
 
             <div className="flex flex-col items-center gap-4 text-center">
@@ -96,7 +101,7 @@ function HomePage() {
                 placeholder="Nome do time"
                 value={fields.teamName}
                 onChange={handleChangeField}
-                className="input input-bordered input-md w-full"
+                className="input input-primary"
               />
 
               <input
@@ -106,7 +111,7 @@ function HomePage() {
                 placeholder="Email"
                 value={fields.email}
                 onChange={handleChangeField}
-                className="input input-bordered input-md w-full"
+                className="input input-primary"
               />
 
               <input
@@ -116,18 +121,18 @@ function HomePage() {
                 placeholder="Senha"
                 value={fields.password}
                 onChange={handleChangeField}
-                className="input input-bordered input-md w-full"
+                className="input input-primary"
               />
             </div>
 
             <div className="w-full flex flex-col items-center gap-3">
-              <button
+              <Button
                 type="submit"
-                disabled={loadingRegister}
+                loading={loadingRegister}
                 className="w-full btn btn-primary text-white disabled:loading"
               >
                 Continuar
-              </button>
+              </Button>
 
               <button className="w-full btn btn-outline" onClick={handleClickLogin}>
                 Já tenho uma conta
@@ -144,13 +149,13 @@ function SuccessPage() {
   const navigate = useNavigate();
 
   const handleClick = () => {
-    navigate('/navigation');
+    navigate('/dashboard');
   };
 
   return (
     <section className=" h-screen flex flex-col items-center justify-center bg-gray-100">
-      <div className="card w-4/12 shadow-sm rounded-lg">
-        <div className="card-body py-14 px-16 gap-7">
+      <div className="card w-4/12 shadow-sm rounded-lg bg-white">
+        <div className="flex flex-col py-14 px-16 gap-7">
           <div className="flex items-center justify-center">
             <BsCheck2Circle className="iconCheck text-green-500" size="195px" />
           </div>

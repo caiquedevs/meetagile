@@ -3,14 +3,15 @@ import { Fragment } from 'react';
 import { BsThreeDots } from 'react-icons/bs';
 import { IconType } from 'react-icons';
 
-type ListItem = { label: string; icon: IconType; onClick: (data: any) => void };
+type ListItem = { label: string; icon: IconType; onClick: (data: any) => any };
 
 interface PageProps {
   list: ListItem[];
   currentItem: any;
+  iconSize?: string;
 }
 
-export default function OptionsComponent({ list, currentItem }: PageProps) {
+export default function OptionsComponent({ list, iconSize, currentItem }: PageProps) {
   const renderItemList = (item: ListItem, index: number) => {
     const handleClick = () => item.onClick(currentItem);
 
@@ -41,7 +42,7 @@ export default function OptionsComponent({ list, currentItem }: PageProps) {
             rounded-md hover:bg-gray-300 ease-in-out duration-300
           "
         >
-          <BsThreeDots size="22px" />
+          <BsThreeDots size={iconSize || '22px'} />
         </Menu.Button>
       </div>
 
@@ -54,7 +55,7 @@ export default function OptionsComponent({ list, currentItem }: PageProps) {
         leaveFrom="transform opacity-100 scale-100"
         leaveTo="transform opacity-0 scale-95"
       >
-        <Menu.Items className="absolute right-14 top-0 bg-white rounded-md shadow-card z-10 px-1 py-2">
+        <Menu.Items className="w-max absolute right-14 top-0 bg-white rounded-md shadow-card z-10 px-1 py-2">
           {list.map(renderItemList)}
         </Menu.Items>
       </Transition>

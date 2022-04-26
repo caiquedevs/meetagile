@@ -3,86 +3,68 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
 
 import request from '../../../services/api';
+
+import { VotingUser } from '../../../components';
+import { StepThreeProps } from '../../../interfaces/hindsight';
+import { FiArrowLeft } from 'react-icons/fi';
+import { ICurrentEmployee } from '../../../components/VotingUser';
+import { IStepProps } from '../../../interfaces/stepProps';
 import { IEmployee } from '../../../interfaces/employee';
-
-import { Header, Table, VotesField, VotingUser } from '../../../components';
-import { IHindsight } from '../../../interfaces/hindsight';
 import { IAction } from '../../../interfaces/action';
-import StepActions from './StepActions';
 
-interface IStep extends IEmployee {
-  votes?: number;
-}
+type Props = {};
 
-interface PropsPage {
-  state: {
-    hindsight: IHindsight;
-    employees: IEmployee[];
-    actions: IAction;
-    winningEmployee: IEmployee;
-    hindMode: 'create' | 'edit' | 'view';
-  };
-}
-
-export default function StepTwo() {
+export default function StepThree({}: Props) {
   const navigate = useNavigate();
   const location = useLocation();
 
-  const { state: navigationProps } = location as PropsPage;
-
-  if (
-    navigationProps?.hindMode === 'view' ||
-    (navigationProps?.hindMode === 'edit' &&
-      navigationProps?.hindsight?.stepThree?.length > 0)
-  ) {
-    var formatedEmployees = navigationProps?.hindsight?.stepThree.map((item) => ({
-      ...item.employee,
-      votes: item.votes,
-    }));
-  } else {
-    formatedEmployees = navigationProps?.employees;
-  }
-
-  const [employees, setEmployees] = useState<IStep[]>(formatedEmployees);
-  const [actions, setActions] = useState<IAction>(navigationProps?.actions);
-
-  const [currentEmployee, setCurrentEmployee] = useState<IEmployee | null>(null);
+  const { state: navigationProps } = location as IStepProps;
   const [loadingFinish, setLoadingFinish] = useState(false);
 
-  const headersTable = [
-    {
-      label: 'Foto',
-      value: 'url',
-      className: 'hidden sm:table-cell',
-    },
-    {
-      label: 'Nome',
-      value: 'employeeName',
-      className: 'hidden sm:table-cell',
-    },
-    {
-      label: 'Posição',
-      value: 'office',
-      className: 'hidden sm:table-cell',
-    },
-    {
-      label: 'Votes',
-      value: 'votes',
-      className: 'hidden sm:table-cell',
-    },
-  ];
+  const [actions, setActions] = useState<IAction>(navigationProps?.actions);
+  const [employees, setEmployees] = useState<StepThreeProps[]>([]);
+
+  const [indexSlide, setIndexSLide] = useState(0);
+  const [employeesVoting, setEmployeesVoting] = useState<StepThreeProps[]>(
+    navigationProps.hindsight.stepThree
+  );
 
   const handleClickGoBack = () => {
-    navigate('../step-two', { state: { ...navigationProps, employees, actions } });
+    navigationProps.hindsight.stepThree = employees;
+    navigate('../step-two', { state: navigationProps });
   };
 
-  const onChangeVotes = (value: number, index: number) => {
-    const payload = [...employees];
-    payload[index as number].votes = value;
-    setEmployees(payload);
+  const decrementOldVote = (id: string) => {
+    employees.map((item) => {
+      if (item.employee._id === id) item.votes--;
+      return item;
+    });
   };
 
-  const onUpdateActions = (winningEmployee: IEmployee) => {
+  const incrementNewVote = (index: number) => {
+    const copyEmployees = [...employees];
+    copyEmployees[index].votes++;
+
+    setEmployees(copyEmployees);
+  };
+
+  const handleChangeVote = (employee: StepThreeProps, index: number) => {
+    const copyEmployeesVoting = [...employeesVoting];
+    const currentEmployee = copyEmployeesVoting[indexSlide];
+
+    if (currentEmployee.votedFor === employee.employee._id) {
+      decrementOldVote(currentEmployee.votedFor!);
+      copyEmployeesVoting[indexSlide].votedFor = null;
+    } else {
+      decrementOldVote(currentEmployee.votedFor!);
+      incrementNewVote(index);
+      copyEmployeesVoting[indexSlide].votedFor = employee.employee._id;
+    }
+
+    setEmployeesVoting(copyEmployeesVoting);
+  };
+
+  const onUpdateActions = (winningEmployee: StepThreeProps) => {
     request({ method: 'PUT', url: `/action/${actions._id}`, data: actions })
       .then(onSuccess)
       .catch(onError);
@@ -99,18 +81,12 @@ export default function StepTwo() {
     }
   };
 
-  const onUpdateHindsight = () => {
-    // Setar todos votos undefined como 0
-    const copyEmployees = employees?.map((employee) => {
-      if (typeof employee.votes === 'undefined') employee.votes = 0;
-      return employee;
-    });
-
+  const onFinish = () => {
     let hasVote = false;
 
     // Buscar maior votação
-    const winningEmployee = copyEmployees.reduce(
-      (acumulador: IStep, current: IStep, index) => {
+    const winningEmployee = employees.reduce(
+      (acumulador: StepThreeProps, current: StepThreeProps, index) => {
         if (current?.votes! > 0) hasVote = true;
         return current?.votes! > acumulador?.votes! ? current : acumulador;
       },
@@ -121,9 +97,10 @@ export default function StepTwo() {
     if (!hasVote) return toast.warning('Faça uma votação para continuar');
 
     // Buscar empates
-    const hasADraw = copyEmployees.filter(
+    const hasADraw = employees.filter(
       (employee) =>
-        employee.votes === winningEmployee.votes && employee._id !== winningEmployee._id
+        employee.votes === winningEmployee.votes &&
+        employee.employee !== winningEmployee.employee
     );
 
     //Se há algum empate
@@ -131,15 +108,10 @@ export default function StepTwo() {
       return toast.warning('Houve um impate, desempate para continuar!');
     }
 
-    const stepThree = copyEmployees.map((employee) => ({
-      employee: employee._id!,
-      votes: employee.votes!,
-    }));
-
-    const payload: IHindsight = {
-      ...navigationProps?.hindsight,
-      stepThree,
-      winningEmployee: winningEmployee._id!,
+    const payload = {
+      ...navigationProps.hindsight,
+      StepThree: employees,
+      winningEmployee: winningEmployee.employee,
     };
 
     setLoadingFinish(true);
@@ -162,124 +134,200 @@ export default function StepTwo() {
     }
   };
 
-  const onFinish = () => {
-    onUpdateHindsight();
-  };
-
   const handleClickBackToInit = () => {
-    navigate('/new-hindsight');
+    navigate('/dashboard');
   };
 
   useEffect(() => {
-    if (!navigationProps?.hindsight) navigate('/new-hindsight');
+    const filterEmployees = navigationProps.hindsight?.stepThree.filter(
+      (item) => item.employee
+    );
+
+    setEmployees(filterEmployees);
+    return () => {};
   }, []);
 
-  if (!navigationProps?.hindsight) return <></>;
-
   return (
-    <>
-      <Header
-        subTitle="Terceira etapa"
-        title="Destaque da Sprint?"
-        onBack={handleClickGoBack}
-        className="before:!bg-sky-500 dark:before:!bg-sky-500 text-white"
-      />
+    <section className="w-full min-h-screen bg-white">
+      <header
+        className="
+          w-full h-64
+          before:content-['']
+          before:w-full before:h-full
+          before:block before:absolute
+          before:bg-sky-500
+        "
+      >
+        <div className="pt-16 md:pt-24 px-8 md:px-14 flex gap-5">
+          <div className="flex flex-col gap-1.5">
+            <div className="flex gap-3 items-center">
+              <button type="button" onClick={handleClickGoBack} className="flex">
+                <FiArrowLeft size="23" color="#ffffff" />
+              </button>
+
+              <h2 className="text-base md:text-lg font-medium text-white">
+                Terceira etapa
+              </h2>
+            </div>
+
+            <h1 className="font-bold text-2xl sm:text-2.5xl text-white">
+              Destaque da Sprint?
+            </h1>
+          </div>
+        </div>
+      </header>
 
       <div className="w-full flex flex-col lg:flex-row lg:gap-16 pb-16 md:pb-16 px-8 md:px-14">
-        <div className="w-full -mt-14 flex-1 flex flex-col gap-8">
-          <Table data={employees} colorHeader="text-white" headers={headersTable}>
-            {(props: { row: IStep; index: number }) => {
-              const handleChangeVotes = (value: number) => {
-                onChangeVotes(value, props.index);
-              };
+        <div className="w-full -mt-12 flex flex-col flex-1 gap-2">
+          <span className="flex text-white font-roboto text-base font-normal">
+            Selecione um funcionário abaixo
+          </span>
+
+          <ul className="w-full flex flex-col gap-2">
+            {employees.map((employee, index) => {
+              const onChangeVote = () => handleChangeVote(employee, index);
+              const currentEmployee = employeesVoting[indexSlide];
+
+              const isTheVoter = currentEmployee?.employee._id === employee.employee._id;
+              const isTheVote = currentEmployee?.votedFor === employee.employee._id;
 
               return (
-                <tr key={props.row._id}>
-                  <td>
-                    {props.row?.url ? (
-                      <div className="avatar">
-                        <div className="w-10 mask mask-squircle">
-                          <img src={props.row.url} />
-                        </div>
-                      </div>
-                    ) : (
-                      <div className="avatar placeholder">
-                        <div className="bg-gray-400 dark:bg-gray-400 text-neutral-content mask mask-squircle w-10">
-                          <span className="text-base font-roboto font-medium">
-                            {props?.row?.name[0] || ''}
+                <li key={employee.employee._id} className="h-max">
+                  <input
+                    className="sr-only peer"
+                    type="checkbox"
+                    value="yes"
+                    name="answer"
+                    onChange={onChangeVote}
+                    checked={navigationProps.mode !== 'view' && isTheVote}
+                    disabled={navigationProps.mode === 'view' || isTheVoter}
+                    id={employee.employee._id!}
+                  />
+
+                  <label
+                    className={`p-4 pr-10 shadow-card
+                    flex items-center gap-5
+                    rounded bg-white select-none
+                    peer-checked:ring-green-400
+                    disabled:peer-checked:!ring-gray-default
+                    peer-checked:bg-green-100
+                    peer-checked:ring-2
+                    peer-checked:border-transparent
+                    disabled:hover:!bg-white
+                    ${
+                      isTheVoter || navigationProps.mode === 'view'
+                        ? ''
+                        : 'cursor-pointer hover:bg-gray-100'
+                    }
+
+                   `}
+                    htmlFor={employee.employee._id!}
+                  >
+                    <article
+                      className={`
+                        w-full
+                        flex items-center gap-5
+                        ${
+                          isTheVoter && navigationProps.mode !== 'view'
+                            ? 'opacity-50'
+                            : 'opacity-100'
+                        }
+                      `}
+                    >
+                      {employee.employee?.url ? (
+                        <img
+                          src={employee.employee?.url}
+                          alt="user image"
+                          className="w-16 h-16 rounded-3xl"
+                        />
+                      ) : (
+                        <div className="w-10 h-10 flex items-center justify-center text-white uppercase rounded-xl bg-gray-400">
+                          <span className="text-2xl font-roboto font-medium">
+                            {employee.employee?.name[0]}
                           </span>
                         </div>
+                      )}
+
+                      <div className="w-full flex items-center justify-between">
+                        <div>
+                          <strong className="text-base">{employee.employee?.name}</strong>
+                          <span className="text-base">{employee.employee?.office}</span>
+                        </div>
+
+                        <span className="text-base text-gray-600">
+                          {employee.votes} {employee.votes === 1 ? 'voto' : 'votos'}
+                        </span>
                       </div>
-                    )}
-                  </td>
+                    </article>
+                  </label>
 
-                  <td>{props.row.name}</td>
-                  <td>{props.row.office}</td>
-
-                  <td>
-                    <VotesField
-                      value={props.row.votes || 0}
-                      onChangeVotes={handleChangeVotes}
-                      max={employees.length + 1}
-                      disabled={navigationProps?.hindMode === 'view'}
-                    />
-                  </td>
-                </tr>
+                  <div className="w-5 h-5 absolute top-9 right-3 hidden peer-checked:flex">
+                    👍
+                  </div>
+                </li>
               );
-            }}
-          </Table>
+            })}
+          </ul>
         </div>
 
-        <div className="w-auto flex flex-col lg:-mt-40">
-          {navigationProps.hindMode !== 'view' ? (
-            <VotingUser
-              current={[currentEmployee, setCurrentEmployee]}
-              onFinish={onFinish}
-              loadingFinish={loadingFinish}
-            />
-          ) : (
-            <VotingUser>
-              <h2 className="text-sky-500 text-2xl font-bold uppercase">
-                Destaque da Sprint
-              </h2>
-              <figure className="flex flex-col items-center justify-center">
-                {navigationProps?.hindsight.winningEmployee?.url ? (
-                  <div className="avatar">
-                    <div className="w-20 mask mask-squircle">
-                      <img src={navigationProps?.hindsight.winningEmployee.url} />
-                    </div>
+        {navigationProps.mode !== 'view' ? (
+          <aside className="lg:min-w-400px">
+            <div className="lg:fixed lg:-mt-40">
+              <VotingUser
+                useEmployeesVoting={[employeesVoting, setEmployeesVoting]}
+                useIndexSlide={[indexSlide, setIndexSLide]}
+                loadingFinish={loadingFinish}
+                onFinish={onFinish}
+              />
+            </div>
+          </aside>
+        ) : (
+          <VotingUser
+            useEmployeesVoting={[employeesVoting, setEmployeesVoting]}
+            useIndexSlide={[indexSlide, setIndexSLide]}
+            loadingFinish={loadingFinish}
+            onFinish={onFinish}
+          >
+            <h2 className="text-sky-500 text-2xl font-bold uppercase">
+              Destaque da Sprint
+            </h2>
+            <figure className="flex flex-col items-center justify-center">
+              {navigationProps?.hindsight.winningEmployee?.url ? (
+                <div className="avatar">
+                  <div className="w-20 mask mask-squircle">
+                    <img src={navigationProps?.hindsight.winningEmployee.url} />
                   </div>
-                ) : (
-                  <div className="avatar placeholder">
-                    <div className="bg-gray-400 dark:bg-gray-400 text-neutral-content mask mask-squircle w-20">
-                      <span className="text-2xl font-roboto font-medium">
-                        {navigationProps?.hindsight.winningEmployee?.name[0]}
-                      </span>
-                    </div>
+                </div>
+              ) : (
+                <div className="avatar placeholder">
+                  <div className="w-20 h-20 flex items-center justify-center text-white uppercase rounded-3xl bg-gray-400">
+                    <span className="text-2xl font-roboto font-medium">
+                      {navigationProps?.hindsight.winningEmployee?.name[0]}
+                    </span>
                   </div>
-                )}
+                </div>
+              )}
 
-                <figcaption className="mt-3.5 flex flex-col items-center justify-center gap-2">
-                  <strong className="text-base text-center">
-                    {navigationProps?.hindsight.winningEmployee?.name}
-                  </strong>
-                  <span className="text-base text-center">
-                    {navigationProps?.hindsight.winningEmployee?.office}
-                  </span>
+              <figcaption className="mt-3.5 flex flex-col items-center justify-center gap-2">
+                <strong className="text-base text-center">
+                  {navigationProps?.hindsight.winningEmployee?.name}
+                </strong>
+                <span className="text-base text-center">
+                  {navigationProps?.hindsight.winningEmployee?.office}
+                </span>
 
-                  <button
-                    type="button"
-                    onClick={handleClickBackToInit}
-                    className="btn mt-3 border-none bg-sky-500 hover:bg-sky-500 w-max mx-auto"
-                  >
-                    Voltar para o inicio
-                  </button>
-                </figcaption>
-              </figure>
-            </VotingUser>
-          )}
-        </div>
+                <button
+                  type="button"
+                  onClick={handleClickBackToInit}
+                  className="btn btn-primary px-5 mt-3 border-none !bg-sky-500 !hover:bg-sky-500 w-max mx-auto"
+                >
+                  Voltar para o inicio
+                </button>
+              </figcaption>
+            </figure>
+          </VotingUser>
+        )}
       </div>
-    </>
+    </section>
   );
 }

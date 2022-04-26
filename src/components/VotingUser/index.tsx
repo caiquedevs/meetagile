@@ -1,132 +1,129 @@
-import { useState, useEffect, ReactNode, memo } from 'react';
-import { FiChevronLeft, FiChevronRight } from 'react-icons/fi';
+import { useState, useEffect, ReactNode, memo, Dispatch, SetStateAction } from 'react';
+import { Swiper, SwiperSlide } from 'swiper/react';
+import { Swiper as SwiperClass } from 'swiper/types';
 import { useLocation } from 'react-router-dom';
 
-import { IEmployee } from '../../interfaces/employee';
+import { IStepProps } from '../../interfaces/stepProps';
 import { shuffleArray } from '../../utils/shuffleArray';
+import Button from '../Button';
 
-type VotingUserProps = {
-  onFinish?: () => void;
-  current?: [any, any];
+import 'swiper/css';
+import 'swiper/css/navigation';
+
+import { Navigation } from 'swiper';
+import { StepThreeProps } from '../../interfaces/hindsight';
+
+export interface ICurrentEmployee {
+  current: StepThreeProps;
+  indexSlide: number;
+}
+
+type VotingEmployeeProps = {
+  useEmployeesVoting: [StepThreeProps[], Dispatch<SetStateAction<StepThreeProps[]>>];
+  useIndexSlide: [number, Dispatch<SetStateAction<number>>];
   loadingFinish?: boolean;
   children?: ReactNode;
+  onFinish?: () => void;
 };
 
-export function VotingUser({
-  onFinish,
-  loadingFinish,
-  current,
-  children,
-}: VotingUserProps) {
-  const { state }: any = useLocation();
+function VotingEmployeeCarousel(props: VotingEmployeeProps) {
+  const location = useLocation();
 
-  const [index, setIndex] = useState(0);
-  const [randomEmployees, setRandomEmployees] = useState<IEmployee[]>([]);
-  const [currentEmployee, setCurrentEmployee] = current || [];
+  const { state: navigationProps } = location as IStepProps;
 
-  if (children) {
+  const [employeesVoting, setEmployeesVoting] = props.useEmployeesVoting;
+  const [indexSlide, setIndexSlide] = props.useIndexSlide;
+
+  const handleChangeIndex = (swipper: SwiperClass) => {
+    setIndexSlide(swipper.activeIndex);
+  };
+
+  useEffect(() => {
+    const filterEmployees = navigationProps.hindsight?.stepThree.filter(
+      (item) => item.employee
+    );
+
+    const random = shuffleArray([...filterEmployees]);
+    console.log('random', random);
+    setEmployeesVoting(random);
+
+    return () => {};
+  }, []);
+
+  if (props.children) {
     return (
       <div
-        className="py-9 flex flex-col items-center justify-center gap-5 bg-white border border-gray-300 rounded"
-        style={{ minWidth: '399px', minHeight: '252px' }}
+        className="-mt-24 py-9 flex h-max flex-col items-center justify-center gap-5 bg-white border border-gray-300 rounded"
+        style={{ minWidth: '400px', minHeight: '252px' }}
       >
-        {children}
+        {props.children}
       </div>
     );
   }
 
-  const handleClickNext = () => {
-    if (index + 1 === randomEmployees.length) return;
-    setIndex(index + 1);
-  };
-
-  const handleClickPrev = () => {
-    if (index + 1 === 1) return;
-    setIndex(index - 1);
-  };
-
-  const handleClickFinish = () => {
-    onFinish && onFinish();
-  };
-
-  useEffect(() => {
-    setRandomEmployees(shuffleArray(state.employees));
-    return () => {};
-  }, []);
-
-  useEffect(() => {
-    if (randomEmployees.length === 0) return;
-    setCurrentEmployee(randomEmployees[index]);
-    return () => {};
-  }, [index, randomEmployees]);
-
   return (
-    <div
-      style={{ minWidth: '300px' }}
-      className="py-9 flex flex-col items-center gap-5 bg-white border border-gray-300 rounded lg:!min-w-400px"
-    >
-      <div className="w-full px-9 flex justify-between absolute top-24 left-0">
-        <button
+    <div className="lg:max-w-300px bottom-0 left-0 py-9 flex flex-col items-center bg-white border border-gray-300 rounded lg:!min-w-400px">
+      <Swiper
+        onActiveIndexChange={handleChangeIndex}
+        navigation={true}
+        modules={[Navigation]}
+        className="voting-employee-swiper"
+      >
+        {employeesVoting.map((employee) => (
+          <SwiperSlide>
+            <figure className="flex flex-col items-center justify-center animate-fadeIn select-none">
+              {employee?.employee?.url && employee?.employee?.url !== 'null' ? (
+                <div className="avatar">
+                  <div className="w-20 h-20 mask mask-squircle">
+                    <img
+                      src={employee?.employee?.url}
+                      alt="user image"
+                      className="w-20 h-20 rounded-3xl"
+                    />
+                  </div>
+                </div>
+              ) : (
+                <div className="avatar placeholder">
+                  <div className="w-20 h-20 flex items-center justify-center text-white uppercase rounded-3xl bg-gray-400">
+                    <span className="text-2xl font-roboto font-medium">
+                      {employee?.employee?.name && employee?.employee?.name[0]}
+                    </span>
+                  </div>
+                </div>
+              )}
+
+              <figcaption
+                style={{ minHeight: '84px' }}
+                className="mt-3.5 flex flex-col items-center justify-center gap-2 animate-fadeIn"
+              >
+                <strong className="text-base text-center">
+                  {employee?.employee?.name}
+                </strong>
+                <span className="text-base text-center">
+                  {employee?.employee?.office}
+                </span>
+              </figcaption>
+            </figure>
+          </SwiperSlide>
+        ))}
+      </Swiper>
+
+      <small className="flex text-sm text-center text-gray-800">
+        {indexSlide + 1} / {employeesVoting.length}
+      </small>
+
+      {indexSlide + 1 === employeesVoting.length ? (
+        <Button
           type="button"
-          disabled={index + 1 === 1}
-          onClick={handleClickPrev}
-          className="btn btn-ghost p-0 disabled:bg-transparent"
-        >
-          <FiChevronLeft size="30px" color={index + 1 === 1 ? '#bdbdbd' : '#19202a'} />
-        </button>
-
-        <button
-          type="button"
-          disabled={index + 1 === randomEmployees.length}
-          onClick={handleClickNext}
-          className="btn btn-ghost p-0 disabled:bg-transparent"
-        >
-          <FiChevronRight size="30px" />
-        </button>
-      </div>
-
-      <figure className="flex flex-col items-center justify-center animate-fadeIn select-none">
-        {currentEmployee?.url && currentEmployee?.url !== 'null' ? (
-          <div className="avatar">
-            <div className="w-20 h-20 mask mask-squircle">
-              <img src={currentEmployee?.url} />
-            </div>
-          </div>
-        ) : (
-          <div className="avatar placeholder">
-            <div className="w-20 h-20 bg-gray-400 dark:bg-gray-400 text-neutral-content mask mask-squircle ">
-              <span className="text-2xl font-roboto font-medium">
-                {currentEmployee?.name[0]}
-              </span>
-            </div>
-          </div>
-        )}
-
-        <figcaption
-          className="mt-3.5 flex flex-col items-center justify-center gap-2 animate-fadeIn"
-          style={{ minHeight: '84px' }}
-        >
-          <strong className="text-base text-center">{currentEmployee?.name}</strong>
-          <span className="text-base text-center">{currentEmployee?.office}</span>
-
-          <small className="flex text-sm text-center text-gray-800">
-            {index + 1} / {randomEmployees.length}
-          </small>
-        </figcaption>
-      </figure>
-
-      {index + 1 === randomEmployees.length ? (
-        <button
-          type="button"
-          onClick={handleClickFinish}
-          disabled={loadingFinish}
-          className="btn btn-outline px-6 py-2 hover:!text-gray-500 hover:!border-gray-500 rounded disabled:loading"
+          onClick={props.onFinish}
+          loading={props.loadingFinish}
+          className="btn btn-outline mt-4 px-6 !w-max !border-gray-500 !text-gray-500 hover:opacity-50 disabled:bg-gray-400 disabled:!text-white disabled:border-0"
         >
           Concluir Etapa
-        </button>
+        </Button>
       ) : null}
     </div>
   );
 }
 
-export default memo(VotingUser);
+export default memo(VotingEmployeeCarousel);

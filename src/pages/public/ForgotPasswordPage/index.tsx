@@ -1,6 +1,7 @@
 import { ChangeEvent, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
+import { Button } from '../../../components';
 import request from '../../../services/api';
 import { Container } from './styles';
 
@@ -43,9 +44,9 @@ function HomePage() {
 
   const FeedBackSendEmail = () => (
     <form className="h-screen flex flex-col items-center justify-center bg-gray-100">
-      <div className="card w-full max-w-lg shadow-sm rounded-lg">
-        <div className="card-body px-8 md:px-16 py-14 gap-7">
-          <strong className="font-roboto font-bold text-2xl text-gray-600 text-center">
+      <div className="card w-full max-w-lg shadow-sm rounded-lg bg-white">
+        <div className="flex flex-col px-8 md:px-16 py-14 gap-7">
+          <strong className="font-roboto font-bold text-2xl text-gray-600 text-left">
             Email enviado
           </strong>
 
@@ -81,10 +82,14 @@ function HomePage() {
         onSubmit={handleSubmit}
         className="h-screen flex flex-col items-center justify-center bg-gray-100"
       >
-        <div className="card w-full max-w-lg shadow-sm rounded-lg">
-          <div className="card-body px-8 md:px-16 py-14 gap-7">
+        <div className="card w-full max-w-lg shadow-sm rounded-lg bg-white">
+          <div className="flex flex-col px-8 md:px-16 py-14 gap-7">
             <div className="flex justify-center h-20">
-              <img src="/images/logo.svg" alt="logo" className="animate-fadeIn" />
+              <img
+                src="/images/logo.svg"
+                alt="logo"
+                className="animate-fadeIn w-auto h-16"
+              />
             </div>
 
             <strong className="font-roboto font-bold text-2xl text-gray-600 text-center">
@@ -99,18 +104,18 @@ function HomePage() {
                 placeholder="Email para recuperação"
                 value={email}
                 onChange={handleChangeField}
-                className="input input-bordered input-md w-full"
+                className="input input-primary"
               />
             </div>
 
             <div className="w-full flex flex-col items-center gap-3">
-              <button
+              <Button
                 type="submit"
-                disabled={loading}
+                loading={loading}
                 className="w-full btn btn-primary text-white disabled:loading"
               >
                 Enviar
-              </button>
+              </Button>
 
               <button className="w-full btn btn-outline" onClick={handleClickBack}>
                 Voltar

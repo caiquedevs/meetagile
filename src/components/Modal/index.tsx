@@ -1,53 +1,60 @@
+import { useNavigate } from 'react-router-dom';
 import { Dialog, Transition } from '@headlessui/react';
-import {
-  ForwardedRef,
-  forwardRef,
-  Fragment,
-  ReactNode,
-  useImperativeHandle,
-  useState,
-} from 'react';
+import { ForwardedRef, forwardRef, Fragment, useImperativeHandle, useState } from 'react';
 
 export interface ModalInterface {
   closeModal: () => any;
   openModal: (payload?: any) => void;
   toogleModal: () => void;
-  getPayload: () => void;
+  closeModalSimple: () => void;
+  payload: any;
+  setPayload: (payload: any) => void;
 }
 
 interface PageProps {
-  children: ReactNode;
+  children: any;
+  preventNavigate?: boolean;
   modalChildren?: any;
+  returnUrl?: string;
 }
 
 function ModalComponent(props: PageProps, ref: ForwardedRef<ModalInterface | undefined>) {
+  const navigate = useNavigate();
+
   let [isOpen, setIsOpen] = useState(false);
-  let [payload, setPayload] = useState<any>(undefined);
-  console.log('payload', payload);
+  let [payloadModal, setPayloadModal] = useState<any>(undefined);
 
-  const toogleModal = () => setIsOpen(!isOpen);
-  const getPayload = () => payload;
-
-  const closeModal = () => {
-    setIsOpen(false);
-    return payload;
+  const setPayload = (value: any) => {
+    setPayloadModal(value);
   };
 
-  const openModal = (info: any) => {
-    setPayload(info);
+  const openModal = (payload?: any) => {
+    setPayloadModal(payload);
     setIsOpen(true);
   };
+
+  const closeModal = () => {
+    const url: any = props.returnUrl || -1;
+
+    setPayloadModal(undefined);
+    setIsOpen(false);
+    navigate(url);
+  };
+
+  const closeModalSimple = () => setIsOpen(false);
+  const toogleModal = () => setIsOpen(!isOpen);
 
   useImperativeHandle(
     ref,
     () => ({
-      closeModal,
+      payload: payloadModal,
+      setPayload: setPayload,
       openModal,
       toogleModal,
-      getPayload,
-      payload,
+      closeModal,
+      closeModalSimple,
     }),
-    [payload]
+    [payloadModal]
   );
 
   if (!isOpen) return null;
@@ -57,7 +64,7 @@ function ModalComponent(props: PageProps, ref: ForwardedRef<ModalInterface | und
       <Dialog
         as="div"
         className="fixed inset-0 z-10 overflow-y-auto"
-        onClose={closeModal}
+        onClose={props.preventNavigate ? closeModalSimple : closeModal}
       >
         <Dialog.Overlay className="fixed inset-0 bg-black opacity-30" />
         <div className="min-h-screen px-4 text-center">
@@ -73,7 +80,6 @@ function ModalComponent(props: PageProps, ref: ForwardedRef<ModalInterface | und
             <Dialog.Overlay className="fixed inset-0" />
           </Transition.Child>
 
-          {/* This element is to trick the browser into centering the modal contents. */}
           <span className="inline-block h-screen align-middle" aria-hidden="true">
             &#8203;
           </span>
@@ -87,7 +93,7 @@ function ModalComponent(props: PageProps, ref: ForwardedRef<ModalInterface | und
             leaveFrom="opacity-100 scale-100"
             leaveTo="opacity-0 scale-95"
           >
-            {props.children}
+            {props.children(payloadModal)}
           </Transition.Child>
         </div>
 

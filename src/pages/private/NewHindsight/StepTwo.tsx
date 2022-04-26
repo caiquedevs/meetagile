@@ -1,69 +1,49 @@
-import { ChangeEvent, useEffect, useState } from 'react';
+import { ChangeEvent, useEffect, useRef, useState } from 'react';
+import { useBeforeunload } from 'react-beforeunload';
+
+import { FiArrowLeft, FiArrowRight } from 'react-icons/fi';
+import { MdDeleteForever, MdModeEdit } from 'react-icons/md';
 import { useLocation, useNavigate } from 'react-router-dom';
 
-import { Header, Options, Table, VotesField, VotingUser } from '../../../components';
-import { IAction } from '../../../interfaces/action';
+import {
+  ConfirmModal,
+  ModalEditStep,
+  Options,
+  ShowIf,
+  VotesField,
+  VotingUser,
+} from '../../../components';
 
-import { IEmployee } from '../../../interfaces/employee';
-import { IHindsight } from '../../../interfaces/hindsight';
-import StepActions from './StepActions';
-
-interface IStep {
-  employeeName?: string;
-  description?: string;
-  votes?: number;
-  _id?: string;
-}
-
-interface PropsPage {
-  state: {
-    hindsight: IHindsight;
-    employees: IEmployee[];
-    actions: IAction;
-    hindMode: 'create' | 'edit' | 'view';
-  };
-}
+import { ModalInterface } from '../../../components/Modal';
+import { ICurrentEmployee } from '../../../components/VotingUser';
+import { IHindsight, StepThreeProps } from '../../../interfaces/hindsight';
+import { IStepProps } from '../../../interfaces/stepProps';
 
 function StepTwo() {
   const navigate = useNavigate();
-
   const location = useLocation();
-  const { state: navigationProps } = location as PropsPage;
+
+  const { state: navigationProps } = location as IStepProps;
+
+  const modalEditRef = useRef<ModalInterface>();
+  const modalConfirmRef = useRef<ModalInterface>();
 
   const [hindsight, setHindsight] = useState<IHindsight>(navigationProps?.hindsight);
-  const [actions, setActions] = useState<IAction>(navigationProps?.actions);
 
-  const [mode, setMode] = useState<'create' | number>('create');
-  const [currentEmployee, setCurrentEmployee] = useState<IEmployee | null>(null);
+  const [indexSlide, setIndexSLide] = useState(0);
+  const [employeesVoting, setEmployeesVoting] = useState<StepThreeProps[]>(
+    navigationProps.hindsight.stepThree
+  );
+
   const [description, setDescription] = useState('');
 
-  const headersTable = [
-    {
-      label: 'Nome',
-      value: 'employeeName',
-      className: 'hidden sm:table-cell',
-    },
-    {
-      label: 'Opnião',
-      value: 'description',
-      className: 'hidden sm:table-cell',
-    },
-    {
-      label: 'Concordância',
-      value: 'votes',
-      className: 'hidden sm:table-cell',
-    },
-  ];
+  const onReset = () => setDescription('');
 
   const handleClickGoBack = () => {
     navigate('../step-one', {
-      state: { ...navigationProps, hindsight, actions },
+      replace: true,
+      state: { ...navigationProps, hindsight },
     });
-  };
-
-  const onReset = () => {
-    setMode('create');
-    setDescription('');
   };
 
   const handleChangeField = (event: ChangeEvent<HTMLInputElement>) => {
@@ -77,9 +57,48 @@ function StepTwo() {
     setHindsight(payload);
   };
 
-  const onCreate = () => {
+  const handleClickDelete = ({ index }: any) => {
+    modalConfirmRef.current?.openModal(index);
+  };
+
+  const onConfirmDelete = () => {
+    const copyHindsight = { ...hindsight };
+
+    const index = modalConfirmRef.current?.payload;
+    copyHindsight.stepTwo.splice(index, 1);
+
+    onReset();
+    setHindsight(copyHindsight);
+    modalConfirmRef.current?.closeModalSimple();
+  };
+
+  const handleClickEdit = ({ description, index }: any) => {
+    modalEditRef.current?.openModal({ description, index });
+  };
+
+  const handleClickNext = () => {
+    navigate('../step-three', {
+      replace: true,
+      state: { ...navigationProps, hindsight },
+    });
+  };
+
+  const onConfirmEdit = () => {
+    const { description, index } = modalEditRef.current?.payload;
+
+    const copyHindsight = { ...hindsight };
+    copyHindsight.stepTwo[index].description = description;
+
+    onReset();
+    setHindsight(copyHindsight);
+    modalEditRef.current?.closeModalSimple();
+  };
+
+  const handleSubmit = (event: any) => {
+    event.preventDefault();
+
     const payload = {
-      employeeName: currentEmployee?.name!,
+      employeeName: employeesVoting[indexSlide].employee.name!,
       description: description,
       votes: 0,
     };
@@ -90,123 +109,162 @@ function StepTwo() {
     onReset();
   };
 
-  const onDelete = (index: number) => {
-    const payload = { ...hindsight };
-    payload.stepTwo.splice(index, 1);
-    setHindsight(payload);
-    onReset();
-  };
-
-  const onEdit = () => {
-    const payload = { ...hindsight };
-    payload.stepTwo[mode as number].description = description;
-    setHindsight(payload);
-    onReset();
-  };
-
-  const handleClickNext = () => {
-    navigate('../step-three', { state: { ...navigationProps, hindsight, actions } });
-  };
-
-  const handleSubmit = (event: any) => {
-    event.preventDefault();
-    mode === 'create' ? onCreate() : onEdit();
-  };
+  const optionsListTable = [
+    {
+      label: 'Editar',
+      icon: MdModeEdit,
+      onClick: handleClickEdit,
+    },
+    {
+      label: 'Excluir',
+      icon: MdDeleteForever,
+      onClick: handleClickDelete,
+    },
+  ];
 
   useEffect(() => {
-    if (!navigationProps) navigate('/new-hindsight');
+    if (!navigationProps) navigate('/dashboard');
   }, []);
 
   if (!navigationProps) return <></>;
 
   return (
-    <>
-      <Header
-        subTitle="Segunda etapa"
-        title="O que pode melhorar?"
-        onBack={handleClickGoBack}
-        onNext={navigationProps.hindMode !== 'create' && handleClickNext}
-        className="before:!bg-red-400 dark:before:!bg-red-400 text-white"
-      />
+    <section className="w-full min-h-screen bg-white">
+      <header
+        className="
+          w-full h-64
+          before:content-['']
+          before:w-full before:h-full
+          before:block before:absolute 
+          before:bg-red-400
+        "
+      >
+        <div className="pt-16 md:pt-24 px-8 md:px-14">
+          <div className="flex flex-col gap-1.5">
+            <div className="flex gap-3 items-center">
+              <button type="button" onClick={handleClickGoBack} className="flex">
+                <FiArrowLeft size="23" color="#ffffff" />
+              </button>
+
+              <h2 className="text-base md:text-lg font-medium text-white">
+                Segunda etapa
+              </h2>
+
+              <ShowIf condition={navigationProps.mode !== 'create'}>
+                <button type="button" onClick={handleClickNext} className="flex">
+                  <FiArrowRight size="23" color="#ffffff" />
+                </button>
+              </ShowIf>
+            </div>
+
+            <h1 className="font-bold text-2xl sm:text-2.5xl text-white">
+              O que pode melhorar?
+            </h1>
+          </div>
+        </div>
+      </header>
 
       <div className="w-full flex flex-col lg:flex-row lg:gap-16 pb-16 md:pb-16 px-8 md:px-14">
         <div className="w-full -mt-14 flex-1 flex flex-col gap-8">
-          <Table data={hindsight.stepTwo} colorHeader="text-white" headers={headersTable}>
-            {(props: { row: IStep; index: number }) => {
-              const handleClickDelete = () => onDelete(props.index);
-              const handleClickEdit = () => {
-                setMode(props.index!);
-                setDescription(props.row.description!);
-              };
+          <table style={{ borderSpacing: '0px 8px', borderCollapse: 'separate' }}>
+            <ShowIf condition={hindsight.stepTwo.length}>
+              <thead className="text-left text-white">
+                <tr>
+                  <th>Nome</th>
+                  <th>Opnião</th>
+                  <th>Concordância</th>
+                </tr>
+              </thead>
+            </ShowIf>
 
-              const handleChangeVotes = (value: number) => {
-                onChangeVotes(value, props.index);
-              };
-
-              return (
-                <tr key={props.row._id}>
-                  <td>
-                    <span className="min-w-max">{props.row.employeeName}</span>
-                  </td>
-
-                  <td>
-                    <span>{props.row.description}</span>
-                  </td>
-
-                  <td>
-                    <VotesField
-                      value={props.row.votes!}
-                      onChangeVotes={handleChangeVotes}
-                      max={navigationProps?.employees.length}
-                      disabled={navigationProps?.hindMode === 'view'}
-                    />
-                  </td>
-
-                  <td>
-                    {navigationProps.hindMode !== 'view' ? (
-                      <Options
-                        item={props.row}
-                        loadingDelete=""
-                        onDelete={handleClickDelete}
-                        onEdit={handleClickEdit}
-                      />
-                    ) : null}
+            <tbody>
+              <ShowIf condition={!hindsight.stepTwo.length}>
+                <tr className="bg-white text-gray-800">
+                  <td
+                    colSpan={3}
+                    className="px-5 py-4 rounded-l-md border border-r-0 border-gray-default break-words"
+                  >
+                    <div className="flex items-center justify-center text-gray-500">
+                      Nenhum conteudo a mostrar por enquanto!
+                    </div>
                   </td>
                 </tr>
-              );
-            }}
-          </Table>
+              </ShowIf>
+
+              {hindsight.stepTwo.map((row, index) => {
+                const handleChangeVotes = (value: number) => {
+                  onChangeVotes(value, index);
+                };
+
+                return (
+                  <tr key={index} className="bg-white text-gray-800">
+                    <td className="px-5 py-4 rounded-l-md border border-r-0 border-gray-default break-words">
+                      {row?.employeeName}
+                    </td>
+
+                    <td className="border-y border-gray-default break-words">
+                      {row?.description}
+                    </td>
+
+                    <td className="border-y border-gray-default break-words">
+                      <VotesField
+                        value={row.votes}
+                        onChangeVotes={handleChangeVotes}
+                        max={navigationProps?.hindsight.stepThree.length}
+                        disabled={navigationProps?.mode === 'view'}
+                      />
+                    </td>
+
+                    <ShowIf condition={navigationProps.mode !== 'view'}>
+                      <td className="px-5 py-4 rounded-r-md border border-l-0 border-gray-default break-words">
+                        <div className="w-full h-auto flex items-center justify-end">
+                          <Options
+                            list={optionsListTable}
+                            currentItem={{ description: row.description, index }}
+                            iconSize="18px"
+                          />
+                        </div>
+                      </td>
+                    </ShowIf>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
         </div>
 
-        {navigationProps.hindMode !== 'view' ? (
-          <div className="lg:-mt-40">
-            <VotingUser
-              current={[currentEmployee, setCurrentEmployee]}
-              onFinish={handleClickNext}
-            />
-
-            <form onSubmit={handleSubmit} className="flex flex-col mt-2">
-              <input
-                type="text"
-                name="hindsightName"
-                placeholder={`O que o ${currentEmployee?.name} tem a dizer?`}
-                required={true}
-                value={description}
-                onChange={handleChangeField}
-                className="input input-bordered w-full rounded focus:outline-none "
+        {navigationProps.mode !== 'view' ? (
+          <aside className="lg:min-w-400px">
+            <div className="lg:fixed lg:-mt-40">
+              <VotingUser
+                useEmployeesVoting={[employeesVoting, setEmployeesVoting]}
+                useIndexSlide={[indexSlide, setIndexSLide]}
+                onFinish={handleClickNext}
               />
 
-              <button
-                type="submit"
-                className="btn mt-2 rounded border-none hover:bg-red-400 bg-red-400"
-              >
-                {mode === 'create' ? 'Cadastrar' : 'Salvar alterações'}
-              </button>
-            </form>
-          </div>
+              <form onSubmit={handleSubmit} className="flex flex-col mt-2">
+                <input
+                  type="text"
+                  name="hindsightName"
+                  required={true}
+                  value={description}
+                  onChange={handleChangeField}
+                  placeholder={`O que ${employeesVoting[indexSlide]?.employee?.name} tem a dizer?`}
+                  className="input input-primary"
+                />
+
+                <button type="submit" className="btn btn-primary mt-2 !bg-red-400">
+                  Cadastrar
+                </button>
+              </form>
+            </div>
+          </aside>
         ) : null}
       </div>
-    </>
+
+      <ModalEditStep onConfirm={onConfirmEdit} modalRef={modalEditRef} />
+      <ConfirmModal onConfirm={onConfirmDelete} modalRef={modalConfirmRef} />
+    </section>
   );
 }
 

@@ -1,5 +1,4 @@
 import NavigationBar from './NavigationBar';
-import Header from './Header';
 import Options from './Options';
 import Table from './Table';
 import VotingUser from './VotingUser';
@@ -8,10 +7,13 @@ import Modal from './Modal';
 import ShowIf from './ShowIf';
 import Button from './Button';
 import ConfirmModal from './ConfirmModal';
-import EmployeeModal from './EmployeeModal';
+
+import ModalFormEmployee from './ModalFormEmployee';
+import ModalShowEmployee from './ModalShowEmployee';
+import ModalFormHindsight from './ModalFormHindsight';
+import ModalEditStep from './ModalEditStep';
 
 export {
-  Header,
   NavigationBar,
   Options,
   Table,
@@ -21,5 +23,8 @@ export {
   ShowIf,
   Button,
   ConfirmModal,
-  EmployeeModal,
+  ModalFormEmployee,
+  ModalShowEmployee,
+  ModalFormHindsight,
+  ModalEditStep,
 };
