@@ -24,7 +24,7 @@ function VotesField({ value, onChangeVotes, max, disabled }: Props) {
           type="button"
           disabled={disabled || value === 0}
           onClick={handleClickDecrement}
-          className="text-red-400 disabled:text-gray-300"
+          className="text-red-400 disabled:text-gray-300 dark:disabled:text-gray-500"
         >
           <FiMinusCircle size="18px" />
         </button>
@@ -37,7 +37,7 @@ function VotesField({ value, onChangeVotes, max, disabled }: Props) {
           type="button"
           disabled={disabled || value === max - 1}
           onClick={handleClickIncrement}
-          className="text-green-500 disabled:text-gray-300"
+          className="text-green-500 disabled:text-gray-300 dark:disabled:text-gray-500"
         >
           <FiPlusCircle size="18px" />
         </button>

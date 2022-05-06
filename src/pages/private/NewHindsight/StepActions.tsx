@@ -1,13 +1,18 @@
-import React, { ChangeEvent, MutableRefObject, useRef, useState } from 'react';
-import { FaWindowClose } from 'react-icons/fa';
-import { IoMdClose, IoMdSend } from 'react-icons/io';
+import { ChangeEvent, MutableRefObject, useRef, useState } from 'react';
+import { IoMdClose } from 'react-icons/io';
 import { MdDeleteForever, MdModeEdit } from 'react-icons/md';
-import { useLocation, useNavigate } from 'react-router-dom';
+import { useDispatch, useSelector } from 'react-redux';
+import { useLocation } from 'react-router-dom';
 import { ConfirmModal, Options, ShowIf } from '../../../components';
 import Modal, { ModalInterface } from '../../../components/Modal';
-import { useDashboard } from '../../../hooks/useDashboard';
-import { IAction } from '../../../interfaces/action';
-import { IStepProps } from '../../../interfaces/stepProps';
+import { INavigationStepProps } from '../../../interfaces/navigationStep';
+
+import { IRootState } from '../../../store/modules/rootReducer';
+import * as actionsStep from '../../../store/modules/step/actions';
+import * as actionsDashboard from '../../../store/modules/dashboard/actions';
+
+import { useRequest } from '../../../hooks/useRequest';
+import { toast } from 'react-toastify';
 
 type StepActionsProps = {
   modalRef: MutableRefObject<ModalInterface | undefined>;
@@ -22,17 +27,22 @@ const colorsSelect: Record<string, string> = {
 };
 
 export default function StepActions({ modalRef }: StepActionsProps) {
-  const navigate = useNavigate();
+  const dispatch = useDispatch();
   const location = useLocation();
-
-  const { data, setData } = useDashboard();
+  const request = useRequest();
 
   const modalEditRef = useRef<ModalInterface>();
   const modalConfirmRef = useRef<ModalInterface>();
 
-  const { state: navigationProps } = location as IStepProps;
+  const { state } = location as INavigationStepProps;
+  const navigationProps = state || { mode: 'create' };
 
-  const [actions, setActions] = useState(navigationProps.actions);
+  const { actions } = useSelector((state: IRootState) => state.dashboardReducer);
+  const { currentActions } = useSelector((state: IRootState) => state.stepReducer);
+
+  const finallyActions = actions._id ? actions : currentActions;
+  console.log('finallyActions', finallyActions);
+
   const [actionName, setActionName] = useState('');
   const [actionNameEdit, setActionNameEdit] = useState({ value: '', index: -1 });
 
@@ -46,12 +56,26 @@ export default function StepActions({ modalRef }: StepActionsProps) {
 
   const handleClickCloseModal = () => {
     modalRef.current?.closeModalSimple();
+
+    request({
+      method: 'PUT',
+      url: `/action/${finallyActions._id}`,
+      data: actions,
+    }).catch(onError);
+
+    function onError(error: any) {
+      toast.error(
+        'Houve um erro ao salvar as ações, por favor, contate um administrador'
+      );
+    }
   };
 
   const handleChangeSelect = ({ value, index }: any) => {
-    const copyActions = { ...actions };
+    const copyActions = { ...finallyActions };
     copyActions.data[index as number].status = value;
-    setActions(copyActions);
+
+    dispatch(actionsStep.setCurrentActions(copyActions));
+    dispatch(actionsDashboard.setActions(copyActions));
   };
 
   const handleClickDelete = ({ row, index }: any) => {
@@ -60,10 +84,12 @@ export default function StepActions({ modalRef }: StepActionsProps) {
 
   const onDelete = () => {
     const { row, index } = modalConfirmRef.current?.payload;
-    const copyActions = { ...actions };
+    const copyActions = { ...finallyActions };
     copyActions.data.splice(index, 1);
 
-    setActions(copyActions);
+    dispatch(actionsStep.setCurrentActions(copyActions));
+    dispatch(actionsDashboard.setActions(copyActions));
+
     setActionName('');
     modalConfirmRef.current?.closeModalSimple();
   };
@@ -74,20 +100,25 @@ export default function StepActions({ modalRef }: StepActionsProps) {
   };
 
   const onEdit = () => {
-    const copyActions = { ...actions };
+    const copyActions = { ...finallyActions };
     copyActions.data[actionNameEdit.index].name = actionNameEdit.value;
 
     modalEditRef.current?.closeModalSimple();
-    setActions(copyActions);
+
+    dispatch(actionsStep.setCurrentActions(copyActions));
+    dispatch(actionsDashboard.setActions(copyActions));
+
     setActionNameEdit({ value: '', index: -1 });
   };
 
   const onCreate = () => {
     const payload = { name: actionName, status: 'TO DO' };
-    const copyActions = { ...actions };
+    const copyActions = { ...finallyActions };
     copyActions.data.unshift(payload);
 
-    setActions(copyActions);
+    dispatch(actionsStep.setCurrentActions(copyActions));
+    dispatch(actionsDashboard.setActions(copyActions));
+
     setActionName('');
   };
 
@@ -118,6 +149,7 @@ export default function StepActions({ modalRef }: StepActionsProps) {
     <Modal
       ref={modalRef}
       preventNavigate={true}
+      callbackBackDrop={handleClickCloseModal}
       modalChildren={
         <>
           <EditModal
@@ -137,7 +169,7 @@ export default function StepActions({ modalRef }: StepActionsProps) {
     >
       {() => {
         return (
-          <div className="inline-block w-full my-8 max-w-screen-lg px-10 py-12 pb-16  text-left align-middle transition-all transform bg-white dark:!bg-gray-800 rounded">
+          <div className="inline-block w-full my-8 max-w-screen-lg px-10 py-12 pb-16  text-left align-middle transition-all transform bg-white dark:!bg-gray-900 rounded">
             <button
               type="button"
               onClick={handleClickCloseModal}
@@ -145,22 +177,25 @@ export default function StepActions({ modalRef }: StepActionsProps) {
               w-8 h-8 p-0
               flex items-center justify-center 
               absolute -top-3 -right-3 z-10
-              bg-gray-600 rounded-full text-white text-lg
+              bg-gray-600 dark:bg-white rounded-full text-white dark:text-black text-lg
             "
             >
               <IoMdClose />
             </button>
 
-            <div className="w-full text-center flex h-full flex-col justify-between">
+            <div className="w-full flex h-full flex-col justify-between">
+              <h3 className="text-lg font-medium leading-6 text-gray-900 dark:text-white">
+                Gerenciar ações do time
+              </h3>
+
+              <div className="mt-2">
+                <p className="text-sm text-gray-500 dark:text-white/80">
+                  Preencha os campos abaixo para cadastrar uma nova ação
+                </p>
+              </div>
               <div className="w-full flex-1 flex flex-col gap-5">
                 {navigationProps.mode !== 'view' ? (
-                  <form onSubmit={handleSubmit} className="form-control">
-                    <label className="label">
-                      <span className="label-text text-gray-800 dark:text-gray-800">
-                        Criar nova ação
-                      </span>
-                    </label>
-
+                  <form onSubmit={handleSubmit} className="mt-4">
                     <div className="flex w-full">
                       <input
                         type="text"
@@ -183,42 +218,48 @@ export default function StepActions({ modalRef }: StepActionsProps) {
                 ) : null}
 
                 <table style={{ borderSpacing: '0px 8px', borderCollapse: 'separate' }}>
-                  <ShowIf condition={actions?.data.length}>
+                  <ShowIf condition={finallyActions?.data?.length}>
                     <thead className="text-left">
                       <tr>
-                        <th className="font-roboto font-medium text-gray-800">Nome</th>
-                        <th className="font-roboto font-medium text-gray-800">Opnião</th>
+                        <th className="font-roboto font-medium text-gray-800 dark:text-white">
+                          Nome
+                        </th>
+                        <th className="font-roboto font-medium text-gray-800 dark:text-white">
+                          Opnião
+                        </th>
                       </tr>
                     </thead>
                   </ShowIf>
 
                   <tbody>
-                    <ShowIf condition={!actions?.data?.length}>
-                      <tr className="bg-white text-gray-800">
+                    <ShowIf condition={!finallyActions?.data?.length}>
+                      <tr className="bg-white text-gray-800 dark:bg-slate-800">
                         <td
                           colSpan={3}
-                          className="px-5 py-4 rounded-l-md border border-r-0 border-gray-default break-words"
+                          className="px-5 py-4 rounded-l-md border border-r-0 border-gray-default dark:border-transparent break-words"
                         >
-                          <div className="flex items-center justify-center text-gray-500">
+                          <div className="flex items-center justify-center text-gray-500 dark:text-white/80">
                             Nenhum conteudo a mostrar por enquanto!
                           </div>
                         </td>
                       </tr>
                     </ShowIf>
 
-                    {actions?.data?.map((row, index) => {
+                    {finallyActions?.data?.map((row, index) => {
                       const onChangeSelect = (event: any) => {
                         const payload = { value: event.target.value, index };
                         handleChangeSelect(payload);
                       };
 
                       return (
-                        <tr key={index} className="tr-actions">
-                          <td className="px-5 py-4 rounded-l-md border border-r-0 border-gray-default break-words">
-                            <span className="text-left">{row?.name!}</span>
+                        <tr key={index} className="tr-actions dark:bg-slate-800">
+                          <td className="px-5 py-4 rounded-l-md border border-r-0 border-gray-default dark:border-transparent break-words">
+                            <span className="text-left dark:text-white">
+                              {row?.name!}
+                            </span>
                           </td>
 
-                          <td className="border-y border-gray-default break-words">
+                          <td className="border-y border-gray-default dark:border-transparent break-words">
                             <select
                               onChange={onChangeSelect}
                               value={row?.status!}
@@ -241,7 +282,7 @@ export default function StepActions({ modalRef }: StepActionsProps) {
                           </td>
 
                           {navigationProps.mode !== 'view' ? (
-                            <td className="px-5 py-4 rounded-r-md border border-l-0 border-gray-default break-words">
+                            <td className="px-5 py-4 rounded-r-md border border-l-0 border-gray-default dark:border-transparent break-words">
                               <div className="w-full flex items-center justify-end">
                                 <Options
                                   list={optionsListTable}

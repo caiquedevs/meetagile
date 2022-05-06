@@ -16,15 +16,15 @@ export default function OptionsComponent({ list, iconSize, currentItem }: PagePr
     const handleClick = () => item.onClick(currentItem);
 
     return (
-      <div className="px-1 py-1" key={index}>
+      <div className="px-1 py-1" key={item.label}>
         <Menu.Item>
           <button
             type="button"
             onClick={handleClick}
-            className="w-full px-2 py-2 flex items-center gap-3 rounded-md hover:bg-gray-200 ease-in-out duration-200 font-roboto text-sm uppercase"
+            className="w-full px-2 py-2 flex items-center gap-3 rounded-md hover:bg-gray-200 dark:hover:bg-slate-600 ease-in-out duration-200 font-roboto text-sm uppercase"
           >
             <item.icon className="text-teal-400 text-lg" />
-            {item.label}
+            <span className="text-black dark:text-white">{item.label}</span>
           </button>
         </Menu.Item>
       </div>
@@ -38,8 +38,8 @@ export default function OptionsComponent({ list, iconSize, currentItem }: PagePr
           className="
             w-full px-2 py-1
             justify-center inline-flex 
-            font-medium text-gray-800 
-            rounded-md hover:bg-gray-300 ease-in-out duration-300
+            font-medium text-gray-800 dark:text-white
+            rounded-md hover:bg-gray-300 dark:hover:bg-slate-600 ease-in-out duration-300
           "
         >
           <BsThreeDots size={iconSize || '22px'} />
@@ -55,7 +55,7 @@ export default function OptionsComponent({ list, iconSize, currentItem }: PagePr
         leaveFrom="transform opacity-100 scale-100"
         leaveTo="transform opacity-0 scale-95"
       >
-        <Menu.Items className="w-max absolute right-14 top-0 bg-white rounded-md shadow-card z-10 px-1 py-2">
+        <Menu.Items className="w-max absolute right-14 top-0 bg-white dark:bg-slate-900 rounded-md shadow-card z-10 px-1 py-2">
           {list.map(renderItemList)}
         </Menu.Items>
       </Transition>

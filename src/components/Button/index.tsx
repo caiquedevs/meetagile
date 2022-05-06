@@ -8,13 +8,13 @@ interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   loading?: boolean;
 }
 
-function Button({ children, ...props }: ButtonProps) {
+function Button({ children, loading, ...props }: ButtonProps) {
   return (
-    <button {...props} disabled={props.loading || props.disabled}>
+    <button {...props} disabled={loading || props.disabled}>
       <div className="flex items-center justify-center gap-2">
         <span className="leading-initial">{children}</span>
 
-        <ShowIf condition={props.loading}>
+        <ShowIf condition={loading}>
           <svg
             role="status"
             className="inline w-4 h-4 text-white/50 animate-spin fill-white"

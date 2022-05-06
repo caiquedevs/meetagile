@@ -16,14 +16,12 @@ function ConfirmModal({ modalRef, onConfirm, loadingConfirm }: ConfirmModalProps
     <Modal ref={modalRef} preventNavigate={true}>
       {() => {
         return (
-          <div className="inline-block w-80 max-w-md px-5 py-5 overflow-hidden text-left align-middle transition-all transform bg-white dark:!bg-gray-800 shadow-xl rounded-2xl">
+          <div className="inline-block w-80 max-w-md px-5 py-5 overflow-hidden text-left align-middle transition-all transform bg-white dark:!bg-slate-900 shadow-xl rounded-2xl">
             <div className="w-full text-center flex h-full flex-col justify-between">
               <BsFillTrashFill className="mt-4 w-12 h-12 m-auto text-red-500 text-5xl" />
 
-              <p className="text-gray-800 dark:text-gray-200 text-xl font-bold mt-4">
-                Remover
-              </p>
-              <p className="text-gray-600 dark:text-gray-400 text-base py-2 px-6">
+              <p className="text-black dark:text-white text-xl font-bold mt-4">Remover</p>
+              <p className="text-gray-600 dark:text-white/80 text-base py-2 px-6">
                 Você deseja remover este item?
               </p>
 

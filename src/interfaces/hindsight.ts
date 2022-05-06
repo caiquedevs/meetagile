@@ -7,21 +7,20 @@ export interface StepProps {
   votes: number;
 }
 
-export interface StepThreeProps {
-  employee: IEmployee;
+export interface IStepThree extends IEmployee {
+  votedFor: IStepThree | null | undefined;
   votes: number;
-  votedFor: string | null | undefined;
 }
 
 export interface IHindsight {
-  _id: string;
+  _id?: string;
   name: string;
   stepOne: StepProps[];
   stepTwo: StepProps[];
-  stepThree: StepThreeProps[];
-  winningEmployee: any;
-  user_id: string;
-  updatedAt: string;
-  createdAt: string;
-  __v: number;
+  stepThree: IStepThree[];
+  winningEmployee?: any;
+  user_id?: string;
+  updatedAt?: string;
+  createdAt?: string;
+  __v?: number;
 }

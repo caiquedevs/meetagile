@@ -6,5 +6,6 @@ export interface IEmployee {
   url: string;
   createdAt?: string;
   updatedAt?: string;
+  votes?: number;
   __v?: number;
 }

@@ -4,9 +4,11 @@ import { toast } from 'react-toastify';
 import { Button, Modal } from '..';
 import { ModalInterface } from '../Modal';
 import { IEmployee } from '../../interfaces/employee';
-import request from '../../services/api';
+import { useRequest } from '../../hooks/useRequest';
 import checkChanges from '../../utils/checkChanges';
-import { useDashboard } from '../../hooks/useDashboard';
+import { useSelector, useDispatch } from 'react-redux';
+import { IRootState } from '../../store/modules/rootReducer';
+import * as actionsDashboard from '../../store/modules/dashboard/actions';
 
 const initialState = {
   name: '',
@@ -24,16 +26,25 @@ interface PropsPage {
 }
 
 export default function FormEmployee({}: any) {
+  const dispatch = useDispatch();
   const navigate = useNavigate();
   const location = useLocation();
+  const request = useRequest();
 
-  const { data, setData, loadingFetch } = useDashboard();
   const { state: navigationProps } = location as PropsPage;
 
   const modalRef = useRef<ModalInterface>();
 
+  const { employees } = useSelector((state: IRootState) => state.dashboardReducer);
   const [loadingSubmit, setLoadingSubmit] = useState(false);
   const [fields, setFields] = useState(initialState);
+
+  const oldFields = {
+    name: navigationProps.employee?.name!,
+    office: navigationProps.employee?.office!,
+    url: navigationProps.employee?.url!,
+    _id: navigationProps.employee?._id,
+  };
 
   const handleChangeField = (event: ChangeEvent<HTMLInputElement>) => {
     const { name, value } = event.currentTarget;
@@ -53,19 +64,18 @@ export default function FormEmployee({}: any) {
       .finally(onFinally);
 
     function onSuccess(response: any) {
-      const employees = [...data?.employees];
-      employees.unshift(response);
+      const copyEmployees = [...employees];
+      copyEmployees.unshift(response);
 
+      dispatch(actionsDashboard.setEmployees(copyEmployees));
       setFields(initialState);
-      setData((old) => ({ ...old, employees }));
 
       modalRef.current?.closeModal();
-      toast.success('Funcionário criado com sucesso!');
+      toast.success('Funcionário criado com sucesso!', { toastId: 'createEmployee' });
     }
 
     function onError(error: any) {
-      console.log('error', error);
-      toast.success(error.data.msg || 'Opps! não foi possível realizar esta operação');
+      toast.error(error.data.msg);
     }
 
     function onFinally() {
@@ -74,19 +84,6 @@ export default function FormEmployee({}: any) {
   };
 
   const onEdit = () => {
-    const oldFields = {
-      name: navigationProps.employee?.name!,
-      office: navigationProps.employee?.office!,
-      url: navigationProps.employee?.url!,
-      _id: navigationProps.employee?._id,
-    };
-
-    const hasChangedFields = checkChanges(fields, oldFields);
-
-    if (!hasChangedFields.length) {
-      return modalRef.current?.closeModal();
-    }
-
     setLoadingSubmit(true);
 
     request({ method: 'PUT', url: `/employee/${fields._id}`, data: fields })
@@ -95,14 +92,16 @@ export default function FormEmployee({}: any) {
       .finally(onFinally);
 
     function onSuccess(response: IEmployee) {
-      const employees = data.employees.map((employee) => {
+      const copyEmployees = employees.map((employee) => {
         if (employee._id === response._id) return response;
         return employee;
       });
 
-      setData((old) => ({ ...old, employees }));
+      dispatch(actionsDashboard.setEmployees(copyEmployees));
+      setFields(initialState);
+
       modalRef.current?.closeModal();
-      toast.success('Dados salvos com sucesso!');
+      toast.success('Dados salvos com sucesso!', { toastId: 'updateEmployee' });
     }
 
     function onError(error: any) {
@@ -143,15 +142,15 @@ export default function FormEmployee({}: any) {
   return (
     <Modal ref={modalRef} returnUrl={navigationProps.returnUrl}>
       {() => (
-        <div className="inline-block w-full max-w-md px-10 py-12 my-8 overflow-hidden text-left align-middle transition-all transform bg-white shadow-xl rounded-lg">
-          <h3 className="text-lg font-medium leading-6 text-gray-900">
+        <div className="inline-block w-full max-w-md px-10 py-12 my-8 overflow-hidden text-left align-middle transition-all transform bg-white dark:!bg-slate-900 shadow-xl rounded-lg">
+          <h3 className="text-lg font-medium leading-6 text-gray-900 dark:text-white">
             {navigationProps.formMode === 'create'
               ? 'Cadastrar funcionário'
               : 'Editar funcionário'}
           </h3>
 
           <div className="mt-2">
-            <p className="text-sm text-gray-500">
+            <p className="text-sm text-gray-500 dark:text-white/60">
               {navigationProps.formMode === 'create'
                 ? 'Preencha os campos abaixo para cadastrar uma novo funcionário para suas próximas retrospectivas.'
                 : 'Preencha os campos abaixo para editar este funcionário.'}
@@ -193,7 +192,12 @@ export default function FormEmployee({}: any) {
             </div>
 
             <div className="w-full mt-5 flex flex-col gap-3.5">
-              <Button type="submit" loading={loadingSubmit} className="btn btn-primary">
+              <Button
+                type="submit"
+                loading={loadingSubmit}
+                disabled={!checkChanges(fields, oldFields).length}
+                className="btn btn-primary"
+              >
                 {navigationProps.formMode === 'edit' ? 'Salvar alterações' : 'Cadastrar'}
               </Button>
             </div>

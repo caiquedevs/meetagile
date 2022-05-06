@@ -1,106 +1,123 @@
 import { useEffect, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
+import { FiArrowLeft } from 'react-icons/fi';
 import { toast } from 'react-toastify';
 
-import request from '../../../services/api';
+import { useDispatch, useSelector } from 'react-redux';
+import { IRootState } from '../../../store/modules/rootReducer';
+import * as actionsStep from '../../../store/modules/step/actions';
+import * as actionsDashboard from '../../../store/modules/dashboard/actions';
+
+import { useRequest } from '../../../hooks/useRequest';
+import { IEmployee } from '../../../interfaces/employee';
+import { IStepThree } from '../../../interfaces/hindsight';
+import { INavigationStepProps } from '../../../interfaces/navigationStep';
 
 import { VotingUser } from '../../../components';
-import { StepThreeProps } from '../../../interfaces/hindsight';
-import { FiArrowLeft } from 'react-icons/fi';
-import { ICurrentEmployee } from '../../../components/VotingUser';
-import { IStepProps } from '../../../interfaces/stepProps';
-import { IEmployee } from '../../../interfaces/employee';
 import { IAction } from '../../../interfaces/action';
 
-type Props = {};
-
-export default function StepThree({}: Props) {
+export default function StepThree() {
+  const dispatch = useDispatch();
   const navigate = useNavigate();
   const location = useLocation();
+  const request = useRequest();
 
-  const { state: navigationProps } = location as IStepProps;
-  const [loadingFinish, setLoadingFinish] = useState(false);
+  const { state: navigationProps } = location as INavigationStepProps;
 
-  const [actions, setActions] = useState<IAction>(navigationProps?.actions);
-  const [employees, setEmployees] = useState<StepThreeProps[]>([]);
+  const { currentHindsight } = useSelector((state: IRootState) => state.stepReducer);
+  const { hindsights } = useSelector((state: IRootState) => state.dashboardReducer);
+
+  const [employeesList, setEmployeesList] = useState([] as any[]);
 
   const [indexSlide, setIndexSLide] = useState(0);
-  const [employeesVoting, setEmployeesVoting] = useState<StepThreeProps[]>(
-    navigationProps.hindsight.stepThree
-  );
+  const [loadingSubmit, setLoadingSubmit] = useState(false);
 
   const handleClickGoBack = () => {
-    navigationProps.hindsight.stepThree = employees;
-    navigate('../step-two', { state: navigationProps });
+    const payload = { state: { ...navigationProps } };
+    navigate('../step-two', payload);
   };
 
-  const decrementOldVote = (id: string) => {
-    employees.map((item) => {
-      if (item.employee._id === id) item.votes--;
-      return item;
-    });
+  const handleClickBackToInit = () => {
+    navigate('/dashboard');
   };
 
-  const incrementNewVote = (index: number) => {
-    const copyEmployees = [...employees];
-    copyEmployees[index].votes++;
-
-    setEmployees(copyEmployees);
+  const getIndexFromDecrement = (arr: IStepThree[], id: string) => {
+    return arr.findIndex((employee) => employee._id === id);
   };
 
-  const handleChangeVote = (employee: StepThreeProps, index: number) => {
-    const copyEmployeesVoting = [...employeesVoting];
-    const currentEmployee = copyEmployeesVoting[indexSlide];
+  const handleChangeVote = (employeeSelected: any, index: number) => {
+    const copyHindsight = { ...currentHindsight };
+    const copyStepThree = [...currentHindsight?.stepThree];
 
-    if (currentEmployee.votedFor === employee.employee._id) {
-      decrementOldVote(currentEmployee.votedFor!);
-      copyEmployeesVoting[indexSlide].votedFor = null;
+    const idOldVotedFor = currentHindsight?.stepThree[indexSlide].votedFor?._id;
+    const indexOldVotedFor = getIndexFromDecrement(copyStepThree, idOldVotedFor!);
+
+    // Se funcionário ja foi escolhido. desmarcar funcionário!
+    if (idOldVotedFor === employeeSelected?._id) {
+      copyStepThree[index].votes--;
+      copyStepThree[indexSlide].votedFor = null;
     } else {
-      decrementOldVote(currentEmployee.votedFor!);
-      incrementNewVote(index);
-      copyEmployeesVoting[indexSlide].votedFor = employee.employee._id;
+      copyStepThree[index].votes++;
+      copyStepThree[indexSlide].votedFor = employeeSelected;
+      indexOldVotedFor >= 0 && copyStepThree[indexOldVotedFor].votes--;
     }
 
-    setEmployeesVoting(copyEmployeesVoting);
+    copyHindsight.stepThree = copyStepThree;
+    dispatch(actionsStep.setCurrentHindsight(copyHindsight));
   };
 
-  const onUpdateActions = (winningEmployee: StepThreeProps) => {
-    request({ method: 'PUT', url: `/action/${actions._id}`, data: actions })
+  const onUpdate = (winningEmployee: IEmployee) => {
+    const copyCurrentHindsight = { ...currentHindsight };
+    copyCurrentHindsight.winningEmployee = winningEmployee;
+
+    setLoadingSubmit(true);
+
+    request({
+      method: 'PUT',
+      url: `/hindsight/${copyCurrentHindsight?._id}`,
+      data: copyCurrentHindsight,
+    })
       .then(onSuccess)
       .catch(onError);
 
     function onSuccess() {
-      navigate('../step-finish', {
-        state: { ...navigationProps, actions, winningEmployee },
+      const filtered = hindsights.map((item) => {
+        if (item._id === copyCurrentHindsight._id) return copyCurrentHindsight;
+        return item;
       });
+
+      navigate('../step-finish', { state: { ...navigationProps, winningEmployee } });
+      dispatch(actionsStep.removeHindsightPending(copyCurrentHindsight?._id!));
+      dispatch(actionsDashboard.setHindsights(filtered));
     }
 
     function onError(error: any) {
       toast.error(error.data.msg);
-      setLoadingFinish(false);
+      setLoadingSubmit(false);
     }
   };
 
-  const onFinish = () => {
+  const onSubmit = () => {
+    console.log('currentHind', currentHindsight);
+
     let hasVote = false;
 
     // Buscar maior votação
-    const winningEmployee = employees.reduce(
-      (acumulador: StepThreeProps, current: StepThreeProps, index) => {
+    const winningEmployee = currentHindsight?.stepThree?.reduce(
+      (acumulador: IStepThree, current: IStepThree, index) => {
         if (current?.votes! > 0) hasVote = true;
         return current?.votes! > acumulador?.votes! ? current : acumulador;
       },
-      employees[0]
+      currentHindsight?.stepThree[0]
     );
 
     // Se não há nenhum voto
     if (!hasVote) return toast.warning('Faça uma votação para continuar');
 
     // Buscar empates
-    const hasADraw = employees.filter(
+    const hasADraw = currentHindsight?.stepThree?.filter(
       (employee) =>
-        employee.votes === winningEmployee.votes &&
-        employee.employee !== winningEmployee.employee
+        employee.votes === winningEmployee.votes && employee._id !== winningEmployee._id
     );
 
     //Se há algum empate
@@ -108,62 +125,33 @@ export default function StepThree({}: Props) {
       return toast.warning('Houve um impate, desempate para continuar!');
     }
 
-    const payload = {
-      ...navigationProps.hindsight,
-      StepThree: employees,
-      winningEmployee: winningEmployee.employee,
-    };
-
-    setLoadingFinish(true);
-
-    request({
-      method: 'PUT',
-      url: `/hindsight/${navigationProps?.hindsight._id}`,
-      data: payload,
-    })
-      .then(onSuccess)
-      .catch(onError);
-
-    function onSuccess() {
-      onUpdateActions(winningEmployee);
-    }
-
-    function onError(error: any) {
-      toast.error(error.data.msg);
-      setLoadingFinish(false);
-    }
-  };
-
-  const handleClickBackToInit = () => {
-    navigate('/dashboard');
+    onUpdate(winningEmployee);
   };
 
   useEffect(() => {
-    const filterEmployees = navigationProps.hindsight?.stepThree.filter(
-      (item) => item.employee
-    );
+    const filtered = currentHindsight?.stepThree?.map((item) => ({
+      _id: item._id,
+      user_id: item.user_id,
+      name: item.name,
+      office: item.office,
+      url: item.url,
+      votes: item.votes,
+    }));
 
-    setEmployees(filterEmployees);
+    setEmployeesList(filtered);
+
     return () => {};
-  }, []);
-
-  useEffect(() => {
-    if (!navigationProps) navigate('/dashboard');
-
-    return () => {};
-  }, []);
-
-  if (!navigationProps) return <></>;
+  }, [currentHindsight]);
 
   return (
-    <section className="w-full min-h-screen bg-white">
+    <section className="w-full min-h-screen bg-white dark:bg-slate-900">
       <header
         className="
           w-full h-64
           before:content-['']
           before:w-full before:h-full
           before:block before:absolute
-          before:bg-sky-500
+          before:bg-sky-500 dark:before:bg-sky-800
         "
       >
         <div className="pt-16 md:pt-24 px-8 md:px-14 flex gap-5">
@@ -192,15 +180,15 @@ export default function StepThree({}: Props) {
           </span>
 
           <ul className="w-full flex flex-col gap-2">
-            {employees.map((employee, index) => {
+            {employeesList.map((employee, index) => {
               const onChangeVote = () => handleChangeVote(employee, index);
-              const currentEmployee = employeesVoting[indexSlide];
+              const currentEmployee = currentHindsight?.stepThree[indexSlide];
 
-              const isTheVoter = currentEmployee?.employee._id === employee.employee._id;
-              const isTheVote = currentEmployee?.votedFor === employee.employee._id;
+              const isTheVoter = currentEmployee?._id === employee?._id;
+              const isTheVote = currentEmployee?.votedFor?._id === employee?._id;
 
               return (
-                <li key={employee.employee._id} className="h-max">
+                <li key={employee._id} className="h-max">
                   <input
                     className="sr-only peer"
                     type="checkbox"
@@ -209,16 +197,16 @@ export default function StepThree({}: Props) {
                     onChange={onChangeVote}
                     checked={navigationProps.mode !== 'view' && isTheVote}
                     disabled={navigationProps.mode === 'view' || isTheVoter}
-                    id={employee.employee._id!}
+                    id={employee._id!}
                   />
 
                   <label
                     className={`p-4 pr-10 shadow-card
                     flex items-center gap-5
-                    rounded bg-white select-none
+                    rounded bg-white dark:bg-slate-800 select-none
                     peer-checked:ring-green-400
                     disabled:peer-checked:!ring-gray-default
-                    peer-checked:bg-green-100
+                    peer-checked:bg-green-100 dark:peer-checked:bg-green-900
                     peer-checked:ring-2
                     peer-checked:border-transparent
                     disabled:hover:!bg-white
@@ -227,9 +215,8 @@ export default function StepThree({}: Props) {
                         ? ''
                         : 'cursor-pointer hover:bg-gray-100'
                     }
-
-                   `}
-                    htmlFor={employee.employee._id!}
+                  `}
+                    htmlFor={employee?._id!}
                   >
                     <article
                       className={`
@@ -242,34 +229,39 @@ export default function StepThree({}: Props) {
                         }
                       `}
                     >
-                      {employee.employee?.url ? (
+                      {employee?.url ? (
                         <img
-                          src={employee.employee?.url}
+                          src={employee?.url}
                           alt="user image"
                           className="w-16 h-16 rounded-3xl"
                         />
                       ) : (
                         <div className="w-10 h-10 flex items-center justify-center text-white uppercase rounded-xl bg-gray-400">
                           <span className="text-2xl font-roboto font-medium">
-                            {employee.employee?.name[0]}
+                            {employee?.name[0]}
                           </span>
                         </div>
                       )}
 
                       <div className="w-full flex items-center justify-between">
                         <div>
-                          <strong className="text-base">{employee.employee?.name}</strong>
-                          <span className="text-base">{employee.employee?.office}</span>
+                          <strong className="text-base dark:text-white">
+                            {employee?.name}
+                          </strong>
+                          <span className="text-base dark:text-white/90">
+                            {employee?.office}
+                          </span>
                         </div>
 
-                        <span className="text-base text-gray-600">
-                          {employee.votes} {employee.votes === 1 ? 'voto' : 'votos'}
+                        <span className="text-base text-gray-600 dark:text-white">
+                          {employee?.votes || 0}
+                          {employee?.votes === 1 ? ' voto' : ' votos'}
                         </span>
                       </div>
                     </article>
                   </label>
 
-                  <div className="w-5 h-5 absolute top-9 right-3 hidden peer-checked:flex">
+                  <div className="w-5 h-5 absolute top-7 right-3 hidden peer-checked:flex">
                     👍
                   </div>
                 </li>
@@ -282,52 +274,50 @@ export default function StepThree({}: Props) {
           <aside className="lg:min-w-400px">
             <div className="lg:fixed lg:-mt-40">
               <VotingUser
-                useEmployeesVoting={[employeesVoting, setEmployeesVoting]}
                 useIndexSlide={[indexSlide, setIndexSLide]}
-                loadingFinish={loadingFinish}
-                onFinish={onFinish}
+                loadingFinish={loadingSubmit}
+                onFinish={onSubmit}
               />
             </div>
           </aside>
         ) : (
           <VotingUser
-            useEmployeesVoting={[employeesVoting, setEmployeesVoting]}
             useIndexSlide={[indexSlide, setIndexSLide]}
-            loadingFinish={loadingFinish}
-            onFinish={onFinish}
+            loadingFinish={loadingSubmit}
+            onFinish={onSubmit}
           >
-            <h2 className="text-sky-500 text-2xl font-bold uppercase">
+            <h2 className="text-sky-500 dark:text-white text-2xl font-bold uppercase">
               Destaque da Sprint
             </h2>
             <figure className="flex flex-col items-center justify-center">
-              {navigationProps?.hindsight.winningEmployee?.url ? (
+              {currentHindsight?.winningEmployee?.url ? (
                 <div className="avatar">
                   <div className="w-20 mask mask-squircle">
-                    <img src={navigationProps?.hindsight.winningEmployee.url} />
+                    <img src={currentHindsight?.winningEmployee.url} />
                   </div>
                 </div>
               ) : (
                 <div className="avatar placeholder">
                   <div className="w-20 h-20 flex items-center justify-center text-white uppercase rounded-3xl bg-gray-400">
                     <span className="text-2xl font-roboto font-medium">
-                      {navigationProps?.hindsight.winningEmployee?.name[0]}
+                      {currentHindsight?.winningEmployee?.name[0]}
                     </span>
                   </div>
                 </div>
               )}
 
               <figcaption className="mt-3.5 flex flex-col items-center justify-center gap-2">
-                <strong className="text-base text-center">
-                  {navigationProps?.hindsight.winningEmployee?.name}
+                <strong className="text-base text-center dark:text-white">
+                  {currentHindsight?.winningEmployee?.name}
                 </strong>
-                <span className="text-base text-center">
-                  {navigationProps?.hindsight.winningEmployee?.office}
+                <span className="text-base text-center dark:text-white/80">
+                  {currentHindsight?.winningEmployee?.office}
                 </span>
 
                 <button
                   type="button"
                   onClick={handleClickBackToInit}
-                  className="btn btn-primary px-5 mt-3 border-none !bg-sky-500 !hover:bg-sky-500 w-max mx-auto"
+                  className="btn btn-primary px-5 mt-3 border-none !bg-sky-500 dark:!bg-sky-800 !hover:bg-sky-500 w-max mx-auto"
                 >
                   Voltar para o inicio
                 </button>

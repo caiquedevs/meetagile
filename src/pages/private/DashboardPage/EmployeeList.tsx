@@ -1,34 +1,37 @@
+import { useSelector } from 'react-redux';
+import { IRootState } from '../../../store/modules/rootReducer';
+import { useNavigate } from 'react-router-dom';
 import { Swiper, SwiperSlide } from 'swiper/react';
-import { BiPlus } from 'react-icons/bi';
 import { FreeMode } from 'swiper';
 
 import { IEmployee } from '../../../interfaces/employee';
 
 import { IoSettingsOutline } from 'react-icons/io5';
-import { useNavigate } from 'react-router-dom';
-import { useDashboard } from '../../../hooks/useDashboard';
-import { ShowIf } from '../../../components';
+import { BiPlus } from 'react-icons/bi';
+
+import 'swiper/css';
+import 'swiper/css/pagination';
 
 const SkeletonEmployee = (
   <SwiperSlide
     style={{ minHeight: '265px', maxWidth: '200px' }}
-    className="cursor-pointer w-full h-auto py-0 px-6 my-3 flex flex-col items-center justify-center gap-5 rounded-xl bg-white shadow-card"
+    className="cursor-pointer w-full h-auto py-0 px-6 my-3 flex flex-col items-center justify-center gap-5 rounded-xl bg-white dark:bg-slate-800 shadow-card"
   >
     <div className="absolute origin top-3 right-3 z-10">
-      <span className="w-6 h-6 block bg-gray-300 rounded animate-pulse-intense" />
+      <span className="w-6 h-6 block bg-gray-300 dark:bg-slate-600 rounded animate-pulse-intense" />
     </div>
 
     <figure className="flex flex-col items-center justify-center gap-5 select-none">
       <div className="avatar placeholder">
-        <div className="w-16 h-16 rounded-3xl bg-gray-300 animate-pulse-intense" />
+        <div className="w-16 h-16 rounded-3xl bg-gray-300 dark:bg-slate-600 animate-pulse-intense" />
       </div>
 
       <figcaption
         style={{ minHeight: '85px' }}
         className="h- flex flex-col items-center justify-center gap-2"
       >
-        <span className="w-32 h-5 block bg-gray-300 rounded animate-pulse-intense" />
-        <small className="w-20 h-5 bg-gray-300 rounded animate-pulse-intense" />
+        <span className="w-32 h-5 block bg-gray-300 dark:bg-slate-600 rounded animate-pulse-intense" />
+        <small className="w-20 h-5 bg-gray-300 dark:bg-slate-600 rounded animate-pulse-intense" />
       </figcaption>
     </figure>
   </SwiperSlide>
@@ -36,9 +39,11 @@ const SkeletonEmployee = (
 
 export default function EmployeeList() {
   const navigate = useNavigate();
-  const { data, setData, loadingFetch } = useDashboard();
-
   const returnUrl = location.pathname;
+
+  const { employees, loadingFetchDashboard } = useSelector(
+    (state: IRootState) => state.dashboardReducer
+  );
 
   const handleClickCreateEmployee = () => {
     navigate('form-employee', { state: { formMode: 'create', returnUrl } });
@@ -51,7 +56,9 @@ export default function EmployeeList() {
   return (
     <section>
       <div className="px-16 pt-10 pb-3">
-        <h2 className="font-medium font-roboto text-base text-gray-600">Funcionários</h2>
+        <h2 className="font-medium font-roboto text-base text-gray-600 dark:text-white">
+          Funcionários
+        </h2>
       </div>
 
       <Swiper
@@ -66,7 +73,7 @@ export default function EmployeeList() {
           style={{ minHeight: '265px', maxWidth: '200px' }}
           className="cursor-pointer w-full h-auto py-0 px-6 my-3
           flex flex-col items-center justify-center gap-5 
-          rounded-xl bg-white shadow-card"
+          rounded-xl bg-white dark:bg-slate-800 shadow-card"
         >
           <article className="flex flex-col items-center justify-center gap-7 select-none">
             <div className="flex items-center justify-center">
@@ -77,7 +84,7 @@ export default function EmployeeList() {
               </div>
             </div>
 
-            <span className="font-roboto text-base font-medium text-center text-black/60 leading-normal">
+            <span className="font-roboto text-base font-medium text-center text-black/60 dark:text-white leading-normal">
               Adicionar
               <br />
               funcionário
@@ -85,24 +92,24 @@ export default function EmployeeList() {
           </article>
         </SwiperSlide>
 
-        {loadingFetch ? (
+        {loadingFetchDashboard ? (
           <>
             {SkeletonEmployee}
             {SkeletonEmployee}
           </>
         ) : null}
 
-        {data?.employees?.map((employee) => {
+        {employees?.map((employee) => {
           const handleClickOptions = () => handleClickOptionsEmployee(employee);
 
           return (
             <SwiperSlide
-              key={employee._id}
+              key={employee.name}
               style={{ minHeight: '265px', maxWidth: '200px' }}
               className={`w-full h-auto py-0 px-6 my-3
                 flex flex-col items-center justify-center gap-5 
-                rounded-xl bg-white shadow-card ${
-                  data?.employees.length > 6 ? 'cursor-move' : ''
+                rounded-xl bg-white dark:bg-slate-800 shadow-card ${
+                  employees?.length > 5 ? 'cursor-move' : ''
                 }`}
             >
               <div className="absolute origin top-3 right-3 z-10">
@@ -111,7 +118,7 @@ export default function EmployeeList() {
                   onClick={handleClickOptions}
                   className="btn btn-primary !h-max p-1
                   font-medium !text-gray-400
-                  !bg-transparent rounded-md hover:!bg-gray-50 ease-in-out duration-300
+                  !bg-transparent rounded-md hover:!bg-gray-50 dark:hover:!bg-slate-600 ease-in-out duration-300
                 "
                 >
                   <IoSettingsOutline size="22px" />
@@ -141,8 +148,12 @@ export default function EmployeeList() {
                   style={{ minHeight: '85px' }}
                   className="h- flex flex-col items-center justify-center gap-2"
                 >
-                  <strong className="text-base text-center">{employee.name}</strong>
-                  <span className="text-base text-center">{employee.office}</span>
+                  <strong className="text-base text-center text-black/70 dark:text-white">
+                    {employee.name}
+                  </strong>
+                  <span className="text-base text-center text-black/70 dark:text-white/60">
+                    {employee.office}
+                  </span>
                 </figcaption>
               </figure>
             </SwiperSlide>
