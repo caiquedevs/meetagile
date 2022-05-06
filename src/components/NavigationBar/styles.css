@@ -2,15 +2,6 @@ nav.navigation-mobile {
   @apply md:hidden;
 }
 
-nav.navigation-desktop {
-  @apply hidden md:flex;
-}
-
-nav.navigation-desktop header {
-  border-bottom: 1px solid #dddfe2;
-  box-shadow: 4px 0px 4px rgba(0, 0, 0, 0.08);
-}
-
 .btn-navigation {
   @apply w-auto md:w-full
   p-3 md:p-0 md:py-4

@@ -1,10 +1,11 @@
 import { ChangeEvent, useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import { useDispatch, useSelector } from 'react-redux';
+import * as actionsAuth from '../../../store/modules/auth/actions';
+import * as actionsDashboard from '../../../store/modules/dashboard/actions';
+import * as actionsStep from '../../../store/modules/step/actions';
 
-import request, { api } from '../../../services/api';
 import { UserProps } from '../../../interfaces/user';
-import { useAuth } from '../../../hooks/useAuth';
-import { toast } from 'react-toastify';
 import { Button } from '../../../components';
 
 interface ResponseProps {
@@ -19,8 +20,10 @@ const initialState = {
 
 export default function HomePage() {
   const navigate = useNavigate();
+  const dispatch = useDispatch();
 
-  const { setAuth } = useAuth();
+  const { isLoggedIn } = useSelector((state: any) => state.authReducer);
+
   const [fields, setFields] = useState(initialState);
   const [loading, setLoading] = useState(false);
 
@@ -33,66 +36,35 @@ export default function HomePage() {
 
   const handleSubmit = (e: any) => {
     e.preventDefault();
-    setLoading(true);
-
-    request({ method: 'POST', url: '/user/login', data: fields })
-      .then(onSuccess)
-      .catch(onError)
-      .finally(onFinally);
-
-    function onSuccess(response: ResponseProps) {
-      const payload = {
-        isLoggedIn: true,
-        token: response.token,
-        user: response.currentUser,
-      };
-
-      setAuth(payload);
-      localStorage.setItem('auth', JSON.stringify(payload));
-      api.defaults.headers.Authorization = `Bearer ${response.token}`;
-
-      navigate('/dashboard');
-    }
-
-    function onError(error: any) {
-      toast.error(error.data.msg);
-    }
-
-    function onFinally() {
-      setLoading(false);
-    }
+    dispatch(actionsStep.stepClear());
+    dispatch(actionsDashboard.dashboardClear());
+    dispatch(actionsAuth.loginRequest({ navigate, data: fields, setLoading }));
   };
 
   useEffect(() => {
-    const payload = {
-      isLoggedIn: false,
-      token: null,
-      user: null,
-    };
-
-    setAuth(payload);
-    localStorage.setItem('auth', JSON.stringify(payload));
-    api.defaults.headers.Authorization = '';
-    return () => {};
+    if (isLoggedIn) navigate('/dashboard');
   }, []);
+
+  if (isLoggedIn) return <></>;
 
   return (
     <main>
       <form
         onSubmit={handleSubmit}
-        className="min-h-screen flex flex-col items-center justify-center bg-gray-100"
+        className="min-h-screen flex flex-col items-center justify-center bg-gray-100 dark:bg-slate-900"
       >
-        <div className="card w-full max-w-lg shadow-sm rounded-lg bg-white">
+        <div className="card w-full max-w-lg shadow-sm rounded-lg bg-white dark:bg-slate-800">
           <div className="flex flex-col px-8 md:px-16 py-14 gap-7">
             <div className="flex justify-center h-20">
+              <img src="/images/logo.svg" alt="logo" className="h-14 dark:hidden" />
               <img
-                src="/images/logo.svg"
+                src="/images/logo-white.svg"
                 alt="logo"
-                className="animate-fadeIn w-auto h-16"
+                className="h-12 hidden dark:flex"
               />
             </div>
 
-            <strong className="font-roboto font-bold text-2xl text-gray-600 text-center">
+            <strong className="font-roboto font-bold text-2xl text-gray-600 text-center dark:text-white">
               Informe o email e senha vinculada a sua conta
             </strong>
 
@@ -104,7 +76,7 @@ export default function HomePage() {
                 placeholder="Email"
                 value={fields.email}
                 onChange={handleChangeField}
-                className="input input-primary"
+                className="input input-primary dark:!bg-slate-900"
               />
 
               <input
@@ -114,7 +86,7 @@ export default function HomePage() {
                 placeholder="Senha"
                 value={fields.password}
                 onChange={handleChangeField}
-                className="input input-primary"
+                className="input input-primary dark:!bg-slate-900"
               />
             </div>
 
@@ -135,7 +107,7 @@ export default function HomePage() {
                 Inscrever-se
               </button>
 
-              <Link to="/forgot-password" className="font-roboto mt-3">
+              <Link to="/forgot-password" className="font-roboto mt-3 dark:text-white">
                 Esqueci minha senha
               </Link>
             </div>

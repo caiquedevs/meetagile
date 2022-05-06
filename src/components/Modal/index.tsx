@@ -16,6 +16,7 @@ interface PageProps {
   preventNavigate?: boolean;
   modalChildren?: any;
   returnUrl?: string;
+  callbackBackDrop?: () => void;
 }
 
 function ModalComponent(props: PageProps, ref: ForwardedRef<ModalInterface | undefined>) {
@@ -41,8 +42,20 @@ function ModalComponent(props: PageProps, ref: ForwardedRef<ModalInterface | und
     navigate(url);
   };
 
-  const closeModalSimple = () => setIsOpen(false);
+  const closeModalSimple = () => {
+    setPayloadModal(undefined);
+    setIsOpen(false);
+  };
+
   const toogleModal = () => setIsOpen(!isOpen);
+
+  const handleClickBackdrop = () => {
+    if (props.callbackBackDrop) {
+      props.callbackBackDrop();
+    } else {
+      props.preventNavigate ? closeModalSimple() : closeModal();
+    }
+  };
 
   useImperativeHandle(
     ref,
@@ -64,9 +77,9 @@ function ModalComponent(props: PageProps, ref: ForwardedRef<ModalInterface | und
       <Dialog
         as="div"
         className="fixed inset-0 z-10 overflow-y-auto"
-        onClose={props.preventNavigate ? closeModalSimple : closeModal}
+        onClose={handleClickBackdrop}
       >
-        <Dialog.Overlay className="fixed inset-0 bg-black opacity-30" />
+        <Dialog.Overlay className="fixed inset-0 bg-black/30 dark:bg-white/20" />
         <div className="min-h-screen px-4 text-center">
           <Transition.Child
             as={Fragment}

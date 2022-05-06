@@ -1,22 +1,19 @@
-import { MutableRefObject, useEffect, useRef, useState } from 'react';
-import { BsFillTrashFill } from 'react-icons/bs';
+import { useEffect, useRef, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
+import { BsFillTrashFill } from 'react-icons/bs';
+import { toast } from 'react-toastify';
+
+import { useDispatch, useSelector } from 'react-redux';
+import * as actionsDashboard from '../../store/modules/dashboard/actions';
+
+import { useRequest } from '../../hooks/useRequest';
 import { IEmployee } from '../../interfaces/employee';
-import Button from '../Button';
+
 import ConfirmModal from '../ConfirmModal';
 import Modal, { ModalInterface } from '../Modal';
-import { useDashboard } from '../../hooks/useDashboard';
-import { toast } from 'react-toastify';
-import request from '../../services/api';
+import { IRootState } from '../../store/modules/rootReducer';
 
-type Props = {
-  modalRef: MutableRefObject<ModalInterface | undefined>;
-  employeeSelected: IEmployee;
-  onEdit: (employee: IEmployee) => void;
-  onRemove: (employee: IEmployee) => void;
-};
-
-interface PropsPage {
+interface INavigationProps {
   state: {
     employee: IEmployee;
     returnUrl: string;
@@ -24,15 +21,17 @@ interface PropsPage {
 }
 
 export default function EmployeeModal() {
+  const dispatch = useDispatch();
   const navigate = useNavigate();
   const location = useLocation();
+  const request = useRequest();
 
-  const { state: navigationProps } = location as PropsPage;
-  const { data, setData, loadingFetch } = useDashboard();
+  const { state: navigationProps } = location as INavigationProps;
 
   const modalRef = useRef<ModalInterface>();
   const modalConfirmRef = useRef<ModalInterface>();
 
+  const { employees } = useSelector((state: IRootState) => state.dashboardReducer);
   const [loadingDelete, setLoadingDelete] = useState(false);
 
   const handleClickCloseModal = () => modalRef.current?.closeModal();
@@ -53,13 +52,14 @@ export default function EmployeeModal() {
       .finally(onFinally);
 
     function onSuccess() {
-      const employees = data.employees.filter(
+      const copyEmployees = employees.filter(
         (employee) => employee._id !== navigationProps.employee._id
       );
 
-      setData((old) => ({ ...old, employees }));
+      dispatch(actionsDashboard.setEmployees(copyEmployees));
+
       modalConfirmRef.current?.closeModal();
-      toast.success('Funcionário removido com sucesso!');
+      toast.success('Funcionário removido com sucesso!', { toastId: 'removeEmployee' });
     }
 
     function onError(error: any) {
@@ -94,13 +94,13 @@ export default function EmployeeModal() {
         }
       >
         {() => (
-          <div className="inline-block w-full max-w-md px-10 py-12 my-8 overflow-hidden text-left align-middle transition-all transform bg-white shadow-xl rounded-lg">
+          <div className="inline-block w-full max-w-md px-10 py-12 my-8 overflow-hidden text-left align-middle transition-all transform bg-white dark:bg-slate-900 shadow-xl rounded-lg">
             <button
               type="button"
               onClick={handleClickDelete}
-              className="p-2 absolute top-5 right-4 border border-gray-300 rounded-lg"
+              className="p-2 absolute top-5 right-4 border border-gray-300 dark:bg-gray-600 dark:border-transparent rounded-lg"
             >
-              <BsFillTrashFill className="w-5 h-5 text-red-500 text-5xl" />
+              <BsFillTrashFill className="w-5 h-5 text-red-500 dark:text-red-400 text-5xl" />
             </button>
 
             <figure className="flex flex-col items-center justify-center gap-5 select-none">
@@ -128,10 +128,11 @@ export default function EmployeeModal() {
                 style={{ minHeight: '85px' }}
                 className="h- flex flex-col items-center justify-center gap-2"
               >
-                <strong className="text-base text-center">
+                <strong className="text-base text-center text-black dark:text-white">
                   {navigationProps?.employee?.name}
                 </strong>
-                <span className="text-base text-center">
+
+                <span className="text-base text-center text-black dark:text-white/80">
                   {navigationProps?.employee?.office}
                 </span>
               </figcaption>

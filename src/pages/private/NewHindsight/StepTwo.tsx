@@ -1,9 +1,13 @@
 import { ChangeEvent, useEffect, useRef, useState } from 'react';
-import { useBeforeunload } from 'react-beforeunload';
+import { useLocation, useNavigate } from 'react-router-dom';
+
+import { useSelector, useDispatch } from 'react-redux';
+import * as actionsStep from '../../../store/modules/step/actions';
 
 import { FiArrowLeft, FiArrowRight } from 'react-icons/fi';
 import { MdDeleteForever, MdModeEdit } from 'react-icons/md';
-import { useLocation, useNavigate } from 'react-router-dom';
+
+import { INavigationStepProps } from '../../../interfaces/navigationStep';
 
 import {
   ConfirmModal,
@@ -15,46 +19,41 @@ import {
 } from '../../../components';
 
 import { ModalInterface } from '../../../components/Modal';
-import { ICurrentEmployee } from '../../../components/VotingUser';
-import { IHindsight, StepThreeProps } from '../../../interfaces/hindsight';
-import { IStepProps } from '../../../interfaces/stepProps';
+import { IRootState } from '../../../store/modules/rootReducer';
 
-function StepTwo() {
+export default function StepTwo() {
+  const dispatch = useDispatch();
   const navigate = useNavigate();
   const location = useLocation();
 
-  const { state: navigationProps } = location as IStepProps;
+  const { state: navigationProps } = location as INavigationStepProps;
 
   const modalEditRef = useRef<ModalInterface>();
   const modalConfirmRef = useRef<ModalInterface>();
+  const inputRef = useRef<HTMLInputElement>(null);
 
-  const [hindsight, setHindsight] = useState<IHindsight>(navigationProps?.hindsight);
-
+  const { currentHindsight } = useSelector((state: IRootState) => state.stepReducer);
   const [indexSlide, setIndexSLide] = useState(0);
-  const [employeesVoting, setEmployeesVoting] = useState<StepThreeProps[]>(
-    navigationProps.hindsight.stepThree
-  );
-
   const [description, setDescription] = useState('');
 
-  const onReset = () => setDescription('');
-
   const handleClickGoBack = () => {
-    navigate('../step-one', {
-      replace: true,
-      state: { ...navigationProps, hindsight },
-    });
+    const payload = { state: { ...navigationProps } };
+    navigate('../step-one', payload);
   };
 
-  const handleChangeField = (event: ChangeEvent<HTMLInputElement>) => {
-    const { value } = event.currentTarget;
-    setDescription(value);
+  const handleClickEdit = ({ description, index }: any) => {
+    modalEditRef.current?.openModal({ description, index });
   };
 
-  const onChangeVotes = (value: number, index: number) => {
-    const payload = { ...hindsight };
-    payload.stepTwo[index as number].votes = value;
-    setHindsight(payload);
+  const onConfirmEdit = () => {
+    const { description, index } = modalEditRef.current?.payload;
+
+    const copyHindsight = { ...currentHindsight };
+    copyHindsight.stepTwo[index].description = description;
+
+    onReset();
+    dispatch(actionsStep.setCurrentHindsight(copyHindsight));
+    modalEditRef.current?.closeModalSimple();
   };
 
   const handleClickDelete = ({ index }: any) => {
@@ -62,51 +61,14 @@ function StepTwo() {
   };
 
   const onConfirmDelete = () => {
-    const copyHindsight = { ...hindsight };
+    const copyHindsight = { ...currentHindsight };
 
     const index = modalConfirmRef.current?.payload;
     copyHindsight.stepTwo.splice(index, 1);
 
     onReset();
-    setHindsight(copyHindsight);
+    dispatch(actionsStep.setCurrentHindsight(copyHindsight));
     modalConfirmRef.current?.closeModalSimple();
-  };
-
-  const handleClickEdit = ({ description, index }: any) => {
-    modalEditRef.current?.openModal({ description, index });
-  };
-
-  const handleClickNext = () => {
-    navigate('../step-three', {
-      replace: true,
-      state: { ...navigationProps, hindsight },
-    });
-  };
-
-  const onConfirmEdit = () => {
-    const { description, index } = modalEditRef.current?.payload;
-
-    const copyHindsight = { ...hindsight };
-    copyHindsight.stepTwo[index].description = description;
-
-    onReset();
-    setHindsight(copyHindsight);
-    modalEditRef.current?.closeModalSimple();
-  };
-
-  const handleSubmit = (event: any) => {
-    event.preventDefault();
-
-    const payload = {
-      employeeName: employeesVoting[indexSlide].employee.name!,
-      description: description,
-      votes: 0,
-    };
-
-    const copyData = { ...hindsight };
-    copyData.stepTwo.push(payload);
-    setHindsight(copyData);
-    onReset();
   };
 
   const optionsListTable = [
@@ -122,27 +84,57 @@ function StepTwo() {
     },
   ];
 
-  useEffect(() => {
-    if (!navigationProps) navigate('/dashboard');
-  }, []);
+  const handleClickNext = () => {
+    const payload = { state: { ...navigationProps } };
+    navigate('../step-three', payload);
+  };
 
-  if (!navigationProps) return <></>;
+  const onReset = () => setDescription('');
+
+  const onChangeVotes = (value: number, index: number) => {
+    const copyHindsight = { ...currentHindsight };
+    copyHindsight.stepTwo[index as number].votes = value;
+
+    dispatch(actionsStep.setCurrentHindsight(copyHindsight));
+  };
+
+  const handleChangeField = (event: ChangeEvent<HTMLInputElement>) => {
+    setDescription(event.currentTarget.value);
+  };
+
+  const handleSubmit = (event: any) => {
+    event.preventDefault();
+
+    const payload = {
+      employeeName: currentHindsight?.stepThree[indexSlide]?.name!,
+      description: description,
+      votes: 0,
+    };
+
+    const copyHindsight = { ...currentHindsight };
+    copyHindsight.stepTwo.push(payload);
+
+    dispatch(actionsStep.setCurrentHindsight(copyHindsight));
+    onReset();
+
+    inputRef.current?.focus();
+  };
 
   return (
-    <section className="w-full min-h-screen bg-white">
+    <section className="w-full min-h-screen bg-white dark:bg-slate-900">
       <header
         className="
           w-full h-64
           before:content-['']
           before:w-full before:h-full
           before:block before:absolute 
-          before:bg-red-400
+          before:bg-red-400 dark:before:bg-rose-900
         "
       >
-        <div className="pt-16 md:pt-24 px-8 md:px-14">
+        <div className="pt-16 md:pt-24 px-8 md:px-14 flex gap-5">
           <div className="flex flex-col gap-1.5">
             <div className="flex gap-3 items-center">
-              <button type="button" onClick={handleClickGoBack} className="flex">
+              <button type="button" onClick={handleClickGoBack} className="btn flex">
                 <FiArrowLeft size="23" color="#ffffff" />
               </button>
 
@@ -150,11 +142,9 @@ function StepTwo() {
                 Segunda etapa
               </h2>
 
-              <ShowIf condition={navigationProps.mode !== 'create'}>
-                <button type="button" onClick={handleClickNext} className="flex">
-                  <FiArrowRight size="23" color="#ffffff" />
-                </button>
-              </ShowIf>
+              <button type="button" onClick={handleClickNext} className="btn flex">
+                <FiArrowRight size="23" color="#ffffff" />
+              </button>
             </div>
 
             <h1 className="font-bold text-2xl sm:text-2.5xl text-white">
@@ -167,7 +157,7 @@ function StepTwo() {
       <div className="w-full flex flex-col lg:flex-row lg:gap-16 pb-16 md:pb-16 px-8 md:px-14">
         <div className="w-full -mt-14 flex-1 flex flex-col gap-8">
           <table style={{ borderSpacing: '0px 8px', borderCollapse: 'separate' }}>
-            <ShowIf condition={hindsight.stepTwo.length}>
+            <ShowIf condition={currentHindsight?.stepTwo?.length}>
               <thead className="text-left text-white">
                 <tr>
                   <th>Nome</th>
@@ -178,45 +168,48 @@ function StepTwo() {
             </ShowIf>
 
             <tbody>
-              <ShowIf condition={!hindsight.stepTwo.length}>
-                <tr className="bg-white text-gray-800">
+              <ShowIf condition={!currentHindsight?.stepTwo?.length}>
+                <tr className="bg-white dark:bg-slate-800">
                   <td
                     colSpan={3}
-                    className="px-5 py-4 rounded-l-md border border-r-0 border-gray-default break-words"
+                    className="px-5 py-4 rounded-l-md border border-r-0 border-gray-default dark:border-transparent break-words"
                   >
-                    <div className="flex items-center justify-center text-gray-500">
+                    <div className="flex items-center justify-center text-gray-500 dark:text-white/80">
                       Nenhum conteudo a mostrar por enquanto!
                     </div>
                   </td>
                 </tr>
               </ShowIf>
 
-              {hindsight.stepTwo.map((row, index) => {
+              {currentHindsight?.stepTwo?.map((row, index) => {
                 const handleChangeVotes = (value: number) => {
                   onChangeVotes(value, index);
                 };
 
                 return (
-                  <tr key={index} className="bg-white text-gray-800">
-                    <td className="px-5 py-4 rounded-l-md border border-r-0 border-gray-default break-words">
-                      {row?.employeeName}
+                  <tr
+                    key={index}
+                    className="bg-white dark:bg-slate-800 text-gray-800 dark:text-white"
+                  >
+                    <td className="px-5 py-4 rounded-l-md border border-r-0 border-gray-default dark:border-transparent break-words">
+                      <span className="min-w-max">{row?.employeeName}</span>
                     </td>
 
-                    <td className="border-y border-gray-default break-words">
+                    <td className="border-y border-gray-default dark:border-transparent break-words">
                       {row?.description}
                     </td>
 
-                    <td className="border-y border-gray-default break-words">
+                    <td className="border-y border-gray-default dark:border-transparent break-words">
                       <VotesField
                         value={row.votes}
                         onChangeVotes={handleChangeVotes}
-                        max={navigationProps?.hindsight.stepThree.length}
+                        max={currentHindsight?.stepThree?.length}
                         disabled={navigationProps?.mode === 'view'}
                       />
                     </td>
 
                     <ShowIf condition={navigationProps.mode !== 'view'}>
-                      <td className="px-5 py-4 rounded-r-md border border-l-0 border-gray-default break-words">
+                      <td className="px-5 py-4 rounded-r-md border border-l-0 border-gray-default dark:border-transparent break-words">
                         <div className="w-full h-auto flex items-center justify-end">
                           <Options
                             list={optionsListTable}
@@ -237,23 +230,30 @@ function StepTwo() {
           <aside className="lg:min-w-400px">
             <div className="lg:fixed lg:-mt-40">
               <VotingUser
-                useEmployeesVoting={[employeesVoting, setEmployeesVoting]}
                 useIndexSlide={[indexSlide, setIndexSLide]}
                 onFinish={handleClickNext}
               />
 
               <form onSubmit={handleSubmit} className="flex flex-col mt-2">
                 <input
+                  ref={inputRef}
                   type="text"
                   name="hindsightName"
                   required={true}
                   value={description}
                   onChange={handleChangeField}
-                  placeholder={`O que ${employeesVoting[indexSlide]?.employee?.name} tem a dizer?`}
+                  placeholder={`O que ${
+                    currentHindsight?.stepThree
+                      ? currentHindsight?.stepThree[indexSlide]?.name
+                      : ''
+                  } tem a dizer?`}
                   className="input input-primary"
                 />
 
-                <button type="submit" className="btn btn-primary mt-2 !bg-red-400">
+                <button
+                  type="submit"
+                  className="btn btn-primary mt-2 !bg-red-400 dark:!bg-rose-800"
+                >
                   Cadastrar
                 </button>
               </form>
@@ -267,5 +267,3 @@ function StepTwo() {
     </section>
   );
 }
-
-export default StepTwo;

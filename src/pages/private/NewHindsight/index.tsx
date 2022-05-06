@@ -1,70 +1,80 @@
-import React, { useEffect, useRef } from 'react';
-import { Beforeunload, useBeforeunload } from 'react-beforeunload';
-import { BiArrowBack, BiCommentAdd, BiMessageSquareAdd } from 'react-icons/bi';
-import { FiLogOut } from 'react-icons/fi';
-import { GoGithubAction } from 'react-icons/go';
-import { MdOutlinePostAdd, MdPendingActions } from 'react-icons/md';
-import { VscColorMode, VscDiffAdded, VscPersonAdd, VscReactions } from 'react-icons/vsc';
-import { AiOutlineUserAdd } from 'react-icons/ai';
-import { Link, Outlet, useLocation, useNavigate } from 'react-router-dom';
-import { NavigationBar, ShowIf } from '../../../components';
-import { useTheme } from '../../../hooks/useTheme';
-import { IoPersonAddOutline } from 'react-icons/io5';
-import { RiPlayListAddLine } from 'react-icons/ri';
-import { useAuth } from '../../../hooks/useAuth';
+import { useEffect, useRef } from 'react';
+import { Outlet, useLocation, useNavigate } from 'react-router-dom';
 
-import StepActions from './StepActions';
+import {
+  MdArrowBackIosNew,
+  MdOutlineDarkMode,
+  MdOutlineLightMode,
+  MdPendingActions,
+} from 'react-icons/md';
+import { RiPlayListAddLine } from 'react-icons/ri';
+
+import { INavigationStepProps } from '../../../interfaces/navigationStep';
+
+import { ModalRandomComment, ShowIf } from '../../../components';
 import { ModalInterface } from '../../../components/Modal';
-import { IStepProps } from '../../../interfaces/stepProps';
+import StepActions from './StepActions';
+import { useDispatch, useSelector } from 'react-redux';
+import { IRootState } from '../../../store/modules/rootReducer';
+import * as actionsTheme from '../../../store/modules/theme/actions';
 
 type Props = {};
 
 export default function NewHindsight({}: Props) {
+  const dispatch = useDispatch();
   const navigate = useNavigate();
   const location = useLocation();
 
-  const { auth } = useAuth();
-  const { theme, setTheme } = useTheme();
+  const { state: navigationProps } = location as INavigationStepProps;
 
-  const { state: navigationProps } = location as IStepProps;
+  const { currentHindsight } = useSelector((state: IRootState) => state.stepReducer);
+  const { theme } = useSelector((state: IRootState) => state.themeReducer);
 
   const modalConfirmRef = useRef<ModalInterface>();
+  const modalRandomCommentRef = useRef<ModalInterface>();
+
+  const whiteListSingleComment = ['/new-hindsight/step-one', '/new-hindsight/step-two'];
 
   const noHasStep =
     location.pathname === '/new-hindsight' || location.pathname === '/new-hindsight/';
 
-  const handleChangeTheme = () => {
-    const currentTheme = theme === 'light' ? 'dark' : 'light';
-    setTheme(currentTheme);
-    localStorage.setItem('theme', currentTheme);
-  };
-
-  const handleClickNavigateToDashboard = (event: any) => {
-    if (navigationProps.mode === 'view') return navigate('/dashboard');
-
-    const input = confirm(
-      'Deseja voltar? \nÉ possível que as alterações feitas não sejam salvas.'
-    );
-
-    if (input) navigate('/dashboard');
+  const handleClickNavigateToDashboard = () => {
+    navigate('/dashboard');
   };
 
   const handleClickShowActions = () => {
     modalConfirmRef.current?.openModal();
   };
 
-  if (navigationProps.mode !== 'view') {
-    useBeforeunload((event) => {
-      event.preventDefault();
-    });
-  }
+  const handleClickShowModalRandomComment = () => {
+    modalRandomCommentRef.current?.openModal();
+  };
+
+  const handleClickToogleTheme = () => {
+    dispatch(actionsTheme.toogleTheme());
+  };
 
   useEffect(() => {
-    if (noHasStep) navigate('/dashboard');
+    if (
+      noHasStep ||
+      !navigationProps?.mode ||
+      (!location.pathname.includes('step-finish') && !currentHindsight?._id)
+    )
+      navigate('/dashboard');
     return () => {};
   }, []);
 
-  if (noHasStep) return <></>;
+  useEffect(() => {
+    document.body.className = theme;
+    return () => {};
+  }, [theme]);
+
+  if (
+    noHasStep ||
+    !navigationProps?.mode ||
+    (!location.pathname.includes('step-finish') && !currentHindsight?._id)
+  )
+    return <></>;
 
   return (
     <main>
@@ -73,24 +83,46 @@ export default function NewHindsight({}: Props) {
           style={{ backdropFilter: 'blur(10px)' }}
           className="w-full absolute top-0 left-0 z-10 bg-white/20"
         >
-          <header className="w-full h-14 pl-5 flex items-center justify-between">
+          <header className="w-full h-14  flex items-center justify-between">
             <button
               type="button"
               onClick={handleClickNavigateToDashboard}
-              className="flex items-center gap-3 font-roboto text-lg text-white font-medium"
+              style={{ backdropFilter: 'blur(10px)' }}
+              className="px-5 h-14 flex items-center gap-3 font-roboto text-lg text-white font-medium bg-white/05"
             >
-              <BiArrowBack className="text-2xl text-white" />
-              Dashboard
+              <MdArrowBackIosNew className="text-2xl text-white" />
             </button>
 
+            <div className="flex items-center gap-3 font-roboto text-lg text-white font-bold uppercase">
+              {currentHindsight?.name}
+            </div>
+
             <div className="h-full px-5 flex items-center gap-3 bg-white">
-              {/* <button
+              <button
                 type="button"
-                onClick={handleChangeTheme}
-                className="btn w-8 h-8 flex items-center justify-center hover:bg-gray-300 rounded-full"
+                onClick={handleClickToogleTheme}
+                className="btn disabled:animate-pulse-intense disabled:bg-gray-300 disabled:text-black/50 w-8 h-8 flex items-center justify-center hover:bg-gray-200 rounded-full"
               >
-                <RiPlayListAddLine size="18px" className="text-black" />
-              </button> */}
+                {theme === 'light' ? (
+                  <MdOutlineDarkMode size="19px" className="text-black" />
+                ) : (
+                  <MdOutlineLightMode size="19px" className="text-black" />
+                )}
+              </button>
+              <ShowIf
+                condition={
+                  navigationProps.mode !== 'view' &&
+                  whiteListSingleComment.includes(location.pathname)
+                }
+              >
+                <button
+                  type="button"
+                  onClick={handleClickShowModalRandomComment}
+                  className="btn w-8 h-8 flex items-center justify-center hover:bg-gray-300 rounded-full"
+                >
+                  <RiPlayListAddLine size="18px" className="text-black" />
+                </button>
+              </ShowIf>
 
               <button
                 type="button"
@@ -110,6 +142,7 @@ export default function NewHindsight({}: Props) {
         </nav>
 
         <StepActions modalRef={modalConfirmRef} />
+        <ModalRandomComment modalRef={modalRandomCommentRef} />
       </ShowIf>
 
       <Outlet />

@@ -1,25 +1,32 @@
+import { useEffect } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
 import { Outlet } from 'react-router-dom';
+import * as actionsDashboard from '../../../store/modules/dashboard/actions';
 
 import { NavigationBar } from '../../../components';
 
-import DashboardProvider from '../../../context/dashboardContext';
-
 import EmployeeList from './EmployeeList';
 import HindsightList from './HindsightList';
+import { IRootState } from '../../../store/modules/rootReducer';
 
-import 'swiper/css';
-import 'swiper/css/pagination';
+export default function DashboardPage(props: any) {
+  const dispatch = useDispatch();
 
-export default function DashboardPage() {
+  const { hindsights } = useSelector((state: IRootState) => state.dashboardReducer);
+
+  useEffect(() => {
+    if (!Boolean(hindsights.length)) {
+      dispatch(actionsDashboard.dashboardRequest());
+    }
+  }, []);
+
   return (
-    <main className="pb-16">
+    <main className="min-h-screen pb-16">
       <NavigationBar />
 
-      <DashboardProvider>
-        <EmployeeList />
-        <HindsightList />
-        <Outlet />
-      </DashboardProvider>
+      <EmployeeList />
+      <HindsightList />
+      <Outlet />
     </main>
   );
 }

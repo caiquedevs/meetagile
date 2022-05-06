@@ -1,6 +1,5 @@
 import NavigationBar from './NavigationBar';
 import Options from './Options';
-import Table from './Table';
 import VotingUser from './VotingUser';
 import VotesField from './VotesField';
 import Modal from './Modal';
@@ -12,11 +11,11 @@ import ModalFormEmployee from './ModalFormEmployee';
 import ModalShowEmployee from './ModalShowEmployee';
 import ModalFormHindsight from './ModalFormHindsight';
 import ModalEditStep from './ModalEditStep';
+import ModalRandomComment from './ModalRandomComment';
 
 export {
   NavigationBar,
   Options,
-  Table,
   VotingUser,
   VotesField,
   Modal,
@@ -27,4 +26,5 @@ export {
   ModalShowEmployee,
   ModalFormHindsight,
   ModalEditStep,
+  ModalRandomComment,
 };

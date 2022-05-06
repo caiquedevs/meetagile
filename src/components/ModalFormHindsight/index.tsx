@@ -1,16 +1,22 @@
 import { ChangeEvent, useEffect, useRef, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
-import request from '../../services/api';
 
-import { ModalInterface } from '../Modal';
+import { useDispatch, useSelector } from 'react-redux';
+import { IRootState } from '../../store/modules/rootReducer';
+import * as actionsDashboard from '../../store/modules/dashboard/actions';
+import * as actionsStep from '../../store/modules/step/actions';
+
+import { useRequest } from '../../hooks/useRequest';
 import { IHindsight } from '../../interfaces/hindsight';
-import { useDashboard } from '../../hooks/useDashboard';
+import { isUniqueInArray } from '../../utils/isUnique';
 
-import { Button, Modal, ShowIf } from '..';
-import { IStepProps } from '../../interfaces/stepProps';
+import Modal, { ModalInterface } from '../Modal';
+import Button from '../Button';
+import ShowIf from '../ShowIf';
+import hindsightMock from '../../utils/hindsightData';
 
-interface PropsPage {
+interface INavigationProps {
   state: {
     formMode: 'create' | 'edit';
     hindsight: IHindsight;
@@ -19,14 +25,20 @@ interface PropsPage {
 }
 
 export default function FormHindsight() {
+  const dispatch = useDispatch();
   const navigate = useNavigate();
   const location = useLocation();
+  const request = useRequest();
 
-  const { data, setData } = useDashboard();
-  const { state: navigationProps } = location as PropsPage;
+  const { state: navigationProps } = location as INavigationProps;
+
+  const { employees, hindsights, actions } = useSelector(
+    (state: IRootState) => state.dashboardReducer
+  );
+
+  const { hindsightsPending } = useSelector((state: IRootState) => state.stepReducer);
 
   const modalRef = useRef<ModalInterface>();
-
   const [loadingSubmit, setLoadingSubmit] = useState(false);
   const [fields, setFields] = useState({ name: '' });
 
@@ -40,47 +52,68 @@ export default function FormHindsight() {
   };
 
   const handleClickEditSteps = () => {
-    if (data.employees.length <= 1) {
+    if (employees.length <= 1) {
       return toast.warn('Cadastre mais funcionários para continuar');
     }
 
-    const payload: IStepProps = {
-      state: {
-        actions: data.actions,
-        hindsight: { ...navigationProps.hindsight },
-        mode: 'update',
-      },
-    };
+    const getCurrent = hindsightsPending?.filter(
+      (item) => item.name === navigationProps?.hindsight?.name
+    )[0];
 
-    navigate('/new-hindsight/step-one', payload);
+    if (!getCurrent) {
+      const copyHindsightsPending = hindsightsPending ? [...hindsightsPending!] : [];
+      copyHindsightsPending.push(navigationProps?.hindsight);
+
+      dispatch(actionsStep.setHindsightsPending([...copyHindsightsPending]));
+    }
+
+    dispatch(actionsStep.setCurrentHindsight(getCurrent || navigationProps?.hindsight));
+    dispatch(actionsStep.setCurrentActions(actions));
+
+    navigate('/new-hindsight/step-one', { state: { mode: 'update' } });
   };
 
   const onCreate = () => {
-    if (data.employees.length <= 1) {
+    if (employees.length <= 1) {
       return toast.warn('Cadastre mais funcionários para continuar');
     }
+
+    const isUnique = isUniqueInArray(fields.name, 'name', hindsights);
+
+    if (!isUnique) {
+      return toast.warn('Já existe uma retrospectiva com esse nome!');
+    }
+
+    const stepThree = employees.map((employee) => ({
+      ...employee,
+      votedFor: undefined,
+      votes: 0,
+    }));
 
     setLoadingSubmit(true);
 
     request({
       method: 'POST',
       url: '/hindsight/register',
-      data: { name: fields.name },
+      data: { name: fields.name, stepThree },
     })
       .then(onSuccess)
       .catch(onError)
       .finally(onFinally);
 
-    function onSuccess(hindsight: IHindsight) {
-      const payload: IStepProps = {
-        state: {
-          actions: data.actions,
-          hindsight: hindsight,
-          mode: 'create',
-        },
-      };
+    function onSuccess(response: IHindsight) {
+      const copyHindsightsPending = [...hindsightsPending];
+      copyHindsightsPending.push(response);
 
-      navigate('/new-hindsight/step-one', payload);
+      const copyHindsights = [...hindsights];
+      copyHindsights.unshift(response);
+
+      dispatch(actionsDashboard.setHindsights(copyHindsights));
+      dispatch(actionsStep.setHindsightsPending([...copyHindsightsPending]));
+      dispatch(actionsStep.setCurrentHindsight(response));
+      dispatch(actionsStep.setCurrentActions(actions));
+
+      navigate('/new-hindsight/step-one', { state: { mode: 'create' } });
     }
 
     function onError(error: any) {
@@ -93,10 +126,6 @@ export default function FormHindsight() {
   };
 
   const onEdit = () => {
-    if (fields.name === navigationProps.hindsight?.name) {
-      return modalRef.current?.closeModal();
-    }
-
     setLoadingSubmit(true);
 
     request({
@@ -109,17 +138,26 @@ export default function FormHindsight() {
       .finally(onFinally);
 
     function onSuccess() {
-      const hindsights = data.hindsights.map((hindsight) => {
+      const copyHindsights = hindsights.map((hindsight) => {
         if (hindsight._id === navigationProps.hindsight?._id) {
           hindsight.name = fields.name;
         }
-
         return hindsight;
       });
 
-      setData((old) => ({ ...old, hindsights }));
+      const copyHindsightsPending = hindsightsPending.map((hindsight) => {
+        if (hindsight?._id === navigationProps?.hindsight?._id) {
+          hindsight.name = fields.name;
+        }
+        return hindsight;
+      });
+
+      dispatch(actionsDashboard.setHindsights(copyHindsights));
+      dispatch(actionsStep.setHindsightsPending(copyHindsightsPending));
+      setFields({ name: '' });
+
       modalRef.current?.closeModal();
-      toast.success('Alterações salvas com sucesso!');
+      toast.success('Alterações salvas com sucesso!', { toastId: 'updateHindsight' });
     }
 
     function onError(error: any) {
@@ -152,15 +190,15 @@ export default function FormHindsight() {
   return (
     <Modal ref={modalRef} returnUrl={navigationProps.returnUrl}>
       {() => (
-        <div className="inline-block w-full max-w-md px-10 py-12 my-8 overflow-hidden text-left align-middle transition-all transform bg-white shadow-xl rounded-lg">
-          <h3 className="text-lg font-medium leading-6 text-gray-900">
+        <div className="inline-block w-full max-w-md px-10 py-12 my-8 overflow-hidden text-left align-middle transition-all transform bg-white dark:bg-slate-900 shadow-xl rounded-lg">
+          <h3 className="text-lg font-medium leading-6 text-gray-900 dark:text-white">
             {navigationProps.formMode === 'create'
               ? 'Cadastrar retrospectiva'
               : 'Editar retrospectiva'}
           </h3>
 
           <div className="mt-2">
-            <p className="text-sm text-gray-500">
+            <p className="text-sm text-gray-500 dark:text-white/60">
               {navigationProps.formMode === 'create'
                 ? 'Preencha os campos abaixo para cadastrar uma nova retrospectiva.'
                 : 'Preencha os campos abaixo para editar esta retrospectiva.'}
@@ -183,10 +221,32 @@ export default function FormHindsight() {
             </div>
 
             <div className="w-full mt-5 flex flex-col gap-3.5">
-              <Button type="submit" loading={loadingSubmit} className="btn btn-primary">
-                {navigationProps.formMode === 'edit' ? 'Salvar' : 'Cadastrar'}
+              <Button
+                type="submit"
+                disabled={fields.name === navigationProps.hindsight?.name}
+                loading={loadingSubmit}
+                className="btn btn-primary"
+              >
+                {navigationProps.formMode === 'edit' ? 'Salvar alterações' : 'Começar'}
               </Button>
             </div>
+
+            <ShowIf
+              condition={
+                navigationProps.formMode === 'edit' &&
+                !navigationProps.hindsight.winningEmployee
+              }
+            >
+              <div className="w-full mt-2 flex flex-col gap-3.5">
+                <button
+                  type="button"
+                  onClick={handleClickEditSteps}
+                  className="btn btn-outline"
+                >
+                  Editar etapas
+                </button>
+              </div>
+            </ShowIf>
 
             <div className="w-full mt-2 flex flex-col gap-3.5">
               <button type="button" onClick={onCloseModal} className="btn btn-outline">
