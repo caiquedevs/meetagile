@@ -6,7 +6,7 @@ export interface StepProps {
   employeeName: string;
   description: string;
   votes: number;
-  type?: 'random' | undefined;
+  type?: string | undefined;
 }
 
 export interface IStepThree extends IEmployee {

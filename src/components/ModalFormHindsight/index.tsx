@@ -14,7 +14,6 @@ import { isUniqueInArray } from '../../utils/isUnique';
 import Modal, { ModalInterface } from '../Modal';
 import Button from '../Button';
 import ShowIf from '../ShowIf';
-import hindsightMock from '../../utils/hindsightData';
 
 interface INavigationProps {
   state: {
