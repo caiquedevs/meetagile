@@ -41,3 +41,10 @@ export function stepClear() {
     type: types.STEP_CLEAR,
   };
 }
+
+export function setTimer(payload: { hours: number; minutes: number; seconds: number }) {
+  return {
+    type: types.SET_TIMER,
+    payload,
+  };
+}

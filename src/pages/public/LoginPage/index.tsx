@@ -5,11 +5,11 @@ import * as actionsAuth from '../../../store/modules/auth/actions';
 import * as actionsDashboard from '../../../store/modules/dashboard/actions';
 import * as actionsStep from '../../../store/modules/step/actions';
 
-import { UserProps } from '../../../interfaces/user';
+import { IUser } from '../../../interfaces/user';
 import { Button } from '../../../components';
 
 interface ResponseProps {
-  currentUser: UserProps;
+  currentUser: IUser;
   token: string;
 }
 

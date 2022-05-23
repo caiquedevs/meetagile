@@ -3,13 +3,20 @@ import types from '../types';
 import { IAction } from '../../../interfaces/action';
 import { IEmployee } from '../../../interfaces/employee';
 import { IHindsight } from '../../../interfaces/hindsight';
-import { toast } from 'react-toastify';
+import { IUser } from '../../../interfaces/user';
 
 const initialState = {
   hindsights: [] as IHindsight[],
-  employees: [] as IEmployee[],
+  hindsightsAdmin: [] as IHindsight[],
+
   actions: {} as IAction,
-  loadingFetchDashboard: false,
+  actionsAdmin: [] as IAction[],
+
+  users: [] as IUser[],
+  users_admin: [] as IUser[],
+
+  employees: [] as IEmployee[],
+  loadingFetchDashboard: true,
 };
 
 export default function Reducer(state = initialState, action: any) {
@@ -37,15 +44,40 @@ export default function Reducer(state = initialState, action: any) {
       return initialState;
     }
 
+    case types.DASHBOARD_ADMIN_REQUEST: {
+      const newState = { ...state };
+      newState.loadingFetchDashboard = true;
+      return newState;
+    }
+
+    case types.DASHBOARD_ADMIN_SUCCESS: {
+      const newState = { ...initialState };
+
+      newState.hindsights = action.payload.hindsights.reverse();
+      newState.hindsightsAdmin = action.payload.hindsights.slice(0, 5);
+
+      newState.users = action.payload.users;
+      newState.users_admin = action.payload.users;
+
+      newState.actionsAdmin = action.payload.actions;
+      newState.loadingFetchDashboard = false;
+
+      return newState;
+    }
+
+    case types.DASHBOARD_ADMIN_FAILURE: {
+      return initialState;
+    }
+
     case types.SET_HINDSIGHT: {
       const newState = { ...state };
       newState.hindsights = action.payload;
       return newState;
     }
 
-    case types.SET_EMPLOYEES: {
+    case types.SET_HINDSIGHT_ADMIN: {
       const newState = { ...state };
-      newState.employees = action.payload;
+      newState.hindsightsAdmin = action.payload;
       return newState;
     }
 
@@ -55,7 +87,41 @@ export default function Reducer(state = initialState, action: any) {
       return newState;
     }
 
+    case types.SET_ACTIONS_ADMIN: {
+      const newState = { ...state };
+      newState.actionsAdmin = action.payload;
+      return newState;
+    }
+
+    case types.SET_USERS: {
+      const newState = { ...state };
+      newState.users = action.payload;
+      return newState;
+    }
+
+    case types.SET_USERS_ADMIN: {
+      const newState = { ...state };
+      newState.users_admin = action.payload;
+      return newState;
+    }
+
+    case types.SET_EMPLOYEES: {
+      const newState = { ...state };
+      newState.employees = action.payload;
+      return newState;
+    }
+
+    case types.SET_LOADING_DASHBOARD: {
+      const newState = { ...state };
+      newState.loadingFetchDashboard = action.payload;
+      return newState;
+    }
+
     case types.DASHBOARD_CLEAR: {
+      return initialState;
+    }
+
+    case types.DASHBOARD_ADMIN_CLEAR: {
       return initialState;
     }
 

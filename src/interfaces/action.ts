@@ -1,4 +1,4 @@
-import { UserProps } from './user';
+import { IUser } from './user';
 
 export interface IAction {
   _id?: string;

@@ -45,6 +45,7 @@ export default function ModalRandomComment({ modalRef }: IPropsPage) {
     const payload = {
       employeeName: fields.employeeName,
       description: fields.description,
+      type: 'random',
       votes: 0,
     };
 

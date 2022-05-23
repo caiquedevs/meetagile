@@ -1,8 +1,9 @@
+import { IUser } from '../../../interfaces/user';
 import { api } from '../../../services/api';
 import types from '../types';
 
 const initialState = {
-  user: {},
+  user: {} as IUser,
   token: false,
   isLoggedIn: false,
 };
@@ -13,7 +14,7 @@ export default function Reducer(state = initialState, action: any) {
       const newState = { ...state };
 
       newState.token = action.payload.token;
-      newState.user = action.payload.user;
+      newState.user = action.payload.currentUser;
       newState.isLoggedIn = true;
 
       return newState;

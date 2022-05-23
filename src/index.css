@@ -10,7 +10,7 @@
 
 /* Cor do scroll*/
 ::-webkit-scrollbar-thumb {
-  background: silver;
+  background: red;
 }
 
 /* Fundo do scroll*/
@@ -27,7 +27,6 @@
 }
 
 html {
-  scroll-behavior: smooth;
   height: 100%;
 }
 
@@ -98,6 +97,54 @@ body {
 .swiper-button-next.swiper-button-disabled,
 .swiper-button-prev.swiper-button-disabled {
   @apply !opacity-25 dark:!opacity-30;
+}
+
+.users-filter-nav li {
+  @apply cursor-pointer;
+}
+
+.users-filter-nav li:after {
+  content: '';
+  width: 100%;
+  height: 3px;
+  margin-top: 3px;
+
+  background-color: transparent;
+  display: flex;
+}
+
+.users-filter-nav li.active {
+  @apply text-gray-600 font-bold after:bg-teal-500 dark:text-white;
+}
+
+div.admin-card-wrap {
+  filter: drop-shadow(4px 4px 4px rgba(0, 0, 0, 0.08));
+}
+
+div.admin-card {
+  height: 169px;
+
+  background-color: white;
+  clip-path: polygon(0 0, 100% 0, 100% 68%, 78% 100%, 0 100%);
+
+  border-radius: 11px;
+
+  @apply dark:border-transparent;
+}
+
+div.team-card:after {
+  content: '';
+  width: 70%;
+  height: 2px;
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  @apply bg-slate-400 dark:bg-slate-500;
+}
+
+div.team-card.active:after {
+  @apply bg-teal-500;
 }
 
 a {

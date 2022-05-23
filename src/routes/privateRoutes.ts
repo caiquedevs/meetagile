@@ -1,11 +1,11 @@
 import DashboardPage from '../pages/private/DashboardPage';
+import DashboardAdminPage from '../pages/private/DashboardAdminPage';
 import StepOne from '../pages/private/NewHindsight/StepOne';
 import StepTwo from '../pages/private/NewHindsight/StepTwo';
 import StepThree from '../pages/private/NewHindsight/StepThree';
 import StepFinish from '../pages/private/NewHindsight/StepFinish';
 
 import IRoute from '../interfaces/route';
-
 import { ModalFormEmployee, ModalShowEmployee, ModalFormHindsight } from '../components';
 import NewHindsight from '../pages/private/NewHindsight';
 
@@ -39,6 +39,13 @@ const routes: IRoute[] = [
         component: ModalFormHindsight,
       },
     ],
+  },
+  {
+    icon: null,
+    path: '/dashboard-admin',
+    name: 'dashboardAdmin',
+    isPrivate: true,
+    component: DashboardAdminPage,
   },
   {
     icon: null,

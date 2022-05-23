@@ -6,6 +6,9 @@ function HomePage() {
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
+  const htmlElement: any = document.querySelector('html');
+  htmlElement.style.scrollBehavior = 'smooth';
+
   const { isLoggedIn } = useSelector((state: any) => state.authReducer);
 
   const handleClickLogin = () => {

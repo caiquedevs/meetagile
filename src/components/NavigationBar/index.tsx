@@ -12,6 +12,7 @@ import { MdOutlineDarkMode, MdOutlineLightMode, MdPendingActions } from 'react-i
 
 import { IRootState } from '../../store/modules/rootReducer';
 import * as actionsTheme from '../../store/modules/theme/actions';
+import ShowIf from '../ShowIf';
 
 interface PropsPage {
   className?: string;
@@ -29,6 +30,7 @@ function NavigationBar(props: PropsPage) {
   const modalConfirmRef = useRef<ModalInterface>();
 
   const { theme } = useSelector((state: IRootState) => state.themeReducer);
+  const { user } = useSelector((state: IRootState) => state.authReducer);
 
   const handleClickShowActions = () => {
     modalConfirmRef.current?.openModal();
@@ -42,12 +44,6 @@ function NavigationBar(props: PropsPage) {
   const handleClickToogleTheme = () => {
     dispatch(actionsTheme.toogleTheme());
   };
-
-  useEffect(() => {
-    document.body.className = theme;
-
-    return () => {};
-  }, [theme]);
 
   return (
     <nav className="navigation-desktop w-full flex">
@@ -87,14 +83,19 @@ function NavigationBar(props: PropsPage) {
             )}
           </button>
 
-          <button
-            type="button"
-            onClick={handleClickShowActions}
-            disabled={loadingFetchDashboard}
-            className="btn disabled:animate-pulse-intense disabled:text-black/50 w-8 h-8 flex items-center justify-center hover:bg-gray-200 dark:hover:bg-slate-600 rounded-full"
-          >
-            <MdPendingActions size="19px" className="text-black/70 dark:text-white/60" />
-          </button>
+          <ShowIf condition={user.type !== 'admin'}>
+            <button
+              type="button"
+              onClick={handleClickShowActions}
+              disabled={loadingFetchDashboard}
+              className="btn disabled:animate-pulse-intense disabled:text-black/50 w-8 h-8 flex items-center justify-center hover:bg-gray-200 dark:hover:bg-slate-600 rounded-full"
+            >
+              <MdPendingActions
+                size="19px"
+                className="text-black/70 dark:text-white/60"
+              />
+            </button>
+          </ShowIf>
 
           <button
             type="button"

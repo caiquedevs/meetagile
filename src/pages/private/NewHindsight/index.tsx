@@ -11,7 +11,7 @@ import { RiPlayListAddLine } from 'react-icons/ri';
 
 import { INavigationStepProps } from '../../../interfaces/navigationStep';
 
-import { ModalRandomComment, ShowIf } from '../../../components';
+import { CountUp, ModalRandomComment, ShowIf } from '../../../components';
 import { ModalInterface } from '../../../components/Modal';
 import StepActions from './StepActions';
 import { useDispatch, useSelector } from 'react-redux';
@@ -39,7 +39,7 @@ export default function NewHindsight({}: Props) {
     location.pathname === '/new-hindsight' || location.pathname === '/new-hindsight/';
 
   const handleClickNavigateToDashboard = () => {
-    navigate('/dashboard');
+    navigate(navigationProps?.returnUrl!);
   };
 
   const handleClickShowActions = () => {
@@ -64,11 +64,6 @@ export default function NewHindsight({}: Props) {
     return () => {};
   }, []);
 
-  useEffect(() => {
-    document.body.className = theme;
-    return () => {};
-  }, [theme]);
-
   if (
     noHasStep ||
     !navigationProps?.mode ||
@@ -84,24 +79,33 @@ export default function NewHindsight({}: Props) {
           className="w-full absolute top-0 left-0 z-10 bg-white/20"
         >
           <header className="w-full h-14  flex items-center justify-between">
-            <button
-              type="button"
-              onClick={handleClickNavigateToDashboard}
-              style={{ backdropFilter: 'blur(10px)' }}
-              className="px-5 h-14 flex items-center gap-3 font-roboto text-lg text-white font-medium bg-white/05"
-            >
-              <MdArrowBackIosNew className="text-2xl text-white" />
-            </button>
+            <div className="w-full h-14 pr-5  flex items-center justify-between">
+              <button
+                type="button"
+                onClick={handleClickNavigateToDashboard}
+                style={{ backdropFilter: 'blur(10px)' }}
+                className="px-5 h-14 flex items-center gap-3 font-roboto text-lg text-white font-medium bg-white/05"
+              >
+                <MdArrowBackIosNew className="text-xl text-white" />
+              </button>
 
-            <div className="flex items-center gap-3 font-roboto text-lg text-white font-bold uppercase">
-              {currentHindsight?.name}
+              <div className="flex items-center gap-3 font-roboto text-base text-white font-bold uppercase">
+                <ShowIf condition={currentHindsight?.user_id?.teamName}>
+                  {currentHindsight?.user_id?.teamName + ' - '}
+                </ShowIf>
+                {currentHindsight?.name}
+              </div>
+
+              <ShowIf condition={navigationProps.mode !== 'view'}>
+                <CountUp />
+              </ShowIf>
             </div>
 
             <div className="h-full px-5 flex items-center gap-3 bg-white">
               <button
                 type="button"
                 onClick={handleClickToogleTheme}
-                className="btn disabled:animate-pulse-intense disabled:bg-gray-300 disabled:text-black/50 w-8 h-8 flex items-center justify-center hover:bg-gray-200 rounded-full"
+                className="btn w-10 h-8 flex items-center justify-center disabled:animate-pulse-intense disabled:bg-gray-300 disabled:text-black/50 hover:bg-gray-200 rounded-full"
               >
                 {theme === 'light' ? (
                   <MdOutlineDarkMode size="19px" className="text-black" />
@@ -118,7 +122,7 @@ export default function NewHindsight({}: Props) {
                 <button
                   type="button"
                   onClick={handleClickShowModalRandomComment}
-                  className="btn w-8 h-8 flex items-center justify-center hover:bg-gray-300 rounded-full"
+                  className="btn w-10 h-8 flex items-center justify-center hover:bg-gray-200 rounded-full"
                 >
                   <RiPlayListAddLine size="18px" className="text-black" />
                 </button>
@@ -127,7 +131,7 @@ export default function NewHindsight({}: Props) {
               <button
                 type="button"
                 onClick={handleClickShowActions}
-                className="btn w-8 h-8 flex items-center justify-center hover:bg-gray-300 rounded-full"
+                className="btn w-10 h-8 flex items-center justify-center hover:bg-gray-200 rounded-full"
               >
                 <MdPendingActions size="19px" className="text-black/70" />
               </button>

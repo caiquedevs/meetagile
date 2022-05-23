@@ -9,6 +9,7 @@ import LoginPage from '../pages/public/LoginPage';
 import ForgotPasswordPage from '../pages/public/ForgotPasswordPage';
 import RegisterPage from '../pages/public/RegisterPage';
 import RegisterSuccessPage from '../pages/public/RegisterSuccessPage';
+import IRoute from '../interfaces/route';
 
 const RoutesAplication = (): ReactElement => {
   const location = useLocation();
@@ -20,7 +21,7 @@ const RoutesAplication = (): ReactElement => {
     return children;
   }
 
-  const renderPrivateRoutes = useCallback((route) => {
+  const renderPrivateRoutes = useCallback((route: IRoute) => {
     return (
       <Route
         key={route.path}
