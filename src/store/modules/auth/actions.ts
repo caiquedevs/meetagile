@@ -1,5 +1,5 @@
 import types from '../types';
-import { UserProps } from '../../../interfaces/user';
+import { IUser } from '../../../interfaces/user';
 import { Dispatch, SetStateAction } from 'react';
 import { NavigateFunction } from 'react-router-dom';
 
@@ -11,7 +11,7 @@ export interface IRegisterRequest {
 
 export interface IRegisterSucess {
   token: string;
-  user: UserProps;
+  user: IUser;
 }
 
 export interface ILoginRequest {
@@ -22,7 +22,7 @@ export interface ILoginRequest {
 
 export interface ILoginSucess {
   token: string;
-  user: UserProps;
+  user: IUser;
 }
 
 export function registerRequest(payload: IRegisterRequest) {
@@ -40,9 +40,7 @@ export function registerSuccess(payload: IRegisterSucess) {
 }
 
 export function registerFailure() {
-  return {
-    type: types.REGISTER_FAILURE,
-  };
+  return { type: types.REGISTER_FAILURE };
 }
 
 export function loginRequest(payload: ILoginRequest) {
@@ -60,13 +58,9 @@ export function loginSuccess(payload: ILoginSucess) {
 }
 
 export function loginFailure() {
-  return {
-    type: types.LOGIN_FAILURE,
-  };
+  return { type: types.LOGIN_FAILURE };
 }
 
 export function logoutRequest() {
-  return {
-    type: types.LOGOUT_REQUEST,
-  };
+  return { type: types.LOGOUT_REQUEST };
 }

@@ -6,6 +6,7 @@ export interface INavigationStepProps {
     name?: string;
     actions: IAction;
     hindsight: IHindsight;
+    returnUrl?: string;
     mode: 'create' | 'update' | 'view';
   };
 }

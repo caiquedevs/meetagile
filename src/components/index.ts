@@ -5,8 +5,9 @@ import VotesField from './VotesField';
 import Modal from './Modal';
 import ShowIf from './ShowIf';
 import Button from './Button';
-import ConfirmModal from './ConfirmModal';
+import CountUp from './CountUp';
 
+import ConfirmModal from './ConfirmModal';
 import ModalFormEmployee from './ModalFormEmployee';
 import ModalShowEmployee from './ModalShowEmployee';
 import ModalFormHindsight from './ModalFormHindsight';
@@ -27,4 +28,5 @@ export {
   ModalFormHindsight,
   ModalEditStep,
   ModalRandomComment,
+  CountUp,
 };

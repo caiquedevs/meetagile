@@ -3,8 +3,17 @@ import Routes from './routes';
 import { ToastContainer } from 'react-toastify';
 
 import 'react-toastify/dist/ReactToastify.css';
+import { useSelector } from 'react-redux';
+import { IRootState } from './store/modules/rootReducer';
 
 function App() {
+  const { theme } = useSelector((state: IRootState) => state.themeReducer);
+
+  useEffect(() => {
+    document.body.className = theme;
+    return () => {};
+  }, [theme]);
+
   useEffect(() => {
     addEventListener('storage', (event) => {
       console.log('event', event);

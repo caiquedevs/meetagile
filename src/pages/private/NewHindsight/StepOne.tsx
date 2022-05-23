@@ -1,4 +1,4 @@
-import { ChangeEvent, useRef, useState } from 'react';
+import { ChangeEvent, useEffect, useRef, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 
 import { useSelector, useDispatch } from 'react-redux';
@@ -115,6 +115,12 @@ export default function StepOne() {
     inputRef.current?.focus();
   };
 
+  useEffect(() => {
+    window.scrollTo(0, 0);
+
+    return () => {};
+  }, []);
+
   return (
     <section className="w-full min-h-screen bg-white dark:bg-slate-900">
       <header
@@ -123,7 +129,7 @@ export default function StepOne() {
           before:content-['']
           before:w-full before:h-full
           before:block before:absolute
-          before:bg-teal-500 dark:before:bg-teal-800
+          before:bg-teal-500 dark:before:bg-teal-700
         "
       >
         <div className="pt-16 md:pt-24 px-8 md:px-14 flex gap-5">
@@ -194,7 +200,11 @@ export default function StepOne() {
                       <VotesField
                         value={row.votes}
                         onChangeVotes={handleChangeVotes}
-                        max={currentHindsight?.stepThree?.length}
+                        max={
+                          row.type === 'random'
+                            ? currentHindsight?.stepThree?.length + 1
+                            : currentHindsight?.stepThree?.length
+                        }
                         disabled={navigationProps?.mode === 'view'}
                       />
                     </td>

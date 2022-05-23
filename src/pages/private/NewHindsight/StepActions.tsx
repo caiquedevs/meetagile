@@ -1,4 +1,4 @@
-import { ChangeEvent, MutableRefObject, useRef, useState } from 'react';
+import { ChangeEvent, MutableRefObject, useEffect, useRef, useState } from 'react';
 import { IoMdClose } from 'react-icons/io';
 import { MdDeleteForever, MdModeEdit } from 'react-icons/md';
 import { useDispatch, useSelector } from 'react-redux';
@@ -6,6 +6,7 @@ import { useLocation } from 'react-router-dom';
 import { ConfirmModal, Options, ShowIf } from '../../../components';
 import Modal, { ModalInterface } from '../../../components/Modal';
 import { INavigationStepProps } from '../../../interfaces/navigationStep';
+import { IAction } from '../../../interfaces/action';
 
 import { IRootState } from '../../../store/modules/rootReducer';
 import * as actionsStep from '../../../store/modules/step/actions';
@@ -38,13 +39,14 @@ export default function StepActions({ modalRef }: StepActionsProps) {
   const navigationProps = state || { mode: 'create' };
 
   const { actions } = useSelector((state: IRootState) => state.dashboardReducer);
-  const { currentActions } = useSelector((state: IRootState) => state.stepReducer);
-
-  const finallyActions = actions._id ? actions : currentActions;
-  console.log('finallyActions', finallyActions);
+  const { currentActions, currentHindsight } = useSelector(
+    (state: IRootState) => state.stepReducer
+  );
+  const { user } = useSelector((state: IRootState) => state.authReducer);
 
   const [actionName, setActionName] = useState('');
   const [actionNameEdit, setActionNameEdit] = useState({ value: '', index: -1 });
+  const [finallyActions, setFinallyActions] = useState({} as IAction);
 
   const handleChangeField = (event: ChangeEvent<HTMLInputElement>) => {
     setActionName(event.target.value);
@@ -56,6 +58,7 @@ export default function StepActions({ modalRef }: StepActionsProps) {
 
   const handleClickCloseModal = () => {
     modalRef.current?.closeModalSimple();
+    if (user.type === 'admin' || navigationProps?.mode === 'view') return;
 
     request({
       method: 'PUT',
@@ -145,6 +148,14 @@ export default function StepActions({ modalRef }: StepActionsProps) {
     },
   ];
 
+  useEffect(() => {
+    // Feito caso actions seja chamada no dashboard ou nas etapas
+    const decisionActions = actions._id ? actions : currentActions;
+    setFinallyActions(decisionActions);
+
+    return () => {};
+  }, [actions, currentActions]);
+
   return (
     <Modal
       ref={modalRef}
@@ -185,12 +196,20 @@ export default function StepActions({ modalRef }: StepActionsProps) {
 
             <div className="w-full flex h-full flex-col justify-between">
               <h3 className="text-lg font-medium leading-6 text-gray-900 dark:text-white">
-                Gerenciar ações do time
+                {navigationProps?.mode === 'view'
+                  ? 'Visualizar ações do time - ' + currentHindsight.user_id?.teamName
+                  : 'Gerenciar ações do time'}
               </h3>
 
               <div className="mt-2">
                 <p className="text-sm text-gray-500 dark:text-white/80">
-                  Preencha os campos abaixo para cadastrar uma nova ação
+                  {navigationProps?.mode === 'view' ? (
+                    <span className="mb-5">
+                      Navegue para baixo para visualizar as ações do time
+                    </span>
+                  ) : (
+                    'Preencha os campos abaixo para cadastrar uma nova ação'
+                  )}
                 </p>
               </div>
               <div className="w-full flex-1 flex flex-col gap-5">
@@ -281,17 +300,17 @@ export default function StepActions({ modalRef }: StepActionsProps) {
                             </select>
                           </td>
 
-                          {navigationProps.mode !== 'view' ? (
-                            <td className="px-5 py-4 rounded-r-md border border-l-0 border-gray-default dark:border-transparent break-words">
-                              <div className="w-full flex items-center justify-end">
+                          <td className="px-5 py-4 rounded-r-md border border-l-0 border-gray-default dark:border-transparent break-words">
+                            <div className="w-full flex items-center justify-end">
+                              {navigationProps.mode !== 'view' ? (
                                 <Options
                                   list={optionsListTable}
                                   currentItem={{ row, index }}
                                   iconSize="18px"
                                 />
-                              </div>
-                            </td>
-                          ) : null}
+                              ) : null}
+                            </div>
+                          </td>
                         </tr>
                       );
                     })}

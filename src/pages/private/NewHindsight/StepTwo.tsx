@@ -120,6 +120,12 @@ export default function StepTwo() {
     inputRef.current?.focus();
   };
 
+  useEffect(() => {
+    window.scrollTo(0, 0);
+
+    return () => {};
+  }, []);
+
   return (
     <section className="w-full min-h-screen bg-white dark:bg-slate-900">
       <header
@@ -128,7 +134,7 @@ export default function StepTwo() {
           before:content-['']
           before:w-full before:h-full
           before:block before:absolute 
-          before:bg-red-400 dark:before:bg-rose-900
+          before:bg-red-400 dark:before:bg-rose-800
         "
       >
         <div className="pt-16 md:pt-24 px-8 md:px-14 flex gap-5">
@@ -203,7 +209,11 @@ export default function StepTwo() {
                       <VotesField
                         value={row.votes}
                         onChangeVotes={handleChangeVotes}
-                        max={currentHindsight?.stepThree?.length}
+                        max={
+                          row.type === 'random'
+                            ? currentHindsight?.stepThree?.length + 1
+                            : currentHindsight?.stepThree?.length
+                        }
                         disabled={navigationProps?.mode === 'view'}
                       />
                     </td>
@@ -252,7 +262,7 @@ export default function StepTwo() {
 
                 <button
                   type="submit"
-                  className="btn btn-primary mt-2 !bg-red-400 dark:!bg-rose-800"
+                  className="btn btn-primary mt-2 !bg-red-400 dark:!bg-rose-700"
                 >
                   Cadastrar
                 </button>

@@ -63,6 +63,7 @@ export default function EmployeeList() {
 
       <Swiper
         slidesPerView="auto"
+        direction="horizontal"
         spaceBetween={15}
         freeMode={true}
         modules={[FreeMode]}
@@ -77,7 +78,7 @@ export default function EmployeeList() {
         >
           <article className="flex flex-col items-center justify-center gap-7 select-none">
             <div className="flex items-center justify-center">
-              <img src="/images/dashed-border.svg" alt="dashed" />
+              <img src="/images/dashed-border.svg" alt="dashed" loading="lazy" />
 
               <div className="w-12 h-12 flex items-center justify-center absolute bg-teal-350 rounded-full text-3xl text-white">
                 <BiPlus />
@@ -132,6 +133,7 @@ export default function EmployeeList() {
                       src={employee.url}
                       alt="user image"
                       className="w-16 h-16 rounded-3xl"
+                      loading="eager"
                     />
                   </div>
                 ) : (

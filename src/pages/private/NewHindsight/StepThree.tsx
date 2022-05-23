@@ -38,7 +38,7 @@ export default function StepThree() {
   };
 
   const handleClickBackToInit = () => {
-    navigate('/dashboard');
+    navigate(navigationProps?.returnUrl!);
   };
 
   const getIndexFromDecrement = (arr: IStepThree[], id: string) => {
@@ -74,7 +74,7 @@ export default function StepThree() {
 
     request({
       method: 'PUT',
-      url: `/hindsight/${copyCurrentHindsight?._id}`,
+      url: `/hindsight`,
       data: copyCurrentHindsight,
     })
       .then(onSuccess)
@@ -98,8 +98,6 @@ export default function StepThree() {
   };
 
   const onSubmit = () => {
-    console.log('currentHind', currentHindsight);
-
     let hasVote = false;
 
     // Buscar maior votação
@@ -143,6 +141,12 @@ export default function StepThree() {
     return () => {};
   }, [currentHindsight]);
 
+  useEffect(() => {
+    window.scrollTo(0, 0);
+
+    return () => {};
+  }, []);
+
   return (
     <section className="w-full min-h-screen bg-white dark:bg-slate-900">
       <header
@@ -151,7 +155,7 @@ export default function StepThree() {
           before:content-['']
           before:w-full before:h-full
           before:block before:absolute
-          before:bg-sky-500 dark:before:bg-sky-800
+          before:bg-sky-500 dark:before:bg-sky-700
         "
       >
         <div className="pt-16 md:pt-24 px-8 md:px-14 flex gap-5">
@@ -201,6 +205,7 @@ export default function StepThree() {
                   />
 
                   <label
+                    style={{ minHeight: 82 }}
                     className={`p-4 pr-10 shadow-card
                     flex items-center gap-5
                     rounded bg-white dark:bg-slate-800 select-none
@@ -261,7 +266,7 @@ export default function StepThree() {
                     </article>
                   </label>
 
-                  <div className="w-5 h-5 absolute top-7 right-3 hidden peer-checked:flex">
+                  <div className="w-5 h-5 absolute top-9 right-3 hidden peer-checked:flex">
                     👍
                   </div>
                 </li>
@@ -291,18 +296,16 @@ export default function StepThree() {
             </h2>
             <figure className="flex flex-col items-center justify-center">
               {currentHindsight?.winningEmployee?.url ? (
-                <div className="avatar">
-                  <div className="w-20 mask mask-squircle">
-                    <img src={currentHindsight?.winningEmployee.url} />
-                  </div>
-                </div>
+                <img
+                  src={currentHindsight?.winningEmployee.url}
+                  alt="user image"
+                  className="w-20 h-20 rounded-3xl"
+                />
               ) : (
-                <div className="avatar placeholder">
-                  <div className="w-20 h-20 flex items-center justify-center text-white uppercase rounded-3xl bg-gray-400">
-                    <span className="text-2xl font-roboto font-medium">
-                      {currentHindsight?.winningEmployee?.name[0]}
-                    </span>
-                  </div>
+                <div className="w-20 h-20 flex items-center justify-center text-white uppercase rounded-xl bg-gray-400">
+                  <span className="text-2xl font-roboto font-medium">
+                    {currentHindsight?.winningEmployee?.name[0]}
+                  </span>
                 </div>
               )}
 
@@ -312,6 +315,15 @@ export default function StepThree() {
                 </strong>
                 <span className="text-base text-center dark:text-white/80">
                   {currentHindsight?.winningEmployee?.office}
+                </span>
+                <span className="text-base text-center dark:text-white/80">
+                  {
+                    employeesList.filter(
+                      (item: IEmployee) =>
+                        item._id === currentHindsight?.winningEmployee?._id
+                    )[0]?.votes
+                  }
+                  {' Votos'}
                 </span>
 
                 <button

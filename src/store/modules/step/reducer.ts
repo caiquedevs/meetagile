@@ -51,6 +51,22 @@ export default function Reducer(state = initialState, action: any) {
       return initialState;
     }
 
+    case types.SET_TIMER: {
+      const newState = { ...state };
+
+      const copyHindsightsPending = newState.hindsightsPending.map((hindsight) => {
+        if (hindsight._id === newState.currentHindsight._id) {
+          hindsight.timer = action.payload;
+        }
+
+        return hindsight;
+      });
+
+      newState.hindsightsPending = copyHindsightsPending;
+      newState.currentHindsight.timer = action.payload;
+      return newState;
+    }
+
     default: {
       return state;
     }

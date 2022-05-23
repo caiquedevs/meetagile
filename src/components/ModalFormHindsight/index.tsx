@@ -56,21 +56,24 @@ export default function FormHindsight() {
       return toast.warn('Cadastre mais funcionários para continuar');
     }
 
+    // se tiver pendente no localstorage
     const getCurrent = hindsightsPending?.filter(
       (item) => item.name === navigationProps?.hindsight?.name
     )[0];
 
-    if (!getCurrent) {
-      const copyHindsightsPending = hindsightsPending ? [...hindsightsPending!] : [];
-      copyHindsightsPending.push(navigationProps?.hindsight);
+    dispatch(actionsStep.setCurrentActions(actions));
+    dispatch(actionsStep.setCurrentHindsight(getCurrent || navigationProps?.hindsight));
 
+    // se não tiver setar no estado global que persiste pelo localstorage
+    if (!getCurrent) {
+      const copyHindsightsPending = hindsightsPending || [];
+      copyHindsightsPending.push(navigationProps?.hindsight);
       dispatch(actionsStep.setHindsightsPending([...copyHindsightsPending]));
     }
 
-    dispatch(actionsStep.setCurrentHindsight(getCurrent || navigationProps?.hindsight));
-    dispatch(actionsStep.setCurrentActions(actions));
-
-    navigate('/new-hindsight/step-one', { state: { mode: 'update' } });
+    navigate('/new-hindsight/step-one', {
+      state: { mode: 'update', returnUrl: '/dashboard' },
+    });
   };
 
   const onCreate = () => {
@@ -113,7 +116,9 @@ export default function FormHindsight() {
       dispatch(actionsStep.setCurrentHindsight(response));
       dispatch(actionsStep.setCurrentActions(actions));
 
-      navigate('/new-hindsight/step-one', { state: { mode: 'create' } });
+      navigate('/new-hindsight/step-one', {
+        state: { mode: 'create', returnUrl: '/dashboard' },
+      });
     }
 
     function onError(error: any) {
@@ -130,8 +135,8 @@ export default function FormHindsight() {
 
     request({
       method: 'PUT',
-      url: `/hindsight/${navigationProps.hindsight?._id}`,
-      data: { name: fields.name },
+      url: `/hindsight`,
+      data: { _id: navigationProps.hindsight?._id, name: fields.name },
     })
       .then(onSuccess)
       .catch(onError)

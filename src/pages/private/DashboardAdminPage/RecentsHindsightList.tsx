@@ -1,6 +1,6 @@
 import { useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { format, formatDistanceStrict, formatDuration } from 'date-fns';
+import { format, formatDistanceStrict } from 'date-fns';
 import { pt } from 'date-fns/locale';
 import { toast } from 'react-toastify';
 
@@ -10,42 +10,42 @@ import * as actionsDashboard from '../../../store/modules/dashboard/actions';
 import * as actionsStep from '../../../store/modules/step/actions';
 
 import { FaRegCalendarAlt, FaRegClock } from 'react-icons/fa';
-import { MdDeleteForever, MdModeEdit } from 'react-icons/md';
 import { HiDocumentReport } from 'react-icons/hi';
 import { GoPrimitiveDot } from 'react-icons/go';
 
 import { useRequest } from '../../../hooks/useRequest';
 import { IHindsight } from '../../../interfaces/hindsight';
 
-import { Options, ShowIf, ConfirmModal } from '../../../components';
+import { ShowIf, ConfirmModal } from '../../../components';
 import { ModalInterface } from '../../../components/Modal';
+import { IUser } from '../../../interfaces/user';
 
-export default function ListHindsights() {
+interface PropsPage {
+  teamSelected: IUser;
+}
+
+export default function ListHindsights({ teamSelected }: PropsPage) {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const request = useRequest();
 
-  const returnUrl = location.pathname;
-
-  const { hindsights, loadingFetchDashboard } = useSelector(
+  const { hindsightsAdmin, loadingFetchDashboard, actionsAdmin } = useSelector(
     (state: IRootState) => state.dashboardReducer
   );
 
   const modalConfirmRef = useRef<ModalInterface>();
   const [loadingDelete, setLoadingDelete] = useState(false);
 
-  const handleClickCreateHindsight = () => {
-    navigate('form-hindsight', { state: { formMode: 'create', returnUrl } });
-  };
-
-  const handleClickEditHindsight = (hindsight: IHindsight) => {
-    navigate('form-hindsight', { state: { formMode: 'edit', hindsight, returnUrl } });
-  };
-
   const handleClickReport = (hindsight: IHindsight) => {
+    const filterActionsUser = actionsAdmin.filter(
+      (actions) => actions?.user_id === hindsight.user_id?._id
+    );
+
     dispatch(actionsStep.setCurrentHindsight(hindsight));
+    dispatch(actionsStep.setCurrentActions(filterActionsUser[0]));
+
     navigate('/new-hindsight/step-one', {
-      state: { mode: 'view', returnUrl: '/dashboard' },
+      state: { mode: 'view', returnUrl: '/dashboard-admin' },
     });
   };
 
@@ -60,8 +60,8 @@ export default function ListHindsights() {
       .finally(onFinally);
 
     function onSuccess() {
-      const hindsightsFilter = hindsights.filter(
-        (hindsight) => hindsight._id !== selectedHindsight._id
+      const hindsightsFilter = hindsightsAdmin.filter(
+        (hindsightsAdmin) => hindsightsAdmin._id !== selectedHindsight._id
       );
 
       dispatch(actionsDashboard.setHindsights(hindsightsFilter));
@@ -82,30 +82,20 @@ export default function ListHindsights() {
     }
   };
 
-  const onOpenConfirmModal = (hindsight: IHindsight) => {
-    modalConfirmRef.current?.openModal(hindsight);
-  };
-
-  const optionsListTable = [
-    {
-      label: 'Editar',
-      icon: MdModeEdit,
-      onClick: handleClickEditHindsight,
-    },
-  ];
-
   return (
     <section className="px-16">
       <div className="pt-6 pb-5">
-        <h2 className="flex items-center gap-1 font-medium font-roboto text-base text-gray-600 dark:text-white">
-          Retrospectivas -
-          <button
-            type="button"
-            onClick={handleClickCreateHindsight}
-            className="font-roboto text-lg font-medium underline text-teal-400 hover:text-teal-600 duration-300 cursor-pointer"
-          >
-            criar agora
-          </button>
+        <h2 className="flex items-center gap-1 font-medium font-roboto text-base text-slate-600 dark:text-white">
+          {teamSelected?.teamName ? (
+            <span className="flex gap-1">
+              Retrospectivas recentes do time:
+              <strong className="text-teal-500 capitalize">
+                {teamSelected?.teamName}
+              </strong>
+            </span>
+          ) : (
+            'Retrospectivas recentes'
+          )}
         </h2>
       </div>
 
@@ -115,12 +105,12 @@ export default function ListHindsights() {
           <SkeletonHindsight />
         </ShowIf>
 
-        <ShowIf condition={!loadingFetchDashboard && hindsights?.length === 0}>
+        <ShowIf condition={!loadingFetchDashboard && hindsightsAdmin?.length === 0}>
           <HindshgtDefault />
         </ShowIf>
 
-        {hindsights?.map((hindsight) => {
-          const copyOptionsListTable = [...optionsListTable];
+        {hindsightsAdmin?.map((hindsight) => {
+          const onClickReport = () => handleClickReport(hindsight);
 
           const hours = hindsight?.timer?.hours || 0;
           const minutes = hindsight?.timer?.minutes || 0;
@@ -141,29 +131,22 @@ export default function ListHindsights() {
             ? formatedMinutes
             : formatedSeconds;
 
-          if (!hindsight.winningEmployee) {
-            copyOptionsListTable.push({
-              label: 'Excluir',
-              icon: MdDeleteForever,
-              onClick: onOpenConfirmModal,
-            });
-          }
-
-          if (hindsight.winningEmployee) {
-            copyOptionsListTable.push({
-              label: 'Relatório',
-              icon: HiDocumentReport,
-              onClick: handleClickReport,
-            });
-          }
-
           return (
             <li
               key={hindsight._id}
               className="pl-14 pr-9 py-6 flex bg-white dark:bg-slate-800 shadow-card rounded-md"
             >
+              <div className="flex flex-col flex-1">
+                <span className="flex items-center gap-1 font-roboto text-lg font-bold text-slate-450 text-slate-600 dark:text-white">
+                  Time
+                </span>
+                <span className="flex items-center gap-2 font-roboto text-base font-medium text-slate-400 dark:text-white/60">
+                  {hindsight.user_id?.teamName}
+                </span>
+              </div>
+
               <div className="flex-1">
-                <span className="font-roboto text-lg font-bold text-gray-450 dark:text-white">
+                <span className="font-roboto text-lg font-bold text-slate-600 dark:text-white">
                   {hindsight.name}
                 </span>
 
@@ -181,7 +164,7 @@ export default function ListHindsights() {
               </div>
 
               <div className="flex-1">
-                <span className="flex items-center gap-1 font-roboto text-lg font-bold text-gray-450 dark:text-white">
+                <span className="flex items-center gap-1 font-roboto text-lg font-bold text-slate-600 dark:text-white">
                   <FaRegCalendarAlt className="text-base text-black dark:text-white" />
                   {formatDistanceStrict(new Date(hindsight?.createdAt!), new Date(), {
                     locale: pt,
@@ -189,7 +172,7 @@ export default function ListHindsights() {
                   {' atrás'}
                 </span>
 
-                <span className="flex items-center gap-2 font-roboto text-base font-medium text-gray-400 dark:text-white/60">
+                <span className="flex items-center gap-2 font-roboto text-base font-medium text-slate-400 dark:text-white/60">
                   <FaRegClock className="text-base text-black dark:text-white" />
                   {hindsight?.winningEmployee && hindsight?.timer ? (
                     timer
@@ -213,7 +196,7 @@ export default function ListHindsights() {
 
                   <ShowIf condition={!hindsight?.winningEmployee?.url}>
                     <div className="avatar placeholder">
-                      <div className="w-11 h-11 text-white flex items-center justify-center rounded-full bg-gray-400">
+                      <div className="w-11 h-11 text-white flex items-center justify-center rounded-full bg-slate-400">
                         <span className="text-2xl font-roboto font-medium uppercase">
                           {hindsight?.winningEmployee?.name
                             ? hindsight.winningEmployee.name[0]
@@ -225,11 +208,10 @@ export default function ListHindsights() {
                 </figure>
 
                 <div className="flex flex-col">
-                  <span className="flex items-center gap-1 font-roboto text-lg font-bold text-gray-450 dark:text-white">
+                  <span className="flex items-center gap-1 font-roboto text-lg font-bold text-slate-600 dark:text-white">
                     Destaque da Sprint
                   </span>
-
-                  <span className="flex items-center gap-2 font-roboto text-base font-medium text-gray-400 dark:text-white/60">
+                  <span className="flex items-center gap-2 font-roboto text-base font-medium text-slate-400 dark:text-white/60">
                     {hindsight.winningEmployee?.name ? (
                       hindsight.winningEmployee?.name
                     ) : (
@@ -240,7 +222,23 @@ export default function ListHindsights() {
               </div>
 
               <div className="flex items-center justify-end flex-1">
-                <Options list={copyOptionsListTable} currentItem={hindsight} />
+                <ShowIf condition={hindsight?.winningEmployee}>
+                  <button
+                    type="button"
+                    onClick={onClickReport}
+                    className="
+                      w-max px-2 py-2
+                      justify-center inline-flex 
+                      font-medium text-slate-800 dark:text-white
+                      rounded-md hoverbg-slate-300 bg-slate-200 dark:bg-slate-600
+                    "
+                  >
+                    <HiDocumentReport
+                      size="23px"
+                      className="text-teal-700 dark:text-white "
+                    />
+                  </button>
+                </ShowIf>
               </div>
             </li>
           );
@@ -260,7 +258,7 @@ function HindshgtDefault() {
   return (
     <li className="pl-14 pr-9 py-6 flex bg-white dark:bg-slate-800 shadow-card rounded-md">
       <div className="flex-1">
-        <span className="font-roboto text-base font-normal text-gray-400 dark:text-white/80">
+        <span className="font-roboto text-base font-normal text-slate-400 dark:text-white/80">
           Não há retrospectivas por enquanto!
         </span>
       </div>
@@ -275,41 +273,41 @@ function SkeletonHindsight() {
       className="pl-14 pr-9 py-6 flex bg-white dark:bg-slate-800 shadow-card rounded-md transition-all duration-200 ease-in-out animate-fadeIn"
     >
       <div className="flex justify-center flex-col gap-1 flex-1 ">
-        <span className="w-20 h-5 block bg-gray-300 dark:bg-slate-600 rounded animate-pulse-intense" />
+        <span className="w-20 h-5 block bg-slate-300 dark:bg-slate-600 rounded animate-pulse-intense" />
 
         <div className="flex items-center gap-1">
-          <small className="w-3 h-3 bg-gray-300 dark:bg-slate-600 rounded animate-pulse-intense" />
-          <span className="w-20 h-5 block bg-gray-300 dark:bg-slate-600 rounded animate-pulse-intense" />
+          <small className="w-3 h-3 bg-slate-300 dark:bg-slate-600 rounded animate-pulse-intense" />
+          <span className="w-20 h-5 block bg-slate-300 dark:bg-slate-600 rounded animate-pulse-intense" />
         </div>
       </div>
 
       <div className="flex justify-center flex-col gap-1 flex-1">
         <div className="flex items-center gap-1">
-          <small className="w-5 h-5 bg-gray-300 dark:bg-slate-600 rounded animate-pulse-intense" />
-          <span className="w-24 h-5 block bg-gray-300 dark:bg-slate-600 rounded animate-pulse-intense" />
+          <small className="w-5 h-5 bg-slate-300 dark:bg-slate-600 rounded animate-pulse-intense" />
+          <span className="w-24 h-5 block bg-slate-300 dark:bg-slate-600 rounded animate-pulse-intense" />
         </div>
 
         <div className="flex items-center gap-1">
-          <small className="w-5 h-5 bg-gray-300 dark:bg-slate-600 rounded animate-pulse-intense" />
-          <span className="w-12 h-5 block bg-gray-300 dark:bg-slate-600 rounded animate-pulse-intense" />
+          <small className="w-5 h-5 bg-slate-300 dark:bg-slate-600 rounded animate-pulse-intense" />
+          <span className="w-12 h-5 block bg-slate-300 dark:bg-slate-600 rounded animate-pulse-intense" />
         </div>
       </div>
 
       <div className="lg:flex items-center flex-1 gap-5 hidden">
         <figure className="flex flex-col items-center gap-3">
           <div className="avatar placeholder">
-            <div className="w-11 h-11 rounded-full bg-gray-300 dark:bg-slate-600 animate-pulse-intense" />
+            <div className="w-11 h-11 rounded-full bg-slate-300 dark:bg-slate-600 animate-pulse-intense" />
           </div>
         </figure>
 
         <div className="flex flex-col justify-center gap-1">
-          <span className="w-40 h-5 block bg-gray-300 dark:bg-slate-600 rounded animate-pulse-intense" />
-          <small className="w-32 h-5 bg-gray-300 dark:bg-slate-600 rounded animate-pulse-intense" />
+          <span className="w-40 h-5 block bg-slate-300 dark:bg-slate-600 rounded animate-pulse-intense" />
+          <small className="w-32 h-5 bg-slate-300 dark:bg-slate-600 rounded animate-pulse-intense" />
         </div>
       </div>
 
       <div className="flex items-center justify-end flex-1">
-        <span className="w-9 h-6 bg-gray-300 dark:bg-slate-600 rounded animate-pulse-intense" />
+        <span className="w-9 h-6 bg-slate-300 dark:bg-slate-600 rounded animate-pulse-intense" />
       </div>
     </li>
   );

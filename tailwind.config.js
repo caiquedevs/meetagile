@@ -54,10 +54,12 @@ module.exports = {
 
       minWidth: {
         '400px': '400px',
+        '245px': '245px',
         '300px': '300px',
       },
       maxWidth: {
         '400px': '400px',
+        '245px': '245px',
         '300px': '300px',
       },
     },
