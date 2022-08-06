@@ -1,3 +1,4 @@
+import { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import * as actionsAuth from '../../../store/modules/auth/actions';
@@ -26,7 +27,9 @@ function HomePage() {
   };
 
   useEffect(() => {
-    return () => (htmlElement.style.scrollBehavior = 'none');
+    return () => {
+      htmlElement.style.scrollBehavior = 'none';
+    };
   }, []);
 
   return (
@@ -130,6 +133,3 @@ function HomePage() {
 }
 
 export default HomePage;
-function useEffect(arg0: () => () => void, arg1: never[]) {
-  throw new Error('Function not implemented.');
-}
