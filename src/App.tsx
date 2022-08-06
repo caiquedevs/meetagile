@@ -14,23 +14,6 @@ function App() {
     return () => {};
   }, [theme]);
 
-  useEffect(() => {
-    addEventListener('storage', (event) => {
-      console.log('event', event);
-      if (event.key === 'persist:meetagile') {
-        const decision = confirm(
-          'Deseja apagar? \n\nÉ possível que as alterações nas retrospectivas pendentes sejam perdidas.'
-        );
-
-        if (!decision) {
-          localStorage.setItem('persist:meetagile', event?.oldValue!);
-        }
-      }
-    });
-
-    return () => {};
-  }, []);
-
   return (
     <div className="dark:!bg-slate-900">
       <Routes />

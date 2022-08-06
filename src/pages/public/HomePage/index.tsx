@@ -25,6 +25,10 @@ function HomePage() {
     navigate('/register');
   };
 
+  useEffect(() => {
+    return () => (htmlElement.style.scrollBehavior = 'none');
+  }, []);
+
   return (
     <main className="bg-white dark:bg-slate-900">
       <section className="h-screen flex flex-col">
@@ -126,3 +130,6 @@ function HomePage() {
 }
 
 export default HomePage;
+function useEffect(arg0: () => () => void, arg1: never[]) {
+  throw new Error('Function not implemented.');
+}
