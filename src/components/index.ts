@@ -6,6 +6,7 @@ import Modal from './Modal';
 import ShowIf from './ShowIf';
 import Button from './Button';
 import CountUp from './CountUp';
+import Input from './Input';
 
 import ConfirmModal from './ConfirmModal';
 import ModalFormEmployee from './ModalFormEmployee';
@@ -22,6 +23,7 @@ export {
   Modal,
   ShowIf,
   Button,
+  Input,
   ConfirmModal,
   ModalFormEmployee,
   ModalShowEmployee,

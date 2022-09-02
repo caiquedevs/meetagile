@@ -21,6 +21,7 @@ module.exports = {
       },
       fontSize: {
         '2.5xl': '1.7rem',
+        '7.5xl': '83px',
       },
       gridTemplateColumns: {
         userList: 'repeat(auto-fit, minmax(260px, 1fr))',
@@ -53,14 +54,25 @@ module.exports = {
       },
 
       minWidth: {
-        '400px': '400px',
         '245px': '245px',
         '300px': '300px',
+        '350px': '350px',
+        '400px': '400px',
       },
       maxWidth: {
-        '400px': '400px',
         '245px': '245px',
         '300px': '300px',
+        '350px': '350px',
+        '400px': '400px',
+      },
+      spacing: {
+        3.5: '13px',
+      },
+      borderRadius: {
+        '3px': '3px',
+      },
+      borderWidth: {
+        '3.5px': '3.5px',
       },
     },
   },
