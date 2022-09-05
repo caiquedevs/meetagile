@@ -74,12 +74,8 @@ function ModalComponent(props: PageProps, ref: ForwardedRef<ModalInterface | und
 
   return (
     <Transition appear show={isOpen} as={Fragment}>
-      <Dialog
-        as="div"
-        className="fixed inset-0 z-10 overflow-y-auto"
-        onClose={handleClickBackdrop}
-      >
-        <Dialog.Overlay className="fixed inset-0 bg-black/30 dark:bg-white/20" />
+      <Dialog as="div" className="fixed inset-0 z-10 overflow-y-auto" onClose={handleClickBackdrop}>
+        <Dialog.Overlay className="fixed inset-0 bg-black/70 dark:bg-white/20" />
         <div className="min-h-screen px-4 text-center">
           <Transition.Child
             as={Fragment}

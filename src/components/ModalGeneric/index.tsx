@@ -92,7 +92,7 @@ function ModalGeneric(props: PageProps, ref: ForwardedRef<ModalInterface | undef
         <div className="flex min-h-full items-center justify-center text-center">
           <div
             onClick={handleClickBackdrop}
-            className="fixed inset-0 bg-black/30 dark:bg-white/20 transition-opacity"
+            className="fixed inset-0 bg-black/70 dark:bg-white/20 transition-opacity"
           />
 
           <div className="flex justify-center min-w-max bg-transparent my-8 bg-white">
