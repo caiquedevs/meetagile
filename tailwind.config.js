@@ -53,11 +53,16 @@ module.exports = {
         scale: 'scale 0.2s cubic-bezier(.4,0,.2,1)',
       },
 
+      width: {
+        '400px': '400px',
+        '500px': '500px',
+      },
       minWidth: {
         '245px': '245px',
         '300px': '300px',
         '350px': '350px',
         '400px': '400px',
+        '1k': '1000px',
       },
       maxWidth: {
         '245px': '245px',

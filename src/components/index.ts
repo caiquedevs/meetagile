@@ -14,6 +14,7 @@ import ModalShowEmployee from './ModalShowEmployee';
 import ModalFormHindsight from './ModalFormHindsight';
 import ModalEditStep from './ModalEditStep';
 import ModalRandomComment from './ModalRandomComment';
+import ModalGeneric from './ModalGeneric';
 
 export {
   NavigationBar,
@@ -31,4 +32,5 @@ export {
   ModalEditStep,
   ModalRandomComment,
   CountUp,
+  ModalGeneric,
 };
