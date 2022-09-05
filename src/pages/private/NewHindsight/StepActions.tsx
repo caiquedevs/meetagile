@@ -94,6 +94,7 @@ export default function StepActions({ modalRef }: StepActionsProps) {
 
     setActionName('');
     modalConfirmRef.current?.closeModalSimple();
+    toast.success('Ação removida com sucesso!');
   };
 
   const handleClickEdit = ({ row, index }: any) => {
@@ -111,6 +112,7 @@ export default function StepActions({ modalRef }: StepActionsProps) {
     dispatch(actionsDashboard.setActions(copyActions));
 
     setActionNameEdit({ value: '', index: -1 });
+    toast.success('Ação alterada com sucesso!');
   };
 
   const onCreate = () => {
@@ -122,6 +124,7 @@ export default function StepActions({ modalRef }: StepActionsProps) {
     dispatch(actionsDashboard.setActions(copyActions));
 
     setActionName('');
+    toast.success('Ação criada com sucesso!');
   };
 
   const handleSubmit = (event: any) => {

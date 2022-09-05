@@ -48,9 +48,7 @@ function HomePage() {
 
           <div className="flex items-center justify-center gap-10">
             <button type="button" onClick={handleClickRegister}>
-              <span className="font-roboto font-normal text-lg text-white">
-                Criar conta
-              </span>
+              <span className="font-roboto font-normal text-lg text-white">Criar conta</span>
             </button>
 
             <button type="button" onClick={handleClickLogin}>
@@ -73,10 +71,10 @@ function HomePage() {
       >
         <h1 className="mb-10">Sobre nós</h1>
         <p className="mb-16 font-roboto text-xl text-black/75 text-center">
-          O Meetagile nasceu para ajudar você a turbinar sua retrospectiva, com nosso
-          sistema, você tera a opção de gerenciar toda a sua retrospectiva, Desde os
-          funcionários, até cada etapa da retrospectiva. Entregando a você total controle
-          sobre a qualidade de sua Sprint, tudo atravez do nosso sistema web e aplicativo.
+          O Meetagile nasceu para ajudar você a turbinar sua retrospectiva, com essa ferramenta,
+          você tera a opção de gerenciar toda a sua retrospectiva, Desde os funcionários, até cada
+          etapa da retrospectiva. Entregando a você total controle sobre a qualidade da sua Sprint,
+          tudo através do nosso sistema web e aplicativo.
         </p>
 
         <footer className="w-full flex flex-col items-center justify-center gap-9">
@@ -88,10 +86,7 @@ function HomePage() {
       <section className="section-three" />
 
       <section className="section-four flex">
-        <div
-          id="about-app"
-          className="box-left h-screen -mt-56 flex items-center justify-end"
-        >
+        <div id="about-app" className="box-left h-screen -mt-56 flex items-center justify-end">
           <img src="images/smartphone.svg" alt="app" className="mt-20 -mr-14 z-10" />
         </div>
 
@@ -99,12 +94,11 @@ function HomePage() {
           <div className="w-96">
             <h1>Sobre nosso app</h1>
             <p className="font-roboto font-normal text-base text-white/90">
-              Nosso app está em{' '}
-              <strong className="text-teal-400">fase de desenvolvimento</strong>, mas tem
-              o proposito de permitir que todos do time consigam colher feedbacks sobre as
-              retrospectivas realizadas através do seu smartphone. No app eles poderão
-              interagir com as retrospectivas realizadas, se informando sobre o que foi
-              bom, o que foi ruim e o destaque de determinada Sprint.
+              Nosso app está em <strong className="text-teal-400">fase de desenvolvimento</strong>,
+              mas tem o proposito de permitir que todos do time consigam colher feedbacks sobre as
+              retrospectivas realizadas através do seu smartphone. No app eles poderão interagir com
+              as retrospectivas realizadas, se informando sobre o que foi bom, o que foi ruim e o
+              destaque de determinada Sprint.
             </p>
 
             <button className="btn btn-primary !w-max px-12 mt-11" disabled>
@@ -119,11 +113,9 @@ function HomePage() {
           <img src="images/thumb-section-five.png" alt="thumb" className="rounded-xl" />
         </figure>
 
-        <h1 className="font-roboto font-bold text-8xl text-white text-center">
-          UMA GLOBO SÓ!
-        </h1>
+        <h1 className="font-roboto font-bold text-8xl text-white text-center">UMA GLOBO SÓ!</h1>
         <span className="block font-roboto font-normal text-2xl text-white text-center">
-          Juntos somos grandes
+          Juntos somos grandes!
         </span>
       </section>
 
@@ -132,10 +124,10 @@ function HomePage() {
 
         <div className="text-group">
           <p className="font-roboto font-normal text-base text-white/90 text-center">
-            Somos parte do time de aquisição da Editora Globo, Oque significa que o
-            meetagile foi desenvolvido pensado nas retrospectivas de nossos times,
-            tornando ideal para todos nós! Sinta-se a vontade de propor melhorias e
-            converse com seu time para utilizar o meetagile hoje mesmo!
+            Somos parte do time de aquisição da Editora Globo, Oque significa que o meetagile foi
+            desenvolvido pensado nas retrospectivas de nossos times, tornando ideal para todos nós!
+            Sinta-se a vontade de propor melhorias e converse com seu time para utilizar o meetagile
+            hoje mesmo!
           </p>
 
           <h1 className="font-roboto font-bold text-2xl text-white text-center">
@@ -151,10 +143,9 @@ function HomePage() {
           <h1>Não perca tempo comece agora !</h1>
 
           <p className="font-roboto font-normal text-base text-black/75 text-center">
-            Comece agora a utilizar nossos serviços, o primeiro mês será gratuito para que
-            possa entender e experimentar como a logo pode trazer beneficio para seu
-            negócio. registre-se atraveś dos botões a baixo e baixe nosso app para seus
-            funcionários cadastrados por você !
+            Comece agora a utilizar nossa ferramenta, o meetagile pode trazer benefícios para seu
+            time. registre-se atraveś dos botões abaixo ou caso já possua cadastro, realize seu
+            login!
           </p>
         </div>
 

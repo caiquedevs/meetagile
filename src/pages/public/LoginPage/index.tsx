@@ -70,15 +70,13 @@ export default function LoginPage() {
           <div>
             <h1>Entrar</h1>
             <p className="mb-24 font-roboto text-xl text-white">
-              The Merge VR Googles are the most comfortable and durable virtual reality
-              headset available.
+              Agora falta pouco, realize o login ao lado para começara a realizar as suas
+              retrospectivas.
             </p>
 
             <footer className="flex gap-11">
               <button type="button" onClick={handleClickBack}>
-                <span className="font-roboto text-base uppercase text-white/70">
-                  Voltar
-                </span>
+                <span className="font-roboto text-base uppercase text-white/70">Voltar</span>
               </button>
 
               <button type="button" onClick={handleClickRegister}>
@@ -96,8 +94,8 @@ export default function LoginPage() {
           </h1>
 
           <span className="mb-7 font-roboto font-normal text-lg text-black/50 leading-6">
-            The Merge VR Googles are the most comfortable and durable virtual reality
-            headset available. Sculpted of marshmallow
+            Para realizar o login, preencha os campos abaixo com as informações que você utilizou na
+            hora de realizar o cadastro.
           </span>
 
           <form onSubmit={handleSubmit} className="w-full">

@@ -56,15 +56,13 @@ export default function RegisterPage() {
           <div>
             <h1>CRIAR CONTA</h1>
             <p className="mb-24 font-roboto text-xl text-white">
-              The Merge VR Googles are the most comfortable and durable virtual reality
-              headset available.
+              Enfim, agora você pode dar seu primeiro passo em direção as suas retrospectivas
+              gerenciadas.
             </p>
 
             <footer className="flex gap-11">
               <button type="button" onClick={handleClickBack}>
-                <span className="font-roboto text-base uppercase text-white/70">
-                  Voltar
-                </span>
+                <span className="font-roboto text-base uppercase text-white/70">Voltar</span>
               </button>
 
               <button type="button" onClick={handleClickLogin}>
@@ -82,8 +80,8 @@ export default function RegisterPage() {
           </h1>
 
           <span className="mb-7 font-roboto font-normal text-lg text-black/50 leading-6">
-            The Merge VR Googles are the most comfortable and durable virtual reality
-            headset available. Sculpted of marshmallow
+            Para dar seu primeiro passo, basta se cadastrar preenchendo os campos abaixo relativos a
+            sua equipe.
           </span>
 
           <form onSubmit={handleSubmit} className="w-full">

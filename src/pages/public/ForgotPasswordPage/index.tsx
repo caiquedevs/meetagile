@@ -53,21 +53,17 @@ function HomePage() {
           </strong>
 
           <p>
-            Enviamos um email com instruções de como redefinir sua senha para
+            Enviamos um email com a sua senha mais recente para
             <strong className="text-teal-500"> {email}.</strong>
-            Se você não encontrar o email na sua caixa de entrada, verifique a lixeira ou
-            a pasta de spam.
+            Se você não encontrar o email na sua caixa de entrada, verifique a lixeira ou a pasta de
+            spam.
             <br />
             <br />
-            Se você não tem mais acesso a esse endereço de email, entre em contato
-            conosco.
+            Se você não tem mais acesso a esse endereço de email, entre em contato conosco.
           </p>
 
           <div className="w-full flex flex-col items-center gap-3">
-            <button
-              className="w-full btn btn-primary text-white"
-              onClick={handleClickBack}
-            >
+            <button className="w-full btn btn-primary text-white" onClick={handleClickBack}>
               Voltar
             </button>
           </div>
