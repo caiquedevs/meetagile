@@ -10,7 +10,7 @@
 
 /* Cor do scroll*/
 ::-webkit-scrollbar-thumb {
-  background: red;
+  background: transparent;
 }
 
 /* Fundo do scroll*/
