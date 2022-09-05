@@ -1,8 +1,9 @@
 import { ChangeEvent, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
-import { Button } from '../../../components';
+import { Button, Input } from '../../../components';
 import { useRequest } from '../../../hooks/useRequest';
+import { MdEmail } from 'react-icons/md';
 import { Container } from './styles';
 
 function HomePage() {
@@ -44,16 +45,16 @@ function HomePage() {
   };
 
   const FeedBackSendEmail = () => (
-    <form className="h-screen flex flex-col items-center justify-center bg-gray-100 dark:bg-slate-900">
-      <div className="card w-full max-w-lg shadow-sm rounded-lg bg-white dark:bg-slate-800">
+    <form className="h-screen flex flex-col items-center justify-center bg-gray-100 ">
+      <div className="card w-full max-w-lg shadow-sm rounded-lg bg-white ">
         <div className="flex flex-col px-8 md:px-16 py-14 gap-7">
-          <strong className="font-roboto font-bold text-2xl text-gray-600 text-left dark:text-white">
+          <strong className="font-roboto font-bold text-2xl text-gray-600 text-left ">
             Email enviado
           </strong>
 
-          <p className="dark:text-white/80">
+          <p>
             Enviamos um email com instruções de como redefinir sua senha para
-            <strong className="text-black dark:text-teal-400"> {email}.</strong>
+            <strong className="text-teal-500"> {email}.</strong>
             Se você não encontrar o email na sua caixa de entrada, verifique a lixeira ou
             a pasta de spam.
             <br />
@@ -81,32 +82,26 @@ function HomePage() {
     <Container>
       <form
         onSubmit={handleSubmit}
-        className="h-screen flex flex-col items-center justify-center bg-gray-100 dark:bg-slate-900"
+        className="h-screen flex flex-col items-center justify-center bg-gray-100"
       >
-        <div className="card w-full max-w-lg shadow-sm rounded-lg bg-white dark:bg-slate-800">
+        <div className="card w-full max-w-lg shadow-sm rounded-lg bg-white ">
           <div className="flex flex-col px-8 md:px-16 py-14 gap-7">
-            <div className="flex justify-center h-20">
-              <img src="/images/logo.svg" alt="logo" className="h-14 dark:hidden" />
-              <img
-                src="/images/logo-white.svg"
-                alt="logo"
-                className="h-12 hidden dark:flex"
-              />
-            </div>
-
-            <strong className="font-roboto font-bold text-2xl text-gray-600 text-center dark:text-white">
-              Informe o email vinculado a sua conta
+            <strong className="font-roboto font-bold text-2xl text-gray-600 text-left">
+              Esqueci minha senha
             </strong>
 
+            <p>Enviaremos um email com a senha mais recente para seu email.</p>
+
             <div className="w-full flex flex-col gap-2.5">
-              <input
+              <Input
                 type="email"
-                name="email"
                 required={true}
-                placeholder="Email para recuperação"
+                name="email"
                 value={email}
                 onChange={handleChangeField}
-                className="input input-primary dark:!bg-slate-900"
+                placeholder="Email para recuperação"
+                icon={MdEmail}
+                className="w-full"
               />
             </div>
 
@@ -119,7 +114,10 @@ function HomePage() {
                 Enviar
               </Button>
 
-              <button className="w-full btn btn-outline" onClick={handleClickBack}>
+              <button
+                className="w-full btn btn-outline !border-teal-500 !text-teal-500"
+                onClick={handleClickBack}
+              >
                 Voltar
               </button>
             </div>

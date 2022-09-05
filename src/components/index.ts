@@ -6,6 +6,7 @@ import Modal from './Modal';
 import ShowIf from './ShowIf';
 import Button from './Button';
 import CountUp from './CountUp';
+import Input from './Input';
 
 import ConfirmModal from './ConfirmModal';
 import ModalFormEmployee from './ModalFormEmployee';
@@ -13,6 +14,7 @@ import ModalShowEmployee from './ModalShowEmployee';
 import ModalFormHindsight from './ModalFormHindsight';
 import ModalEditStep from './ModalEditStep';
 import ModalRandomComment from './ModalRandomComment';
+import ModalGeneric from './ModalGeneric';
 
 export {
   NavigationBar,
@@ -22,6 +24,7 @@ export {
   Modal,
   ShowIf,
   Button,
+  Input,
   ConfirmModal,
   ModalFormEmployee,
   ModalShowEmployee,
@@ -29,4 +32,5 @@ export {
   ModalEditStep,
   ModalRandomComment,
   CountUp,
+  ModalGeneric,
 };

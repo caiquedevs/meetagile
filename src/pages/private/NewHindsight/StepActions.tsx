@@ -1,10 +1,9 @@
 import { ChangeEvent, MutableRefObject, useEffect, useRef, useState } from 'react';
-import { IoMdClose } from 'react-icons/io';
+import { CgClose } from 'react-icons/cg';
 import { MdDeleteForever, MdModeEdit } from 'react-icons/md';
 import { useDispatch, useSelector } from 'react-redux';
 import { useLocation } from 'react-router-dom';
-import { ConfirmModal, Options, ShowIf } from '../../../components';
-import Modal, { ModalInterface } from '../../../components/Modal';
+import { ConfirmModal, ModalGeneric, Options, ShowIf } from '../../../components';
 import { INavigationStepProps } from '../../../interfaces/navigationStep';
 import { IAction } from '../../../interfaces/action';
 
@@ -14,6 +13,8 @@ import * as actionsDashboard from '../../../store/modules/dashboard/actions';
 
 import { useRequest } from '../../../hooks/useRequest';
 import { toast } from 'react-toastify';
+import { ModalInterface } from '../../../components/ModalGeneric';
+import { Modal } from '../../../components';
 
 type StepActionsProps = {
   modalRef: MutableRefObject<ModalInterface | undefined>;
@@ -67,9 +68,7 @@ export default function StepActions({ modalRef }: StepActionsProps) {
     }).catch(onError);
 
     function onError(error: any) {
-      toast.error(
-        'Houve um erro ao salvar as ações, por favor, contate um administrador'
-      );
+      toast.error('Houve um erro ao salvar as ações, por favor, contate um administrador');
     }
   };
 
@@ -157,12 +156,14 @@ export default function StepActions({ modalRef }: StepActionsProps) {
   }, [actions, currentActions]);
 
   return (
-    <Modal
+    <ModalGeneric
       ref={modalRef}
       preventNavigate={true}
       callbackBackDrop={handleClickCloseModal}
-      modalChildren={
-        <>
+      blockScroll={true}
+    >
+      {() => (
+        <div className="min-w-1k bg-white inline-block max-w-screen-lg px-10 py-12 pb-16  text-left align-middle transition-all transform dark:!bg-gray-900 rounded-xl">
           <EditModal
             modalRef={modalEditRef}
             onConfirm={handleSubmitEdit}
@@ -170,158 +171,139 @@ export default function StepActions({ modalRef }: StepActionsProps) {
             handleChangeFieldEdit={handleChangeFieldEdit}
           />
 
-          <ConfirmModal
-            loadingConfirm={false}
-            onConfirm={onDelete}
-            modalRef={modalConfirmRef}
-          />
-        </>
-      }
-    >
-      {() => {
-        return (
-          <div className="inline-block w-full my-8 max-w-screen-lg px-10 py-12 pb-16  text-left align-middle transition-all transform bg-white dark:!bg-gray-900 rounded">
-            <button
-              type="button"
-              onClick={handleClickCloseModal}
-              className="
-              w-8 h-8 p-0
-              flex items-center justify-center 
-              absolute -top-3 -right-3 z-10
-              bg-gray-600 dark:bg-white rounded-full text-white dark:text-black text-lg
-            "
-            >
-              <IoMdClose />
-            </button>
+          <ConfirmModal loadingConfirm={false} onConfirm={onDelete} modalRef={modalConfirmRef} />
 
-            <div className="w-full flex h-full flex-col justify-between">
-              <h3 className="text-lg font-medium leading-6 text-gray-900 dark:text-white">
-                {navigationProps?.mode === 'view'
-                  ? 'Visualizar ações do time - ' + currentHindsight.user_id?.teamName
-                  : 'Gerenciar ações do time'}
-              </h3>
+          <button
+            type="button"
+            onClick={handleClickCloseModal}
+            className="w-8 h-8 p-0 flex items-center justify-center absolute top-2 right-2 z-10 text-black dark:text-white text-2xl"
+          >
+            <CgClose />
+          </button>
 
-              <div className="mt-2">
-                <p className="text-sm text-gray-500 dark:text-white/80">
-                  {navigationProps?.mode === 'view' ? (
-                    <span className="mb-5">
-                      Navegue para baixo para visualizar as ações do time
-                    </span>
-                  ) : (
-                    'Preencha os campos abaixo para cadastrar uma nova ação'
-                  )}
-                </p>
-              </div>
-              <div className="w-full flex-1 flex flex-col gap-5">
-                {navigationProps.mode !== 'view' ? (
-                  <form onSubmit={handleSubmit} className="mt-4">
-                    <div className="flex w-full">
-                      <input
-                        type="text"
-                        name="hindsightName"
-                        value={actionName}
-                        required={true}
-                        placeholder="Nome da ação"
-                        onChange={handleChangeField}
-                        className="input input-primary !rounded-r-none"
-                      />
+          <div className="w-full flex h-full flex-col justify-between">
+            <h3 className="text-lg font-medium leading-6 text-gray-900 dark:text-white">
+              {navigationProps?.mode === 'view'
+                ? 'Visualizar ações do time - ' + currentHindsight.user_id?.teamName
+                : 'Gerenciar ações do time'}
+            </h3>
 
-                      <button
-                        type="submit"
-                        className="btn btn-primary !rounded-l-none flex items-center !w-max px-5 !bg-orange-400"
+            <div className="mt-2">
+              <p className="text-sm text-gray-500 dark:text-white/80">
+                {navigationProps?.mode === 'view' ? (
+                  <span className="mb-5">Navegue para baixo para visualizar as ações do time</span>
+                ) : (
+                  'Preencha os campos abaixo para cadastrar uma nova ação'
+                )}
+              </p>
+            </div>
+
+            <div className="w-full flex-1 flex flex-col gap-5">
+              {navigationProps.mode !== 'view' ? (
+                <form onSubmit={handleSubmit} className="mt-4">
+                  <div className="flex w-full">
+                    <input
+                      type="text"
+                      name="hindsightName"
+                      value={actionName}
+                      required={true}
+                      placeholder="Nome da ação"
+                      onChange={handleChangeField}
+                      className="input input-primary !rounded-r-none"
+                    />
+
+                    <button
+                      type="submit"
+                      className="btn btn-primary !rounded-l-none flex items-center !w-max px-5 !bg-orange-400"
+                    >
+                      Cadastrar
+                    </button>
+                  </div>
+                </form>
+              ) : null}
+
+              <table style={{ borderSpacing: '0px 8px', borderCollapse: 'separate' }}>
+                <ShowIf condition={finallyActions?.data?.length}>
+                  <thead className="text-left">
+                    <tr>
+                      <th className="font-roboto font-medium text-gray-800 dark:text-white">
+                        Descrição
+                      </th>
+                      <th className="font-roboto font-medium text-gray-800 dark:text-white">
+                        Status
+                      </th>
+                    </tr>
+                  </thead>
+                </ShowIf>
+
+                <tbody>
+                  <ShowIf condition={!finallyActions?.data?.length}>
+                    <tr className="bg-white text-gray-800 dark:bg-slate-800">
+                      <td
+                        colSpan={3}
+                        className="px-5 py-4 rounded-l-md border border-r-0 border-gray-default dark:border-transparent break-words"
                       >
-                        Cadastrar
-                      </button>
-                    </div>
-                  </form>
-                ) : null}
-
-                <table style={{ borderSpacing: '0px 8px', borderCollapse: 'separate' }}>
-                  <ShowIf condition={finallyActions?.data?.length}>
-                    <thead className="text-left">
-                      <tr>
-                        <th className="font-roboto font-medium text-gray-800 dark:text-white">
-                          Nome
-                        </th>
-                        <th className="font-roboto font-medium text-gray-800 dark:text-white">
-                          Opnião
-                        </th>
-                      </tr>
-                    </thead>
+                        <div className="flex items-center justify-center text-gray-500 dark:text-white/80">
+                          Nenhum conteudo a mostrar por enquanto!
+                        </div>
+                      </td>
+                    </tr>
                   </ShowIf>
 
-                  <tbody>
-                    <ShowIf condition={!finallyActions?.data?.length}>
-                      <tr className="bg-white text-gray-800 dark:bg-slate-800">
-                        <td
-                          colSpan={3}
-                          className="px-5 py-4 rounded-l-md border border-r-0 border-gray-default dark:border-transparent break-words"
-                        >
-                          <div className="flex items-center justify-center text-gray-500 dark:text-white/80">
-                            Nenhum conteudo a mostrar por enquanto!
+                  {finallyActions?.data?.map((row, index) => {
+                    const onChangeSelect = (event: any) => {
+                      const payload = { value: event.target.value, index };
+                      handleChangeSelect(payload);
+                    };
+
+                    return (
+                      <tr
+                        key={index}
+                        className="tr-actions bg-white shadow-card dark:bg-slate-800 hover:bg-slate-300 transition-all duration-100 ease-in-out"
+                      >
+                        <td className="px-5 py-4 rounded-l-md border border-r-0 border-gray-default dark:border-transparent break-words">
+                          <span className="text-left dark:text-white">{row?.name!}</span>
+                        </td>
+
+                        <td className="border-y border-gray-default dark:border-transparent break-words">
+                          <select
+                            onChange={onChangeSelect}
+                            value={row?.status!}
+                            style={{ minWidth: 150 }}
+                            disabled={navigationProps.mode === 'view'}
+                            className={`w-full px-2 min-h-8 h-8 cursor-pointer font-semibold rounded disabled:!cursor-auto ${
+                              colorsSelect[row?.status!]
+                            }`}
+                          >
+                            <option className="bg-white text-gray-800 font-normal">TO DO</option>
+                            <option className="bg-white text-gray-800 font-normal">
+                              IN PROGRESS
+                            </option>
+                            <option className="bg-white text-gray-800 font-normal">DONE</option>
+                          </select>
+                        </td>
+
+                        <td className="px-5 py-4 rounded-r-md border border-l-0 border-gray-default dark:border-transparent break-words">
+                          <div className="w-full flex items-center justify-end">
+                            {navigationProps.mode !== 'view' ? (
+                              <Options
+                                list={optionsListTable}
+                                currentItem={{ row, index }}
+                                iconSize="18px"
+                              />
+                            ) : null}
                           </div>
                         </td>
                       </tr>
-                    </ShowIf>
-
-                    {finallyActions?.data?.map((row, index) => {
-                      const onChangeSelect = (event: any) => {
-                        const payload = { value: event.target.value, index };
-                        handleChangeSelect(payload);
-                      };
-
-                      return (
-                        <tr key={index} className="tr-actions dark:bg-slate-800">
-                          <td className="px-5 py-4 rounded-l-md border border-r-0 border-gray-default dark:border-transparent break-words">
-                            <span className="text-left dark:text-white">
-                              {row?.name!}
-                            </span>
-                          </td>
-
-                          <td className="border-y border-gray-default dark:border-transparent break-words">
-                            <select
-                              onChange={onChangeSelect}
-                              value={row?.status!}
-                              style={{ minWidth: 150 }}
-                              disabled={navigationProps.mode === 'view'}
-                              className={`w-full px-2 min-h-8 h-8 cursor-pointer font-semibold rounded disabled:!cursor-auto ${
-                                colorsSelect[row?.status!]
-                              }`}
-                            >
-                              <option className="bg-white text-gray-800 font-normal">
-                                TO DO
-                              </option>
-                              <option className="bg-white text-gray-800 font-normal">
-                                IN PROGRESS
-                              </option>
-                              <option className="bg-white text-gray-800 font-normal">
-                                DONE
-                              </option>
-                            </select>
-                          </td>
-
-                          <td className="px-5 py-4 rounded-r-md border border-l-0 border-gray-default dark:border-transparent break-words">
-                            <div className="w-full flex items-center justify-end">
-                              {navigationProps.mode !== 'view' ? (
-                                <Options
-                                  list={optionsListTable}
-                                  currentItem={{ row, index }}
-                                  iconSize="18px"
-                                />
-                              ) : null}
-                            </div>
-                          </td>
-                        </tr>
-                      );
-                    })}
-                  </tbody>
-                </table>
-              </div>
+                    );
+                  })}
+                </tbody>
+              </table>
             </div>
           </div>
-        );
-      }}
-    </Modal>
+        </div>
+      )}
+    </ModalGeneric>
   );
 }
 
@@ -333,12 +315,10 @@ function EditModal({ modalRef, onConfirm, actionNameEdit, handleChangeFieldEdit 
   return (
     <Modal ref={modalRef} preventNavigate={true}>
       {() => (
-        <div className="inline-block w-full max-w-md px-10 py-12 my-8 overflow-hidden text-left align-middle transition-all transform bg-white shadow-xl rounded-lg">
+        <div className="inline-block w-500px max-w-md px-10 py-12 my-8 overflow-hidden text-left align-middle transition-all transform bg-red-500 dark:bg-slate-900 shadow-xl rounded-lg">
           <form onSubmit={onConfirm} className="flex flex-col">
             <label className="label">
-              <span className="label-text text-gray-700 dark:text-gray-700">
-                Editar ação
-              </span>
+              <span className="mb-3 text-gray-700 dark:text-white">Editar ação</span>
             </label>
 
             <input
@@ -360,7 +340,7 @@ function EditModal({ modalRef, onConfirm, actionNameEdit, handleChangeFieldEdit 
 
             <div className="w-full mt-2 flex flex-col gap-3.5">
               <button type="button" onClick={onCloseModal} className="btn btn-outline">
-                Voltar
+                Fechar
               </button>
             </div>
           </form>
