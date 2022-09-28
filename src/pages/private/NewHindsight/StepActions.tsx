@@ -318,7 +318,7 @@ function EditModal({ modalRef, onConfirm, actionNameEdit, handleChangeFieldEdit 
   return (
     <Modal ref={modalRef} preventNavigate={true}>
       {() => (
-        <div className="inline-block w-500px max-w-md px-10 py-12 my-8 overflow-hidden text-left align-middle transition-all transform bg-red-500 dark:bg-slate-900 shadow-xl rounded-lg">
+        <div className="inline-block w-500px max-w-md px-10 py-12 my-8 overflow-hidden text-left align-middle transition-all transform bg-white dark:bg-slate-900 shadow-xl rounded-lg">
           <form onSubmit={onConfirm} className="flex flex-col">
             <label className="label">
               <span className="mb-3 text-gray-700 dark:text-white">Editar ação</span>
