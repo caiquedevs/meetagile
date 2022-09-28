@@ -1,6 +1,8 @@
-import { useEffect } from 'react';
+import { useEffect, useRef, useState } from 'react';
+import { AiOutlineArrowUp } from 'react-icons/ai';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
+import { ShowIf } from '../../../components';
 import * as actionsAuth from '../../../store/modules/auth/actions';
 import './styles.css';
 
@@ -9,6 +11,16 @@ function HomePage() {
   const dispatch = useDispatch();
 
   const { isLoggedIn } = useSelector((state: any) => state.authReducer);
+  const [toogleButtonScroll, setToogleButtonScroll] = useState(document.documentElement.scrollTop);
+  const mainRef = useRef<any>(null);
+
+  const handleChangeScroll = (event: any) => {
+    setToogleButtonScroll(event.currentTarget.scrollTop);
+  };
+
+  const handleClickScrollTop = () => {
+    mainRef?.current?.scrollTo(0, 0);
+  };
 
   const handleClickLogin = () => {
     if (isLoggedIn) return navigate('/dashboard');
@@ -25,7 +37,11 @@ function HomePage() {
   };
 
   return (
-    <main className="h-screen bg-white dark:bg-slate-900 overflow-auto scroll-smooth">
+    <main
+      className="h-screen bg-white dark:bg-slate-900 overflow-auto scroll-smooth"
+      onScroll={handleChangeScroll}
+      ref={mainRef}
+    >
       <section className="section-one h-screen pt-11 flex flex-col items-center justify-between">
         <header className="w-full h-auto px-20 flex items-center justify-between">
           <figure className="w-44 h-px">
@@ -166,6 +182,15 @@ function HomePage() {
           </button>
         </div>
       </section>
+
+      <ShowIf condition={toogleButtonScroll > window.innerHeight}>
+        <button
+          className="p-3 bg-teal-500 rounded fixed bottom-5 right-5 z-50"
+          onClick={handleClickScrollTop}
+        >
+          <AiOutlineArrowUp className="text-xl text-white" />
+        </button>
+      </ShowIf>
     </main>
   );
 }
